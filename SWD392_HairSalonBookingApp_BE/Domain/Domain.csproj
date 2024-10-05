@@ -7,8 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Contracts\Abstracts\" />
-    <Folder Include="Contracts\DTO\" />
     <Folder Include="Enums\" />
   </ItemGroup>
 

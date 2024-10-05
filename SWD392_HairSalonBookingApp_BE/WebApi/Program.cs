@@ -1,6 +1,7 @@
 using Infrastructures;
 using WebAPI;
 using Application.Commons;
+using Domain.Contracts.Settings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +10,16 @@ var configuration = builder.Configuration.Get<AppConfiguration>();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddCors(opt =>
+{
+    opt.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("http://localhost:5173", "http://localhost:5174")
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
 
 /*
     register with singleton life time
@@ -27,6 +38,7 @@ if (app.Environment.IsDevelopment())
 
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();
+app.UseCors();
 // todo authentication
 app.UseAuthorization();
 
