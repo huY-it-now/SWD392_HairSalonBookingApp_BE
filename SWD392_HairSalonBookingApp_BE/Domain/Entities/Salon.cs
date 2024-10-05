@@ -1,0 +1,14 @@
+﻿namespace Domain.Entities
+{
+    public class Salon : BaseEntity
+    {
+        public string Address { get; set; }
+
+        #region RelationShip
+        public ICollection<Category> Categories { get; set; }
+        public ICollection<SalonMember> SalonMembers { get; set; }
+        public ICollection<User> Users { get; set; }
+        public ICollection<Booking> Bookings { get; set; }
+        #endregion
+    }
+}

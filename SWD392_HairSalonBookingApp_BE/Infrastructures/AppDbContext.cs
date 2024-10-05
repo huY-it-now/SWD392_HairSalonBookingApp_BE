@@ -1,0 +1,106 @@
+﻿using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructures
+{
+    public class AppDbContext : DbContext
+    {
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+        {
+        }
+
+        #region DbSet
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+        public DbSet<Category> Categories { get; set; }
+        public DbSet<ComboDetail> ComboDetails { get; set; }
+        public DbSet<ComboService> ComboServices { get; set; }
+        public DbSet<Salon> Salons { get; set; }
+        public DbSet<SalonMember> SalonMembers { get; set; }
+        public DbSet<Service> Services { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
+        #endregion
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Role>().HasData(
+                new Role { Id = 1, RoleDetail = "Admin" },
+                new Role { Id = 2, RoleDetail = "Customer" },
+                new Role { Id = 3, RoleDetail = "Salon Manager" },
+                new Role { Id = 4, RoleDetail = "Salon Staff" },
+                new Role { Id = 5, RoleDetail = "Stylist" }
+            );
+
+            modelBuilder.Entity<ComboDetail>()
+                .HasOne(c => c.ComboService)
+                .WithMany(c => c.ComboDetails)
+                .HasForeignKey(c => c.ComboServiceId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_ComboService_ComboDetails");
+
+            modelBuilder.Entity<ComboService>()
+                .HasOne(c => c.Service)
+                .WithMany(c => c.ComboServices)
+                .HasForeignKey(s => s.ServiceId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Service_ComboService");
+
+            modelBuilder.Entity<Service>()
+                .HasOne(c => c.Category)
+                .WithMany(c => c.Services)
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Category_Service");
+
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.Salon)
+                .WithMany(c => c.Categories)
+                .HasForeignKey(s => s.SalonId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Salon_Category");
+
+            modelBuilder.Entity<SalonMember>()
+                .HasOne(c => c.Salon)
+                .WithMany(c => c.SalonMembers)
+                .HasForeignKey(s => s.SalonId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_SalonMember_Salon");
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Salon)
+                .WithMany(s => s.Users)
+                .HasForeignKey(u => u.SalonId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_User_Salon");
+
+            modelBuilder.Entity<User>()
+                .HasOne(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_User_Role");
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.User)
+                .WithMany(u => u.Bookings)
+                .HasForeignKey(b => b.UserId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Booking_User");
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Salon)
+                .WithMany(s => s.Bookings)
+                .HasForeignKey(b => b.SalonId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Booking_Salon");
+
+            modelBuilder.Entity<SalonMember>()
+                .HasOne(sm => sm.User)
+                .WithOne(u => u.SalonMember)
+                .HasForeignKey<SalonMember>(sm => sm.UserId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_SalonMember_User");
+        }
+
+    }
+}
