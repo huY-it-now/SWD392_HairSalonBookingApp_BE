@@ -1,5 +1,7 @@
-﻿using Domain.Entities;
+﻿using Azure;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 
 namespace Infrastructures
 {
@@ -39,11 +41,10 @@ namespace Infrastructures
                 .HasConstraintName("FK_ComboService_ComboDetails");
 
             modelBuilder.Entity<ComboService>()
-                .HasOne(c => c.Service)
+                .HasMany(c => c.Service)
                 .WithMany(c => c.ComboServices)
-                .HasForeignKey(s => s.ServiceId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_Service_ComboService");
+                .UsingEntity("ComboService_Service",
+                    l => l.HasOne(typeof(Service)).WithMany().HasForeignKey("ServiceId").HasPrincipalKey(nameof(Service.Id)), r => r.HasOne(typeof(ComboService)).WithMany().HasForeignKey("ComboServiceId").HasPrincipalKey(nameof(ComboService.Id)), j => j.HasKey("ServiceId", "ComboServiceId"));
 
             modelBuilder.Entity<Service>()
                 .HasOne(c => c.Category)
@@ -67,11 +68,11 @@ namespace Infrastructures
                 .HasConstraintName("FK_SalonMember_Salon");
 
             modelBuilder.Entity<User>()
-                .HasOne(u => u.Salon)
-                .WithMany(s => s.Users)
-                .HasForeignKey(u => u.SalonId)
+                .HasOne(u => u.SalonMember)
+                .WithOne(sm => sm.User)
+                .HasForeignKey<SalonMember>(sm => sm.Id)
                 .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_User_Salon");
+                .HasConstraintName("FK_User_SalonMember");
 
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
@@ -81,18 +82,17 @@ namespace Infrastructures
                 .HasConstraintName("FK_User_Role");
 
             modelBuilder.Entity<Booking>()
-                .HasOne(b => b.User)
-                .WithMany(u => u.Bookings)
-                .HasForeignKey(b => b.UserId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_Booking_User");
+                .HasMany(b => b.SalonMembers)
+                .WithMany(sm => sm.Bookings)
+                .UsingEntity("Booking_SalonMembers",
+                    l => l.HasOne(typeof(SalonMember)).WithMany().HasForeignKey("SalonMemberId").HasPrincipalKey(nameof(SalonMember.Id)), r => r.HasOne(typeof(Booking)).WithMany().HasForeignKey("SalonMemberId").HasPrincipalKey(nameof(Booking.Id)), j => j.HasKey("SalonMemberId", "BookingId"));
 
             modelBuilder.Entity<Booking>()
-                .HasOne(b => b.Salon)
-                .WithMany(s => s.Bookings)
-                .HasForeignKey(b => b.SalonId)
+                .HasMany(b => b.BookingDetails)
+                .WithOne(bt => bt.Booking)
+                .HasForeignKey(b => b.BookingId)
                 .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_Booking_Salon");
+                .HasConstraintName("FK_Booking_BookingDetails");
 
             modelBuilder.Entity<SalonMember>()
                 .HasOne(sm => sm.User)
