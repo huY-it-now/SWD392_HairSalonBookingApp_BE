@@ -13,6 +13,8 @@ namespace Infrastructures.Mappers
         {
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap<RegisterUserRequest, RegisterUserDTO>();
+            CreateMap<LoginUserRequest, LoginUserDTO>();
+            CreateMap<VerifyTokenRequest, VerifyTokenDTO>();
             CreateMap<User, UserDTO>();
         }
     }

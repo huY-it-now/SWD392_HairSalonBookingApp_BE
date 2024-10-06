@@ -23,5 +23,15 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Users.ToListAsync();
         }
+
+        public async Task<User> GetUserByEmail(string email)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(e => e.Email.ToLower() == email.ToLower());
+        }
+
+        public async Task<User> Verify(string token)
+        {
+            return await _dbContext.Users.FirstOrDefaultAsync(t => t.VerificationToken == token);
+        }
     }
 }
