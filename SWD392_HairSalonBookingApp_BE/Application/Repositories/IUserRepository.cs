@@ -7,5 +7,7 @@ namespace Application.Repositories
     {
         Task<List<User>> GetAllUserAsync();
         Task<bool> CheckEmailExist(string email);
+        Task<User> GetUserByEmail(string email);
+        Task<User> Verify(string token);
     }
 }

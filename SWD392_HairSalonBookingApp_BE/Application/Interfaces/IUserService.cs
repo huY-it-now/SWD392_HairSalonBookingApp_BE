@@ -9,5 +9,7 @@ namespace Application.Interfaces
     {
         Task<Result<object>> GetAllUser();
         Task<Result<object>> Register(RegisterUserDTO request);
+        Task<Result<object>> Login(LoginUserDTO request);
+        Task<Result<object>> Verify(VerifyTokenDTO request);
     }
 }
