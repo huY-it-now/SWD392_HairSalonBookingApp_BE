@@ -19,7 +19,6 @@ namespace Infrastructures
         public DbSet<SalonMember> SalonMembers { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Booking> Bookings { get; set; }
-        public DbSet<SalonWithMembers> SalonWithMembers { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -95,8 +94,11 @@ namespace Infrastructures
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_SalonMember_User");
 
-            modelBuilder.Entity<SalonWithMembers>()
-                .HasKey(r => new {r.SalonId, r.SalonMemberId});
+            modelBuilder.Entity<Salon>()
+                .HasMany(s => s.SalonMembers)
+                .WithOne(s => s.Salon)
+                .HasForeignKey(s => s.SalonId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
     }
