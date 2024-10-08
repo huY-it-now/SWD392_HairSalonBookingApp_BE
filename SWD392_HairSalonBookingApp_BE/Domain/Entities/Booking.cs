@@ -10,6 +10,8 @@
         public User User { get; set; }
         public Guid SalonId { get; set; }
         public Salon Salon { get; set; }
+        public Category Category { get; set; }
+        public Guid CategoryId { get; set; }
         #endregion
     }
 }

@@ -8,8 +8,7 @@
 
         #region RelationShip
         public User User { get; set; }
-        public Guid SalonId { get; set; }
-        public Salon Salon { get; set; }
+        public ICollection<SalonWithMembers> SalonWithMembers { get; set; }
         #endregion
     }
 }

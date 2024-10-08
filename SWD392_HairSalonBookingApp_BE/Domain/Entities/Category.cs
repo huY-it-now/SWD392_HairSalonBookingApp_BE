@@ -9,6 +9,7 @@
         public Salon Salon { get; set; }
 
         public ICollection<Service> Services { get; set; }
+        public ICollection<Booking> Bookings { get; set; }
         #endregion
     }
 }

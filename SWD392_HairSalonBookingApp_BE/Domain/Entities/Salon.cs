@@ -6,8 +6,7 @@
 
         #region RelationShip
         public ICollection<Category> Categories { get; set; }
-        public ICollection<SalonMember> SalonMembers { get; set; }
-        public ICollection<User> Users { get; set; }
+        public ICollection<SalonWithMembers> SalonWithMembers { get; set; }
         public ICollection<Booking> Bookings { get; set; }
         #endregion
     }
