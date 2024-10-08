@@ -19,6 +19,7 @@ namespace Infrastructures
         public DbSet<SalonMember> SalonMembers { get; set; }
         public DbSet<Service> Services { get; set; }
         public DbSet<Booking> Bookings { get; set; }
+        public DbSet<SalonWithMembers> SalonWithMembers { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -59,20 +60,6 @@ namespace Infrastructures
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_Salon_Category");
 
-            modelBuilder.Entity<SalonMember>()
-                .HasOne(c => c.Salon)
-                .WithMany(c => c.SalonMembers)
-                .HasForeignKey(s => s.SalonId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_SalonMember_Salon");
-
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Salon)
-                .WithMany(s => s.Users)
-                .HasForeignKey(u => u.SalonId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_User_Salon");
-
             modelBuilder.Entity<User>()
                 .HasOne(u => u.Role)
                 .WithMany(r => r.Users)
@@ -94,12 +81,22 @@ namespace Infrastructures
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_Booking_Salon");
 
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Category)
+                .WithMany(s => s.Bookings)
+                .HasForeignKey(b => b.CategoryId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Booking_Category");
+
             modelBuilder.Entity<SalonMember>()
                 .HasOne(sm => sm.User)
                 .WithOne(u => u.SalonMember)
                 .HasForeignKey<SalonMember>(sm => sm.UserId)
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_SalonMember_User");
+
+            modelBuilder.Entity<SalonWithMembers>()
+                .HasKey(r => new {r.SalonId, r.SalonMemberId});
         }
 
     }

@@ -99,5 +99,15 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetUserById(Guid id)
+        {
+            var result = await _userService.GetUserById(id);
+
+            return Ok(result);
+        }
     }
 }

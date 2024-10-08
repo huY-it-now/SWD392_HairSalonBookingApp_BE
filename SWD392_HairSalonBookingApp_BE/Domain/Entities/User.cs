@@ -12,7 +12,6 @@
 
         #region RelationShip
         public Guid? SalonId { get; set; }
-        public Salon? Salon { get; set; }
         public int RoleId { get; set; }  // Foreign key property
         public Role Role { get; set; }
         public Guid? SalonMemberId { get; set; }
