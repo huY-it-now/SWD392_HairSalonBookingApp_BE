@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using FluentValidation.AspNetCore;
 using System.Diagnostics;
+using WebApi.Services;
 using WebAPI.Services;
 
 namespace WebAPI
@@ -15,6 +16,7 @@ namespace WebAPI
             services.AddHealthChecks();
             services.AddSingleton<Stopwatch>();
             services.AddScoped<IClaimsService, ClaimsService>();
+            services.AddScoped<IPaymentService, PaymentService>();
             services.AddHttpContextAccessor();
             services.AddFluentValidationAutoValidation();
             services.AddFluentValidationClientsideAdapters();
