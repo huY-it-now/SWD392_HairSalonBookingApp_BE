@@ -2,11 +2,12 @@
 {
     public class Service : BaseEntity
     {
-        public string ServiceService { get; set; }
-
+        public string ServiceName { get; set; }
+        public decimal Money { get; set; }
         #region Relationship
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
+        public ICollection<BookingDetails> BookingDetails { get; set; }
         public ICollection<ComboService> ComboServices { get; set; }
         #endregion
     }

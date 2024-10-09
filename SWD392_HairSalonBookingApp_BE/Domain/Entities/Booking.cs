@@ -3,15 +3,14 @@
     public class Booking : BaseEntity
     {
         public string? Feedback { get; set; }
+        public DateTime BookingDate { get; set; }
         public decimal TotalMoney { get; set; }
+        public bool Checked { get; set; }
 
         #region Relationship
-        public Guid UserId { get; set; }
-        public User User { get; set; }
-        public Guid SalonId { get; set; }
-        public Salon Salon { get; set; }
-        public Category Category { get; set; }
-        public Guid CategoryId { get; set; }
+        public ICollection<Payments> Payments { get; set; }
+        public ICollection<BookingDetails> BookingDetails { get; set; }
+        public ICollection<SalonMember> SalonMembers { get; set; }
         #endregion
     }
 }
