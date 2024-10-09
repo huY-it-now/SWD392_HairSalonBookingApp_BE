@@ -28,8 +28,16 @@ namespace Application.Services
 
         public async Task<ComboService> GetComboServiceByIdAsync(Guid id)
         {
-            return await _comboServiceRepository.GetByIdAsync(id);
+            var comboService = await _comboServiceRepository.GetByIdAsync(id);
+
+            if (comboService == null)
+            {
+                throw new KeyNotFoundException($"ComboService id {id} not found.");
+            }
+
+            return comboService;
         }
+
 
         public async Task UpdateComboServiceAsync(ComboService comboService)
         {
