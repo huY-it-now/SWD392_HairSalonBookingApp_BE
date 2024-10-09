@@ -123,12 +123,25 @@ namespace Infrastructures
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_Booking_BookingDetails");
 
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Category)
+                .WithMany(s => s.Bookings)
+                .HasForeignKey(b => b.CategoryId)
+                .OnDelete(DeleteBehavior.NoAction)
+                .HasConstraintName("FK_Booking_Category");
+
             modelBuilder.Entity<SalonMember>()
                 .HasOne(sm => sm.User)
                 .WithOne(u => u.SalonMember)
                 .HasForeignKey<SalonMember>(sm => sm.UserId)
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_SalonMember_User");
+
+            modelBuilder.Entity<Salon>()
+                .HasMany(s => s.SalonMembers)
+                .WithOne(s => s.Salon)
+                .HasForeignKey(s => s.SalonId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
 
     }
