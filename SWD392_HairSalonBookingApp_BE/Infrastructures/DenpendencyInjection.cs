@@ -21,6 +21,7 @@ namespace Infrastructures
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<IPaymentsRepository, PaymentsRepository>();
             services.AddSingleton<ICurrentTime, CurrentTime>();
 
             // ATTENTION: if you do migration please check file README.md

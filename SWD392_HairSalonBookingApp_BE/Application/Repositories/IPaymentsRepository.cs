@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
-    public interface IBookingRepository : IGenericRepository<Booking>
+    public interface IPaymentsRepository : IGenericRepository<Payments>
     {
-        Task<Booking> GetBookingWithPayment(Guid id);
-        Task<List<Booking>> GetFullBookingInformation();
+        public bool CheckPayment(Payments payments);
     }
 }

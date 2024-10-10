@@ -8,7 +8,7 @@
         public bool Checked { get; set; }
 
         #region Relationship
-        public ICollection<Payments> Payments { get; set; }
+        public Payments Payments { get; set; }
         public ICollection<BookingDetails> BookingDetails { get; set; }
         public ICollection<SalonMember> SalonMembers { get; set; }
         #endregion

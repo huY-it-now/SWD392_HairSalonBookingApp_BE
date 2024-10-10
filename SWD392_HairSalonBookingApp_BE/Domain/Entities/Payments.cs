@@ -10,8 +10,12 @@ namespace Domain.Entities
     {
         public Decimal PaymentAmount { get; set; }
         public DateTime PaymentDate { get; set; }
-        public ICollection<PaymentMethods> PaymentMethods { get; set; }
-        public ICollection<PaymentSatus> PaymentSatus { get; set; }
+        public Booking Booking { get; set; }
+
+        public Guid PaymentMethodId { get; set; }
+        public PaymentMethods PaymentMethods { get; set; }
+        public Guid PaymentStatusId { get; set; }
+        public PaymentSatus PaymentSatus { get; set; }
         public ICollection<PaymentLogs> PaymentLogs { get; set; }
     }
 }
