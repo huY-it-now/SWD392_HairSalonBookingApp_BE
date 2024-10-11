@@ -22,7 +22,12 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetFullBookingInformation()
         {
-            return await _dbContext.Bookings.Where(b => b.Checked == false).Include(b => b.BookingDetails).Include(b => b.SalonMembers).ToListAsync();
+            return await _dbContext.Bookings
+               .Where(b => b.Checked == false)
+               .Include(b => b.User)
+               .Include(b => b.Payments)
+               .Include(b => b.SalonMember)
+               .ToListAsync();
         }
     }
 }
