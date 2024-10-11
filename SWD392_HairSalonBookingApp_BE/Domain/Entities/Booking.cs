@@ -9,8 +9,12 @@
 
         #region Relationship
         public ICollection<Payments> Payments { get; set; }
-        public ICollection<BookingDetails> BookingDetails { get; set; }
-        public ICollection<SalonMember> SalonMembers { get; set; }
+        public Guid UserId { get; set; }
+        public User User { get; set; }
+        public Guid SalonMemberId { get; set; }
+        public SalonMember SalonMember { get; set; }
+        public Guid ServiceId { get; set; }
+        public Service Service { get; set; }
         #endregion
     }
 }
