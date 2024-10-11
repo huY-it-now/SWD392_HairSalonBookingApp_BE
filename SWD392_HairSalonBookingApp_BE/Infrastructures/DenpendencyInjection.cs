@@ -24,6 +24,12 @@ namespace Infrastructures
             services.AddScoped<IPaymentsRepository, PaymentsRepository>();
             services.AddSingleton<ICurrentTime, CurrentTime>();
 
+            services.AddScoped<IComboServiceRepository, ComboServiceRepository>();
+            services.AddScoped<IComboDetailRepository, ComboDetailRepository>();
+            services.AddScoped<ComboServiceService>();
+            services.AddScoped<ComboDetailService>();
+
+
             // ATTENTION: if you do migration please check file README.md
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(databaseConnection));
 

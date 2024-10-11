@@ -36,6 +36,26 @@ namespace Application.Services
             };
         }
 
+        public async Task<Result<object>> GetUserById(Guid id)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserById(id);
+
+            var userDTO = new UserDTO
+            {
+                Id = user.Id,
+                FullName = user.FullName,
+                Email = user.Email,
+                Phone = user.PhoneNumber
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All user",
+                Data = userDTO
+            };
+        }
+
         public async Task<Result<object>> Login(LoginUserDTO request)
         {
             var user = await _unitOfWork.UserRepository.GetUserByEmail(request.Email);
@@ -50,16 +70,6 @@ namespace Application.Services
                 };
             }
 
-            if (user.VerifiedAt == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Please verify your email.",
-                    Data = null
-                };
-            }
-
             var isPasswordValid = _passwordHash.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
 
             if (!isPasswordValid)
@@ -68,6 +78,16 @@ namespace Application.Services
                 {
                     Error = 1,
                     Message = "Incorrect password.",
+                    Data = null
+                };
+            }
+
+            if (user.VerifiedAt == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Please verify your email.",
                     Data = null
                 };
             }

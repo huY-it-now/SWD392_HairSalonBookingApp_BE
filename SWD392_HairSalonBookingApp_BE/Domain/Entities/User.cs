@@ -15,6 +15,7 @@
         public Role Role { get; set; }
         public Guid? SalonMemberId { get; set; }
         public SalonMember? SalonMember { get; set; }
+        public ICollection<Feedback>? Feedbacks { get; set; }
         #endregion
     }
 }

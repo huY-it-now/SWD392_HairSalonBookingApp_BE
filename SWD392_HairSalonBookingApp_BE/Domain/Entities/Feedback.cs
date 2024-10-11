@@ -6,9 +6,11 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class Rating : BaseEntity
+    public class Feedback : BaseEntity
     {
         public string RatingContent { get; set; }
+        public Guid UserId { get; set; }
+        public User User { get; set; }
         public Guid SalonId { get; set; }
         public Salon Salon { get; set;}
     }
