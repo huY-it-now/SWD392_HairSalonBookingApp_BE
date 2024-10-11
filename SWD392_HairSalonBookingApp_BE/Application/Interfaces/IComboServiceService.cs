@@ -8,5 +8,6 @@ namespace Application.Interfaces
 {
     public interface IComboServiceService
     {
+        public bool CheckComboServiceById(Guid id);
     }
 }

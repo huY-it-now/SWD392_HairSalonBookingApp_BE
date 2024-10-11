@@ -10,5 +10,9 @@ namespace Application.Services
 {
     public class ServiceService : IServiceService
     {
+        public bool CheckServiceById(Guid id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

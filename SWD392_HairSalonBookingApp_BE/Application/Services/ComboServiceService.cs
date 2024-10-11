@@ -9,5 +9,9 @@ namespace Application.Services
 {
     public class ComboServiceService : IComboServiceService
     {
+        public bool CheckComboServiceById(Guid id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
