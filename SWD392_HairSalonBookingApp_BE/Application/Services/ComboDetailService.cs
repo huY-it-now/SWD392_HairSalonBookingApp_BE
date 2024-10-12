@@ -1,4 +1,9 @@
 ﻿using Application.Repositories;
+using Application.Validations.Combo;
+using AutoMapper;
+using Domain.Contracts.Abstracts.Combo;
+using Domain.Contracts.Abstracts.Shared;
+using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
 
 namespace Application.Services
@@ -6,45 +11,89 @@ namespace Application.Services
     public class ComboDetailService
     {
         private readonly IComboDetailRepository _comboDetailRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public ComboDetailService(IComboDetailRepository comboDetailRepository, IUnitOfWork unitOfWork)
+        public ComboDetailService(IComboDetailRepository comboDetailRepository, IMapper mapper)
         {
             _comboDetailRepository = comboDetailRepository;
-            _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
-        public async Task<ComboDetail> CreateComboDetailAsync(ComboDetail comboDetail)
+        public async Task<Result<object>> GetAllComboDetails()
         {
-            await _comboDetailRepository.AddAsync(comboDetail);
-            await _unitOfWork.SaveChangeAsync();
-            return comboDetail;
-        }
+            var comboDetails = await _comboDetailRepository.GetAllComboDetailsAsync();
+            var comboDetailsMapper = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
 
-        public async Task<IEnumerable<ComboDetail>> GetAllComboDetailsAsync()
-        {
-            return await _comboDetailRepository.GetAllAsync();
-        }
-
-        public async Task<ComboDetail> GetComboDetailByIdAsync(Guid id)
-        {
-            return await _comboDetailRepository.GetByIdAsync(id);
-        }
-
-        public async Task UpdateComboDetailAsync(ComboDetail comboDetail)
-        {
-            _comboDetailRepository.Update(comboDetail);
-            await _unitOfWork.SaveChangeAsync();
-        }
-
-        public async Task DeleteComboDetailAsync(Guid id)
-        {
-            var comboDetail = await _comboDetailRepository.GetByIdAsync(id);
-            if (comboDetail != null)
+            return new Result<object>
             {
-                _comboDetailRepository.SoftRemove(comboDetail);
-                await _unitOfWork.SaveChangeAsync();
+                Error = 0,
+                Message = "Print all combo details",
+                Data = comboDetailsMapper
+            };
+        }
+
+        public async Task<Result<object>> GetComboDetailById(Guid id)
+        {
+            var comboDetail = await _comboDetailRepository.GetComboDetailById(id);
+
+            if (comboDetail == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Combo detail not found",
+                    Data = null
+                };
             }
+
+            var comboDetailDTO = _mapper.Map<ComboDetailDTO>(comboDetail);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo detail details",
+                Data = comboDetailDTO
+            };
+        }
+
+        public async Task<Result<object>> AddComboDetail(AddComboDetailRequest createRequest)
+        {
+            ComboDetailValidation.Validate(_mapper.Map<ComboDetailDTO>(createRequest));
+            var comboDetail = _mapper.Map<ComboDetail>(createRequest);
+            await _comboDetailRepository.AddComboDetail(comboDetail);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo detail added successfully",
+                Data = null
+            };
+        }
+
+        public async Task<Result<object>> UpdateComboDetail(UpdateComboDetailRequest updateRequest)
+        {
+            ComboDetailValidation.Validate(_mapper.Map<ComboDetailDTO>(updateRequest));
+            var comboDetail = _mapper.Map<ComboDetail>(updateRequest);
+            await _comboDetailRepository.UpdateComboDetail(comboDetail);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo detail updated successfully",
+                Data = null
+            };
+        }
+
+        public async Task<Result<object>> DeleteComboDetail(Guid id)
+        {
+            await _comboDetailRepository.DeleteComboDetail(id);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo detail deleted successfully",
+                Data = null
+            };
         }
     }
 }
