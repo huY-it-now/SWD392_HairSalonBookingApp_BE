@@ -73,13 +73,6 @@ namespace Infrastructures
                 .OnDelete(DeleteBehavior.NoAction)
                 .HasConstraintName("FK_User_SalonMember");
 
-            modelBuilder.Entity<User>()
-                .HasOne(u => u.Role)
-                .WithMany(r => r.Users)
-                .HasForeignKey(u => u.RoleId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_User_Role");
-
             modelBuilder.Entity<SalonMember>()
                 .HasOne(sm => sm.User)
                 .WithOne(u => u.SalonMember)
