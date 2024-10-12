@@ -1,4 +1,6 @@
-﻿using Application.Interfaces;
+﻿using Application.Commons;
+using Application.Interfaces;
+using Application.Utils;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
@@ -14,13 +16,17 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IPasswordHash _passwordHash;
         private readonly IEmailService _emailService;
+        private readonly AppConfiguration _configuration;
+        private readonly ICurrentTime _currentTime;
 
-        public UserService(IMapper mapper, IUnitOfWork unitOfWork, IPasswordHash passwordHash, IEmailService emailService)
+        public UserService(IMapper mapper, IUnitOfWork unitOfWork, IPasswordHash passwordHash, IEmailService emailService, AppConfiguration configuration, ICurrentTime currentTime)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _passwordHash = passwordHash;
             _emailService = emailService;
+            _configuration = configuration;
+            _currentTime = currentTime;
         }
 
         public async Task<Result<object>> GetAllUser()
@@ -92,13 +98,13 @@ namespace Application.Services
                 };
             }
 
-            var userDto = _mapper.Map<UserDTO>(user);
+            var token = user.GenerateJsonWebToken(_configuration.JWTSecretKey, _currentTime.GetCurrentTime());
 
             return new Result<object>
             {
                 Error = 0,
                 Message = $"Welcome back, {user.FullName}!",
-                Data = userDto
+                Data = token
             };
         }
 
