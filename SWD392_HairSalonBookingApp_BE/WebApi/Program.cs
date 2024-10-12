@@ -10,7 +10,11 @@ var configuration = builder.Configuration.Get<AppConfiguration>();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
+
+builder.Services.AddAuthentication().AddJwtBearer();
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<AppConfiguration>(builder.Configuration.GetSection("JWTSecretKey"));
+
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
