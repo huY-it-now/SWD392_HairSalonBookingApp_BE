@@ -4,6 +4,8 @@ using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
+using Domain.Contracts.DTO.Combo;
+using Domain.Contracts.Abstracts.Combo;
 
 namespace Infrastructures.Mappers
 {
@@ -16,6 +18,18 @@ namespace Infrastructures.Mappers
             CreateMap<LoginUserRequest, LoginUserDTO>();
             CreateMap<VerifyTokenRequest, VerifyTokenDTO>();
             CreateMap<User, UserDTO>();
+
+            //cbs
+            CreateMap<ComboService, ComboServiceDTO>();
+            CreateMap<AddComboServiceRequest, ComboService>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Ignore Id for creation
+            CreateMap<UpdateComboServiceRequest, ComboService>();
+
+            //cbt
+            CreateMap<ComboDetail, ComboDetailDTO>();
+            CreateMap<AddComboDetailRequest, ComboDetail>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore());
+            CreateMap<UpdateComboDetailRequest, ComboDetail>();
         }
     }
 }

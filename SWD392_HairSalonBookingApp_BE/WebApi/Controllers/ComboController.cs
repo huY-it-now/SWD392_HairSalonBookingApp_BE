@@ -1,11 +1,14 @@
 ﻿using Application.Services;
+using Domain.Contracts.Abstracts.Combo;
+using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 
 namespace WebApi.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class ComboController : ControllerBase
     {
         private readonly ComboServiceService _comboServiceService;
@@ -17,96 +20,120 @@ namespace WebApi.Controllers
             _comboDetailService = comboDetailService;
         }
 
-        // CRUD cho ComboService
-
-        [HttpPost("service")]
-        public async Task<IActionResult> CreateComboService([FromBody] ComboService comboService)
-        {
-            var createdComboService = await _comboServiceService.CreateComboServiceAsync(comboService);
-            return CreatedAtAction(nameof(GetComboServiceById), new { id = createdComboService.Id }, createdComboService);
-        }
-
-        [HttpGet("service")]
+        [HttpGet("comboservices")]
         public async Task<IActionResult> GetAllComboServices()
         {
-            var comboServices = await _comboServiceService.GetAllComboServicesAsync();
-            return Ok(comboServices);
+            var result = await _comboServiceService.GetAllComboServices();
+            var comboServices = result.Data as IEnumerable<ComboServiceDTO>;
+            if (comboServices == null || !comboServices.Any())
+            {
+                return NotFound(new { Error = 1, Message = "No combo services found" });
+            }
+            return Ok(new { Error = 0, Message = "All combo services", Data = comboServices });
         }
 
-        [HttpGet("service/{id:guid}")]
+        [HttpGet("comboservices/{id}")]
         public async Task<IActionResult> GetComboServiceById(Guid id)
         {
-            var comboService = await _comboServiceService.GetComboServiceByIdAsync(id);
+            var comboService = await _comboServiceService.GetComboServiceById(id);
             if (comboService == null)
             {
-                return NotFound();
+                return NotFound(new { Error = 1, Message = "Combo service not found" });
             }
-            return Ok(comboService);
+            return Ok(new { Error = 0, Message = "Combo service details", Data = comboService });
         }
 
-        [HttpPut("service/{id:guid}")]
-        public async Task<IActionResult> UpdateComboService(Guid id, [FromBody] ComboService comboService)
+        [HttpPost("comboservices")]
+        public async Task<IActionResult> AddComboService([FromBody] AddComboServiceRequest createRequest)
         {
-            if (id != comboService.Id)
+            try
             {
-                return BadRequest("Id mismatch");
+                await _comboServiceService.AddComboService(createRequest);
+                return Ok(new { Error = 0, Message = "Combo service added successfully" });
             }
-
-            await _comboServiceService.UpdateComboServiceAsync(comboService);
-            return NoContent();
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Error = 1, Message = ex.Message });
+            }
         }
 
-        [HttpDelete("service/{id:guid}")]
+        [HttpPut("comboservices")]
+        public async Task<IActionResult> UpdateComboService([FromBody] UpdateComboServiceRequest updateRequest)
+        {
+            try
+            {
+                await _comboServiceService.UpdateComboService(updateRequest);
+                return Ok(new { Error = 0, Message = "Combo service updated successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Error = 1, Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("comboservices/{id}")]
         public async Task<IActionResult> DeleteComboService(Guid id)
         {
-            await _comboServiceService.DeleteComboServiceAsync(id);
-            return NoContent();
+            await _comboServiceService.DeleteComboService(id);
+            return Ok(new { Error = 0, Message = "Combo service deleted successfully" });
         }
 
-        // CRUD cho ComboDetail
-
-        [HttpPost("detail")]
-        public async Task<IActionResult> CreateComboDetail([FromBody] ComboDetail comboDetail)
-        {
-            var createdComboDetail = await _comboDetailService.CreateComboDetailAsync(comboDetail);
-            return CreatedAtAction(nameof(GetComboDetailById), new { id = createdComboDetail.Id }, createdComboDetail);
-        }
-
-        [HttpGet("detail")]
+        [HttpGet("combodetails")]
         public async Task<IActionResult> GetAllComboDetails()
         {
-            var comboDetails = await _comboDetailService.GetAllComboDetailsAsync();
-            return Ok(comboDetails);
+            var result = await _comboDetailService.GetAllComboDetails();
+            var comboDetails = result.Data as IEnumerable<ComboDetailDTO>;
+            if (comboDetails == null || !comboDetails.Any())
+            {
+                return NotFound(new { Error = 1, Message = "No combo detail found" });
+            }
+            return Ok(new { Error = 0, Message = "All combo details", Data = comboDetails });
         }
 
-        [HttpGet("detail/{id:guid}")]
+        [HttpGet("combodetails/{id}")]
         public async Task<IActionResult> GetComboDetailById(Guid id)
         {
-            var comboDetail = await _comboDetailService.GetComboDetailByIdAsync(id);
+            var comboDetail = await _comboDetailService.GetComboDetailById(id);
             if (comboDetail == null)
             {
-                return NotFound();
+                return NotFound(new { Error = 1, Message = "Combo detail not found" });
             }
-            return Ok(comboDetail);
+            return Ok(new { Error = 0, Message = "Combo detail details", Data = comboDetail });
         }
 
-        [HttpPut("detail/{id:guid}")]
-        public async Task<IActionResult> UpdateComboDetail(Guid id, [FromBody] ComboDetail comboDetail)
+        [HttpPost("combodetails")]
+        public async Task<IActionResult> AddComboDetail([FromBody] AddComboDetailRequest createRequest)
         {
-            if (id != comboDetail.Id)
+            try
             {
-                return BadRequest("Id mismatch");
+                await _comboDetailService.AddComboDetail(createRequest);
+                return Ok(new { Error = 0, Message = "Combo detail added successfully" });
             }
-
-            await _comboDetailService.UpdateComboDetailAsync(comboDetail);
-            return NoContent();
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Error = 1, Message = ex.Message });
+            }
         }
 
-        [HttpDelete("detail/{id:guid}")]
+        [HttpPut("combodetails")]
+        public async Task<IActionResult> UpdateComboDetail([FromBody] UpdateComboDetailRequest updateRequest)
+        {
+            try
+            {
+                await _comboDetailService.UpdateComboDetail(updateRequest);
+                return Ok(new { Error = 0, Message = "Combo detail updated successfully" });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { Error = 1, Message = ex.Message });
+            }
+        }
+
+        [HttpDelete("combodetails/{id}")]
         public async Task<IActionResult> DeleteComboDetail(Guid id)
         {
-            await _comboDetailService.DeleteComboDetailAsync(id);
-            return NoContent();
+            await _comboDetailService.DeleteComboDetail(id);
+            return Ok(new { Error = 0, Message = "Combo detail deleted successfully" });
         }
     }
 }
