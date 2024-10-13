@@ -135,7 +135,7 @@ namespace Application.Services
                 PasswordHash = passwordHash,
                 PasswordSalt = passwordSalt,
                 RoleId = 2,
-                VerificationToken = token
+                VerificationToken = token,
             };
 
             await _emailService.SendOtpMail(request.FullName, token, request.Email);
