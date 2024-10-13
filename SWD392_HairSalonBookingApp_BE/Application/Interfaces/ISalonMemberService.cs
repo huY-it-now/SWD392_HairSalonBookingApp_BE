@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
-    public interface IServiceService
+    public interface ISalonMemberService
     {
-        public Task<Service> GetServiceById (string id);
+        public Task<SalonMember> GetSalonMemberById(Guid id);
     }
 }

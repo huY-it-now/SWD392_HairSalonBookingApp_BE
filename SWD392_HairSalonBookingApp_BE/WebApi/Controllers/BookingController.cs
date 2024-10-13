@@ -14,15 +14,19 @@ namespace WebApi.Controllers
     public class BookingController : BaseController
     {
         private readonly IBookingService _bookingService;
+        private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly ISalonMemberService _salonMemberService;
         private readonly IComboServiceService _comboServiceService;
         private readonly IServiceService _serviceService;
 
-        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboServiceService comboServiceService)
+        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboServiceService comboServiceService, IUserService userService, ISalonMemberService salonMemberService)
         {
+            _salonMemberService = salonMemberService;
             _comboServiceService = comboServiceService;
             _serviceService = serviceService;
             _bookingService = bookingService;
+            _userService = userService;
             _mapper = mapper;
         }
 
@@ -51,13 +55,53 @@ namespace WebApi.Controllers
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<IActionResult> AddBooking([FromForm] Guid CustomerId, Guid SalonId, Guid SalonMemberId, DateTime cuttingDate, string ServiceId, string ComboServiceId)
         {
-            List<string> listComboServiceName = ExtractValidIds(ServiceId);
-            List<string> listServiceName = ExtractValidIds(ComboServiceId);
+            Decimal TotalAmount = 0;
+            Booking booking = new Booking();
 
-            return Ok();
+            booking.Checked = false;
+            booking.BookingDate = DateTime.Now;
+            booking.SalonMemberId = SalonMemberId;
+            booking.UserId = CustomerId;
+
+            var salonMember = await _salonMemberService.GetSalonMemberById(SalonMemberId);
+
+            if (salonMember != null)
+            {
+                booking.SalonMember = salonMember;
+
+                booking.SalonMemberId = SalonMemberId;
+            }
+
+            var service = await _serviceService.GetServiceById(ServiceId);
+
+            if (service != null)
+            {
+                booking.Service = service;
+
+                TotalAmount += service.Money;
+            }
+
+            foreach (var id in ExtractValidIds(ComboServiceId))
+            {
+                var comboService = await _comboServiceService.GetComboServiceByIdAsync(new Guid(id));
+
+                if (comboService != null)
+                {
+                    booking.ComboServices.Add(comboService);
+
+                    TotalAmount += comboService.Price;
+                }
+            }
+
+            if (!await _bookingService.CreateBooking(booking))
+            {
+                return BadRequest("Create booking fail");
+            }
+
+            return Ok(booking);
         }
 
-        static List<string> ExtractValidIds(string input)
+        List<string> ExtractValidIds(string input)
         {
             List<string> result = new List<string>();
             int start = 0;
@@ -65,7 +109,7 @@ namespace WebApi.Controllers
             while (start < input.Length)
             {
                 bool found = false;
-
+                
                 // Try different lengths starting from the current position
                 for (int length = 36; length <= input.Length - start; length++)
                 {

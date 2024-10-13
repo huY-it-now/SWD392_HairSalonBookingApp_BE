@@ -11,5 +11,6 @@ namespace Application.Interfaces
     {
         Task<List<Booking>> ShowAllUncheckedBooking();
         Task<bool> CheckBooking(Guid bookingId, bool Check);
+        Task<bool> CreateBooking(Booking booking);
     }
 }

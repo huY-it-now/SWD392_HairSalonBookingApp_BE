@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces
+namespace Application.Repositories
 {
-    public interface IServiceService
+    public interface ISalonMemberRepository : IGenericRepository<SalonMember>
     {
-        public Task<Service> GetServiceById (string id);
+
     }
 }

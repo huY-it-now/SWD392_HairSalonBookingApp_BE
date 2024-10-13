@@ -5,10 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Application.Interfaces
+namespace Application.Repositories
 {
-    public interface IServiceService
+    public interface IServiceRepository : IGenericRepository<Service>
     {
-        public Task<Service> GetServiceById (string id);
     }
 }

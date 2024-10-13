@@ -1,9 +1,10 @@
-﻿using Application.Repositories;
+﻿using Application.Interfaces;
+using Application.Repositories;
 using Domain.Entities;
 
 namespace Application.Services
 {
-    public class ComboServiceService
+    public class ComboServiceService : IComboServiceService
     {
         private readonly IComboServiceRepository _comboServiceRepository;
         private readonly IUnitOfWork _unitOfWork;
