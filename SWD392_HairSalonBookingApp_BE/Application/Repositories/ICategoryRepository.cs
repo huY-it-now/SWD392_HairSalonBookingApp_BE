@@ -9,6 +9,7 @@ namespace Application.Repositories
 {
     public interface ICategoryRepository : IGenericRepository<Category>
     {
-        Task<List<Category>> GetAllCategory();
+        Task<List<Category>> GetAllCategoryAsync();
+        Task<Category> GetCategoryById(Guid id);
     }
 }
