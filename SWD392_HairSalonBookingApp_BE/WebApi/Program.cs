@@ -13,16 +13,14 @@ builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
 builder.Services.AddAuthentication().AddJwtBearer();
-builder.Services.AddSwaggerGen(options =>
+builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwaggerGen(setup =>
 {
-    options.AddSecurityDefinition("oauth2", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    setup.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
     {
-        In = ParameterLocation.Header,
-        Name = "Authorization",
-        Type = SecuritySchemeType.ApiKey,
+        Title = "Maverick Deploy",
+        Version = "v1"
     });
-
-    options.OperationFilter<SecurityRequirementsOperationFilter>();
 });
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
@@ -47,11 +45,9 @@ builder.Services.AddSingleton(configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+//app.UseDeveloperExceptionPage();
 
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();
