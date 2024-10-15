@@ -39,13 +39,6 @@ namespace Infrastructures
                 new Role { Id = 5, RoleDetail = "Stylist" }
             );
 
-            modelBuilder.Entity<ComboDetail>()
-                .HasOne(c => c.ComboService)
-                .WithMany(c => c.ComboDetails)
-                .HasForeignKey(c => c.ComboServiceId)
-                .OnDelete(DeleteBehavior.NoAction)
-                .HasConstraintName("FK_ComboService_ComboDetails");
-
             modelBuilder.Entity<ComboService>()
                 .HasMany(c => c.Service)
                 .WithMany(c => c.ComboServices)

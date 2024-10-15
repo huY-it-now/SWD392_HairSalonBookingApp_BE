@@ -27,7 +27,6 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetFullBookingInformation()
         {
-            return await _dbContext.Bookings.Where(b => b.Checked == false).Include(b => b.BookingDetails).Include(b => b.SalonMembers).Include(b => b.Payments).ToListAsync();
             return await _dbContext.Bookings
                .Where(b => b.Checked == false)
                .Include(b => b.User)

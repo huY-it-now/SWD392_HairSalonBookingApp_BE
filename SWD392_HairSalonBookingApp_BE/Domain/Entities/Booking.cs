@@ -8,7 +8,8 @@
         public bool Checked { get; set; }
 
         #region Relationship
-        public ICollection<Payments> Payments { get; set; }
+        public Guid PaymentId { get; set; }
+        public Payments Payments { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; }
         public Guid SalonId { get; set; }
