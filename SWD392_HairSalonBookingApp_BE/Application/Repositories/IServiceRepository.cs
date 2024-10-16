@@ -7,8 +7,8 @@ using Domain.Entities;
 
 namespace Application.Repositories
 {
-    public interface ICategoryRepository : IGenericRepository<Category>
+    public interface IServiceRepository : IGenericRepository<Service>
     {
-        Task<List<Category>> GetAllCategoryAsync();
+        Task<List<Service>> GetAllServicesAsync();
     }
 }

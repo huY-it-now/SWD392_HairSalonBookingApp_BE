@@ -10,18 +10,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructures.Repositories
 {
-    public class CategoryRepository : GenericRepository<Category>, ICategoryRepository
+    public class ServiceRepository : GenericRepository<Service>, IServiceRepository
     {
         private readonly AppDbContext _dbContext;
 
-        public CategoryRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public ServiceRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
 
-        public async Task<List<Category>> GetAllCategoryAsync()
+        public async Task<List<Service>> GetAllServicesAsync()
         {
-            return await _dbContext.Categories.ToListAsync();
+            return await _dbContext.Services.ToListAsync();
         }
+
     }
 }

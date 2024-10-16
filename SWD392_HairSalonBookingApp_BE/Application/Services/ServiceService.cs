@@ -7,31 +7,33 @@ using Application.Interfaces;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Category;
+using Domain.Contracts.DTO.Service;
 
 namespace Application.Services
 {
-    public class CategoryService : ICategoryService
+    public class ServiceService : IServiceService
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryService(IMapper mapper, IUnitOfWork unitOfWork)
+        public ServiceService(IMapper mapper, IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<Result<object>> GetAllCategory()
+        public async Task<Result<object>> GetAllServices()
         {
-            var category = await _unitOfWork.CategoryRepository.GetAllCategoryAsync();
-            var categoryMapper = _mapper.Map<List<CategoryDTO>>(category);
+            var services = await _unitOfWork.ServiceRepository.GetAllServicesAsync();
+            var servicesMapper = _mapper.Map<List<ServiceDTO>>(services);
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Print all category",
-                Data = categoryMapper
+                Message = "Print all service",
+                Data = servicesMapper
             };
         }
+    {
     }
 }

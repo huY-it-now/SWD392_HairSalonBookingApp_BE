@@ -18,6 +18,8 @@ namespace Infrastructures
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICategoryRepository,CategoryRepository>();
             services.AddScoped<ICategoryService,CategoryService>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBookingRepository, BookingRepository>();
