@@ -19,7 +19,7 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<List<Category>> GetAllCategory()
+        public async Task<List<Category>> GetAllCategoryAsync()
         {
             return await _dbContext.Categories.ToListAsync();
         }

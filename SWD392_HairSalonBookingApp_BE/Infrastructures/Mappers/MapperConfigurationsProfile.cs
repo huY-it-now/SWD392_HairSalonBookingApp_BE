@@ -6,6 +6,8 @@ using Domain.Contracts.DTO.User;
 using Domain.Entities;
 using Domain.Contracts.DTO.Combo;
 using Domain.Contracts.Abstracts.Combo;
+using Domain.Contracts.DTO.Category;
+using Domain.Contracts.DTO.Service;
 
 namespace Infrastructures.Mappers
 {
@@ -30,6 +32,12 @@ namespace Infrastructures.Mappers
             CreateMap<AddComboDetailRequest, ComboDetail>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<UpdateComboDetailRequest, ComboDetail>();
+
+            //cate
+            CreateMap<Category, CategoryDTO>();
+
+            //ser
+            CreateMap<Service, ServiceDTO>();
         }
     }
 }

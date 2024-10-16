@@ -23,7 +23,7 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllCategory()
         {
-            var category = await _unitOfWork.CategoryRepository.GetAllAsync();
+            var category = await _unitOfWork.CategoryRepository.GetAllCategoryAsync();
             var categoryMapper = _mapper.Map<List<CategoryDTO>>(category);
 
             return new Result<object>

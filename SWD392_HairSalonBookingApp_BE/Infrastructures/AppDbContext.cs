@@ -85,6 +85,10 @@ namespace Infrastructures
                 .WithOne(s => s.Salon)
                 .HasForeignKey(s => s.SalonId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            // Áp dụng bộ lọc toàn cục cho Service
+            modelBuilder.Entity<Service>().HasQueryFilter(c => !c.IsDeleted);
+            base.OnModelCreating(modelBuilder);
         }
 
     }

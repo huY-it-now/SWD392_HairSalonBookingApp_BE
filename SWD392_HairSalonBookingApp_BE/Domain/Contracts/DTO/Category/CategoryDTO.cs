@@ -9,6 +9,6 @@ namespace Domain.Contracts.DTO.Category
     public class CategoryDTO
     {
         public string CategoryName { get; set; }
-        public List<string> ServiceNames { get; set; }
+        public List<string> ServiceName { get; set; }
     }
 }
