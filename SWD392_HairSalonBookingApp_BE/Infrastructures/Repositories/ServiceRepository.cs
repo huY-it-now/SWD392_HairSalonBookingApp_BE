@@ -24,5 +24,9 @@ namespace Infrastructures.Repositories
             return await _dbContext.Services.ToListAsync();
         }
 
+        public async Task<Service> GetServiceById(Guid id)
+        {
+            return await _dbContext.Services.FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

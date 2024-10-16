@@ -10,5 +10,6 @@ namespace Application.Repositories
     public interface IServiceRepository : IGenericRepository<Service>
     {
         Task<List<Service>> GetAllServicesAsync();
+        Task<Service> GetServiceById(Guid id);
     }
 }

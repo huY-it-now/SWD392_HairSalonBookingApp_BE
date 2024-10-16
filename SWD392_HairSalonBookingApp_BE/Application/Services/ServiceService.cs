@@ -34,6 +34,28 @@ namespace Application.Services
                 Data = servicesMapper
             };
         }
-    {
+        public async Task<Result<object>> GetServiceById(Guid id)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
+
+            if (service == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Service not found!",
+                    Data = null
+                };
+            }
+
+            var serviceDTO = _mapper.Map<ServiceDTO>(service);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Service details etrieved successfully!",
+                Data = serviceDTO
+            };
+        }
     }
 }

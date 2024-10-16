@@ -10,5 +10,6 @@ namespace Application.Interfaces
     public interface IServiceService
     {
         Task<Result<object>> GetAllServices();
+        Task<Result<object>> GetServiceById(Guid id);
     }
 }

@@ -8,6 +8,7 @@ namespace Domain.Contracts.DTO.Service
 {
     public class ServiceDTO
     {
-        public List<string> ServiceName { get; set; }
+        public Guid Id { get; set; }
+        public string ServiceName { get; set; }
     }
 }
