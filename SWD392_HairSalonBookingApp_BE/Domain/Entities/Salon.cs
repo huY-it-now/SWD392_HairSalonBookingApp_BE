@@ -11,8 +11,6 @@ namespace Domain.Entities
         #region RelationShip
         public ICollection<ComboService> ComboServices { get; set; }
         public ICollection<SalonMember> SalonMembers { get; set; }
-        public int ProvinceId { get; set; }
-        public Province Province { get; set; }
         #endregion
     }
 }

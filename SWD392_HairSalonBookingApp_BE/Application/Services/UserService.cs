@@ -118,7 +118,7 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "This email already exists, please check again!",
+                    Message = "This email already exist, Do you want to verify?",
                     Data = null
                 };
             }
@@ -136,6 +136,8 @@ namespace Application.Services
                 PasswordSalt = passwordSalt,
                 RoleId = 2,
                 VerificationToken = token,
+                IsDeleted = false,
+                Status = false
             };
 
             await _emailService.SendOtpMail(request.FullName, token, request.Email);
@@ -143,6 +145,7 @@ namespace Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             var result = _mapper.Map<UserDTO>(user);
+            result.Phone = request.PhoneNumber;
 
             return new Result<object>
             {
@@ -168,6 +171,7 @@ namespace Application.Services
 
             verify.VerifiedAt = DateTime.UtcNow;
             verify.VerificationToken = null;
+            verify.Status = true;
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>

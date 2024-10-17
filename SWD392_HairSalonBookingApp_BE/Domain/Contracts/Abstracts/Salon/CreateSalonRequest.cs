@@ -6,6 +6,5 @@ namespace Domain.Contracts.Abstracts.Salon
     {
         public string Address { get; set; }
         public IFormFile? Image { get; set; }
-        public int Province { get; set; }
     }
 }
