@@ -5,21 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Domain.Contracts.DTO.Combo;
 using Domain.Contracts.DTO.Service;
+using FluentValidation;
 
 namespace Application.Validations.Service
 {
-    public static class ServiceValidation
+    public class ServiceValidation : AbstractValidator<CreateServiceDTO>
     {
-        public static void Validate(CreateServiceDTO createRequest)
+        public ServiceValidation()
         {
-            if (createRequest.ServiceId == Guid.Empty)
-            {
-                throw new ArgumentException("ServiceId is required");
-            }
-            if (string.IsNullOrWhiteSpace(createRequest.ServiceName))
-            {
-                throw new ArgumentException("ServiceName is required");
-            }
+            RuleFor(x => x.ServiceId)
+                .NotEqual(Guid.Empty).WithMessage("ServiceId is required");
+
+            RuleFor(x => x.ServiceName)
+                .NotEmpty().WithMessage("ServiceName is required");
         }
     }
 }

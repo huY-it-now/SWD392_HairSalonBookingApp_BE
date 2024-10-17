@@ -1,7 +1,10 @@
 ﻿using Application.Interfaces;
+using Application.Services;
 using AutoMapper;
+using Domain.Contracts.Abstracts.Category;
 using Domain.Contracts.Abstracts.Service;
 using Domain.Contracts.Abstracts.Shared;
+using Domain.Contracts.DTO.Category;
 using Domain.Contracts.DTO.Service;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
@@ -47,6 +50,27 @@ namespace WebApi.Controllers
         {
             var serviceDTO = _mapper.Map<CreateServiceDTO>(createRequest);
             var result = await _serviceService.CreateService(serviceDTO);
+
+            return Ok(result);
+        }
+
+        [HttpPut("update-service/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> UpdateService(Guid id, [FromBody] UpdateServiceRequest updateRequest)
+        {
+            var updateDTO = _mapper.Map<UpdateServiceDTO>(updateRequest);
+            var result = await _serviceService.UpdateService(id, updateDTO);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("delete-service/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> DeleteService(Guid id)
+        {
+            var result = await _serviceService.DeleteService(id);
 
             return Ok(result);
         }

@@ -84,6 +84,7 @@ namespace Application.Services
                     Data = null
                 };
             }
+
             try
             {
                 await _unitOfWork.SaveChangeAsync();
@@ -97,7 +98,9 @@ namespace Application.Services
                     Data = null
                 };
             }
+
             var result = _mapper.Map<CategoryDTO>(category);
+
             return new Result<object>
             {
                 Error = 0,

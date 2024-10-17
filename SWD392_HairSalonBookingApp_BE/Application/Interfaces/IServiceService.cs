@@ -15,5 +15,7 @@ namespace Application.Interfaces
         Task<Result<object>> GetAllServices();
         Task<Result<object>> GetServiceById(Guid id);
         Task<Result<object>> CreateService(CreateServiceDTO request);
+        Task<Result<object>> UpdateService(Guid id, UpdateServiceDTO request);
+        Task<Result<object>> DeleteService(Guid id);
     }
 }
