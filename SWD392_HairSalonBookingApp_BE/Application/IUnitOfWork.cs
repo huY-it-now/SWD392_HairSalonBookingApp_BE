@@ -10,5 +10,6 @@ namespace Application
         IComboDetailRepository ComboDetailRepository { get; }
         ICategoryRepository CategoryRepository { get; }
         IServiceRepository ServiceRepository { get; }
+        ISalonRepository SalonRepository { get; }
     }
 }
