@@ -10,5 +10,6 @@ namespace Application.Interfaces
     public interface ICategoryService
     {
         Task<Result<object>> GetAllCategory();
+        Task<Result<object>> GetCategoryById(Guid id);
     }
 }

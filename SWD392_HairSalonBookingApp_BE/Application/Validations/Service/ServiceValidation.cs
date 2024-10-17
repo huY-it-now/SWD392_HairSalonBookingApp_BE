@@ -10,15 +10,15 @@ namespace Application.Validations.Service
 {
     public static class ServiceValidation
     {
-        public static void Validate(ServiceDTO serviceDTO)
+        public static void Validate(CreateServiceDTO createRequest)
         {
-            if (string.IsNullOrEmpty(serviceDTO.ServiceName))
-            {
-                throw new ArgumentException("Service name is required");
-            }
-            if (serviceDTO.Id == Guid.Empty)
+            if (createRequest.ServiceId == Guid.Empty)
             {
                 throw new ArgumentException("ServiceId is required");
+            }
+            if (string.IsNullOrWhiteSpace(createRequest.ServiceName))
+            {
+                throw new ArgumentException("ServiceName is required");
             }
         }
     }

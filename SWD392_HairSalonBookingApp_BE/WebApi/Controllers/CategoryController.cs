@@ -27,5 +27,15 @@ namespace WebApi.Controllers
 
             return Ok(category);
         }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetCategoryById(Guid id)
+        {
+            var category = await _categoryService.GetCategoryById(id);
+
+            return Ok(category);
+        }
     }
 }

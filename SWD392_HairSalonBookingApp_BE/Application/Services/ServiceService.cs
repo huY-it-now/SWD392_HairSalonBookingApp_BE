@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Application.Interfaces;
+using Application.Validations.Service;
 using AutoMapper;
+using Domain.Contracts.Abstracts.Service;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Category;
 using Domain.Contracts.DTO.Service;
+using Domain.Entities;
 
 namespace Application.Services
 {
@@ -56,6 +59,64 @@ namespace Application.Services
                 Message = "Service details etrieved successfully!",
                 Data = serviceDTO
             };
+        }
+
+        public async Task<Result<object>> CreateService(CreateServiceDTO createRequest)
+        {
+            try
+            {
+                ServiceValidation.Validate(createRequest);
+            }
+            catch (ArgumentException ex)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = ex.Message,
+                    Data = null
+                };
+            }
+
+            var categoryExists = await _unitOfWork.CategoryRepository.GetCategoryById(createRequest.CategoryId);
+            if (categoryExists == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Category not found!",
+                    Data = null
+                };
+            }
+
+            var newService = new Service
+            {
+                Id = Guid.NewGuid(),
+                ServiceName = createRequest.ServiceName
+            };
+
+            try
+            {
+                await _unitOfWork.ServiceRepository.AddAsync(newService);
+                await _unitOfWork.SaveChangeAsync();
+
+                var serviceDTO = _mapper.Map<ServiceDTO>(newService);
+
+                return new Result<object>
+                {
+                    Error = 0,
+                    Message = "Service created successfully!",
+                    Data = serviceDTO
+                };
+            }
+            catch (Exception ex) 
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = $"Failed to create service: {ex.Message}. Inner Exception: {ex.InnerException?.Message}",
+                    Data = null
+                };
+            }
         }
     }
 }

@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Contracts.DTO.Category
+namespace Domain.Contracts.Abstracts.Service
 {
-    public class CategoryDTO
+    public class CreateServiceRequest
     {
-        public string CategoryName { get; set; }
-        public List<string> ServiceName { get; set; }
+        public Guid ServiceId { get; set; }
+        public string ServiceName { get; set; }
         public Guid CategoryId { get; set; }
     }
 }

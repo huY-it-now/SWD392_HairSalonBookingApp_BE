@@ -8,6 +8,7 @@ using Domain.Contracts.DTO.Combo;
 using Domain.Contracts.Abstracts.Combo;
 using Domain.Contracts.DTO.Category;
 using Domain.Contracts.DTO.Service;
+using Domain.Contracts.Abstracts.Service;
 
 namespace Infrastructures.Mappers
 {
@@ -38,6 +39,7 @@ namespace Infrastructures.Mappers
 
             //ser
             CreateMap<Service, ServiceDTO>();
+            CreateMap<CreateServiceRequest, CreateServiceDTO>();
         }
     }
 }
