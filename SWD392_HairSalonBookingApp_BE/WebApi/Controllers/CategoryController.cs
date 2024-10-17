@@ -62,5 +62,16 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpDelete("delete-category/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> DeleteCategory(Guid id)
+        {
+            var result = await _categoryService.DeleteCategory(id);
+
+            return Ok(result);
+        }
+
     }
 }
