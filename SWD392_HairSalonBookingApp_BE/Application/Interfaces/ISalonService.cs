@@ -11,5 +11,6 @@ namespace Application.Interfaces
     public interface ISalonService
     {
         Task<Result<object>> CreateSalon(CreateSalonDTO req);
+        Task<Result<object>> PrintAllSalon();
     }
 }

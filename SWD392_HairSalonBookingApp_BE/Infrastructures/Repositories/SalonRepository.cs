@@ -19,6 +19,11 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<List<Salon>> GetAllSalonAsync()
+        {
+            return await _dbContext.Salons.ToListAsync();
+        }
+
         public async Task<Province> GetProvinceById(int id)
         {
             return await _dbContext.Provinces.FirstOrDefaultAsync(x => x.Id == id);
