@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Domain.Contracts.Abstracts.Service;
 using Domain.Contracts.Abstracts.Shared;
+using Domain.Contracts.DTO.Service;
+using Domain.Entities;
 
 namespace Application.Interfaces
 {
@@ -11,5 +14,6 @@ namespace Application.Interfaces
     {
         Task<Result<object>> GetAllServices();
         Task<Result<object>> GetServiceById(Guid id);
+        Task<Result<object>> CreateService(CreateServiceDTO request);
     }
 }

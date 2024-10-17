@@ -11,5 +11,6 @@ namespace Application.Repositories
     {
         Task<List<Service>> GetAllServicesAsync();
         Task<Service> GetServiceById(Guid id);
+        Task<Service> CreateService(Service service);
     }
 }

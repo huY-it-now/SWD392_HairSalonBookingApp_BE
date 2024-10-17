@@ -28,5 +28,12 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Services.FirstOrDefaultAsync(x => x.Id == id);
         }
+
+        public async Task<Service> CreateService(Service service)
+        {
+            await _dbContext.Services.AddAsync(service);
+            await _dbContext.SaveChangesAsync();
+            return service;
+        }
     }
 }
