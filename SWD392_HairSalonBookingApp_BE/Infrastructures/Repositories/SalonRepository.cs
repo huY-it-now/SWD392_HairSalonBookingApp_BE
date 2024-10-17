@@ -23,10 +23,5 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Salons.ToListAsync();
         }
-
-        public async Task<Province> GetProvinceById(int id)
-        {
-            return await _dbContext.Provinces.FirstOrDefaultAsync(x => x.Id == id);
-        }
     }
 }

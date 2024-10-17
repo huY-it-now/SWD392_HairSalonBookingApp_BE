@@ -27,7 +27,6 @@ namespace Infrastructures
         public DbSet<PaymentSatus> PaymentSatus { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<SalonMemberSchedule> SalonMemberSchedules { get; set; }
-        public DbSet<Province> Provinces { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,13 +37,6 @@ namespace Infrastructures
                 new Role { Id = 3, RoleDetail = "Salon Manager" },
                 new Role { Id = 4, RoleDetail = "Salon Staff" },
                 new Role { Id = 5, RoleDetail = "Stylist" }
-            );
-
-            modelBuilder.Entity<Province>().HasData(
-                new Province { Id = 1, Name = "Ho Chi Minh" },
-                new Province { Id = 2, Name = "Ha Noi" },
-                new Province { Id = 3, Name = "Dak Lak" },
-                new Province { Id = 4, Name = "Nghe An" }
             );
 
             modelBuilder.Entity<ComboDetail>()

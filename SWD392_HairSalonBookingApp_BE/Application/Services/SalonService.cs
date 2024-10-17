@@ -51,16 +51,12 @@ namespace Application.Services
                 Address = req.Address,
                 ImageId = cloudinaryResult.PublicImageId,
                 ImageUrl = cloudinaryResult.ImageUrl,
-                ProvinceId = req.Province
             };
 
             await _unitOfWork.SalonRepository.AddAsync(salon);
             await _unitOfWork.SaveChangeAsync();
 
-            var province = await _unitOfWork.SalonRepository.GetProvinceById(req.Province);
-
             var salonMapper = _mapper.Map<SalonDTO>(salon);
-            salonMapper.Province = province.Name;
             salonMapper.Image = salon.ImageUrl;
 
             return new Result<object>
@@ -79,12 +75,9 @@ namespace Application.Services
 
             foreach (var salon in salons)
             {
-                var province = await _unitOfWork.SalonRepository.GetProvinceById(salon.ProvinceId);
-
                 var salonDTO = new SalonDTO
                 {
                     Address = salon.Address,
-                    Province = province.Name,
                     Image = salon.ImageUrl
                 };
 
