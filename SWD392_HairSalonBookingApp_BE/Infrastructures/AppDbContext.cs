@@ -97,6 +97,10 @@ namespace Infrastructures
             // Áp dụng bộ lọc toàn cục cho Service
             modelBuilder.Entity<Service>().HasQueryFilter(c => !c.IsDeleted);
             base.OnModelCreating(modelBuilder);
+
+            // Áp dụng bộ lọc toàn cục cho Category
+            modelBuilder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
+            base.OnModelCreating(modelBuilder);
         }
 
     }

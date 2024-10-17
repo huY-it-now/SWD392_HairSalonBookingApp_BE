@@ -4,6 +4,7 @@ using Application.Repositories;
 using Application.Services;
 using Infrastructures.Mappers;
 using Infrastructures.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
