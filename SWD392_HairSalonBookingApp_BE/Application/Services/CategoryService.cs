@@ -42,12 +42,12 @@ namespace Application.Services
         {
             var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
 
-            if (category == null)
+            if (category == null || category.IsDeleted)
             {
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "Category not found!",
+                    Message = "Category not found or has been deleted!",
                     Data = null
                 };
             }
@@ -65,6 +65,7 @@ namespace Application.Services
         public async Task<Result<object>> CreateCategory(CreateCategoryDTO createRequest)
         {
             var cId = createRequest.CategoryId = Guid.NewGuid();
+
             var category = new Category
             {
                 Id = cId,
@@ -88,7 +89,7 @@ namespace Application.Services
             {
                 await _unitOfWork.SaveChangeAsync();
             }
-            catch (Exception) 
+            catch (Exception)
             {
                 return new Result<object>
                 {
@@ -107,6 +108,72 @@ namespace Application.Services
                 Data = result
             };
 
+
+        }
+
+        public async Task<Result<object>> UpdateCategory(Guid id, UpdateCategoryDTO updateRequest)
+        {
+            var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
+
+            if (category == null || category.IsDeleted)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Category not found or has been deleted!",
+                    Data = null
+                };
+            }
+
+            category.CategoryName = updateRequest.CategoryName;
+
+            try
+            {
+                await _unitOfWork.SaveChangeAsync();
+            }
+            catch (Exception)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "An error occurred while updating the category.",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<CategoryDTO>(category);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Category updated successfully!",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> DeleteCategory(Guid id)
+        {
+            var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
+
+            if (category == null || category.IsDeleted)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Category not found or has already been deleted!",
+                    Data = null
+                };
+            }
+
+            category.IsDeleted = true;
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Category marked as deleted successfully!",
+                Data = null
+            };
         }
     }
 }

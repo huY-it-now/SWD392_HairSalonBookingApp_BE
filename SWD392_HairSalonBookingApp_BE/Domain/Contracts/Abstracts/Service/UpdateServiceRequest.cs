@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Contracts.DTO.Service
+namespace Domain.Contracts.Abstracts.Service
 {
-    public class ServiceDTO
+    public class UpdateServiceRequest
     {
-        public Guid Id { get; set; }
         public string ServiceName { get; set; }
         public Guid CategoryId { get; set; }
     }

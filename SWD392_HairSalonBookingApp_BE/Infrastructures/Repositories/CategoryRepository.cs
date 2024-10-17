@@ -44,5 +44,29 @@ namespace Infrastructures.Repositories
             await _dbContext.SaveChangesAsync();
             return category;
         }
+
+        public async Task<Category> UpdateCategory(Category category)
+        {
+            var existingCategory = await _dbContext.Categories.FirstOrDefaultAsync(c => c.Id == category.Id);
+
+            if (existingCategory == null)
+            {
+                return null;
+            }
+
+            existingCategory.CategoryName = category.CategoryName;
+            _dbContext.Categories.Update(existingCategory);
+            await _dbContext.SaveChangesAsync();
+
+            return existingCategory;
+        }
+
+        public async Task<bool> DeleteCategory(Category category)
+        {
+            _dbContext.Categories.Remove(category);
+            var result = await _dbContext.SaveChangesAsync();
+
+            return result > 0;
+        }
     }
 }

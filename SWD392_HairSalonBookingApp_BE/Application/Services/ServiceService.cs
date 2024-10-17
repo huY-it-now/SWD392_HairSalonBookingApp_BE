@@ -74,7 +74,7 @@ namespace Application.Services
                 };
             }
 
-            var newService = new Service
+            var service = new Service
             {
                 Id = Guid.NewGuid(),
                 ServiceName = createRequest.ServiceName,
@@ -84,27 +84,107 @@ namespace Application.Services
 
             try
             {
-                await _unitOfWork.ServiceRepository.AddAsync(newService);
+                await _unitOfWork.ServiceRepository.CreateService(service);
                 await _unitOfWork.SaveChangeAsync();
-
-                var serviceDTO = _mapper.Map<ServiceDTO>(newService);
-
-                return new Result<object>
-                {
-                    Error = 0,
-                    Message = "Service created successfully!",
-                    Data = serviceDTO
-                };
             }
-            catch (Exception ex) 
+            catch (ArgumentException ex)
             {
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = $"Failed to create service: {ex.Message}. Inner Exception: {ex.InnerException?.Message}",
+                    Message = ex.Message, 
                     Data = null
                 };
             }
+            catch (Exception)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "An error occurred while creating the service.",
+                    Data = null
+                };
+            }
+
+            var serviceDTO = _mapper.Map<ServiceDTO>(service);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Service created successfully!",
+                Data = serviceDTO
+            };
+
         }
+
+        public async Task<Result<object>> UpdateService(Guid id, UpdateServiceDTO updateRequest)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
+
+            if (service == null || service.IsDeleted)
+            {
+                return new Result<object> 
+                {
+                    Error = 1,
+                    Message = "Service not found or has been deleted!",
+                    Data = null
+                };
+            }
+
+            service.ServiceName = updateRequest.ServiceName;
+            service.CategoryId = updateRequest.CategoryId;
+
+            try
+            {
+                _unitOfWork.ServiceRepository.Update(service);
+                await _unitOfWork.SaveChangeAsync();
+            }
+            catch (Exception)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "An error occurred while updating the category.",
+                    Data = null
+                };
+            }
+
+            var serviceDTO = _mapper.Map<ServiceDTO>(service);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Service updated successfully!",
+                Data = serviceDTO
+            };
+        }
+
+        public async Task<Result<object>> DeleteService(Guid id)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
+
+            if (service == null || service.IsDeleted)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Service not found or has already been deleted!",
+                    Data = null
+                };
+            }
+
+            service.IsDeleted = true;
+            _unitOfWork.ServiceRepository.Update(service);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Service marked as deleted successfully!",
+                Data = null
+            };
+
+        }
+
     }
 }
