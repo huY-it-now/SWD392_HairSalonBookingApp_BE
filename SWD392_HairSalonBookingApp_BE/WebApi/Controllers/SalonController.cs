@@ -42,5 +42,14 @@ namespace WebApi.Controllers
             var result = await _salonService.CreateSalon(salonMapper);
             return Ok(result);
         }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> PrintAllSalon()
+        {
+            var salon = await _salonService.PrintAllSalon();
+            return Ok(salon);
+        }
     }
 }

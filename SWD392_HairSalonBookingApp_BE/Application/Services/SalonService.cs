@@ -70,5 +70,33 @@ namespace Application.Services
                 Data = salonMapper
             };
         }
+
+        public async Task<Result<object>> PrintAllSalon()
+        {
+            var salons = await _unitOfWork.SalonRepository.GetAllSalonAsync();
+
+            var salonDTOList = new List<SalonDTO>();
+
+            foreach (var salon in salons)
+            {
+                var province = await _unitOfWork.SalonRepository.GetProvinceById(salon.ProvinceId);
+
+                var salonDTO = new SalonDTO
+                {
+                    Address = salon.Address,
+                    Province = province.Name,
+                    Image = salon.ImageUrl
+                };
+
+                salonDTOList.Add(salonDTO);
+            }
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All Salons",
+                Data = salonDTOList
+            };
+        }
     }
 }
