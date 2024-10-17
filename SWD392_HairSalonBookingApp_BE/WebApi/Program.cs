@@ -25,6 +25,7 @@ builder.Services.ConfigureSwaggerGen(setup =>
 
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 builder.Services.Configure<AppConfiguration>(builder.Configuration.GetSection("JWTSecretKey"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
 
 builder.Services.AddCors(opt =>
 {
@@ -45,8 +46,15 @@ builder.Services.AddSingleton(configuration);
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-app.UseSwagger();
-app.UseSwaggerUI();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+} else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
 //app.UseDeveloperExceptionPage();
 
 app.MapHealthChecks("/healthchecks");
