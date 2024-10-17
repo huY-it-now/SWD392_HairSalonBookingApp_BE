@@ -42,6 +42,8 @@ namespace Infrastructures.Mappers
             CreateMap<Service, ServiceDTO>();
             //Salon
             CreateMap<CreateSalonRequest, CreateSalonDTO>();
+            CreateMap<CreateSalonDTO, SalonDTO>();
+            CreateMap<Salon, SalonDTO>();
         }
     }
 }

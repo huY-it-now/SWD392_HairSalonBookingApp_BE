@@ -40,12 +40,6 @@ namespace WebApi.Controllers
 
             var salonMapper = _mapper.Map<CreateSalonDTO>(request);
             var result = await _salonService.CreateSalon(salonMapper);
-
-            if (result.Error != 0)
-            {
-                return BadRequest(result);
-            }
-
             return Ok(result);
         }
     }
