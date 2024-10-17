@@ -15,6 +15,9 @@ namespace Infrastructures
         {
             services.AddScoped<IPasswordHash, PasswordHash>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<ISalonService, SalonService>();
+            services.AddScoped<ISalonRepository, SalonRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICategoryRepository,CategoryRepository>();
             services.AddScoped<ICategoryService,CategoryService>();
