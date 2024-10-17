@@ -63,20 +63,6 @@ namespace Application.Services
 
         public async Task<Result<object>> CreateService(CreateServiceDTO createRequest)
         {
-            try
-            {
-                ServiceValidation.Validate(createRequest);
-            }
-            catch (ArgumentException ex)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = ex.Message,
-                    Data = null
-                };
-            }
-
             var categoryExists = await _unitOfWork.CategoryRepository.GetCategoryById(createRequest.CategoryId);
             if (categoryExists == null)
             {
@@ -91,7 +77,9 @@ namespace Application.Services
             var newService = new Service
             {
                 Id = Guid.NewGuid(),
-                ServiceName = createRequest.ServiceName
+                ServiceName = createRequest.ServiceName,
+                CategoryId = createRequest.CategoryId,
+                IsDeleted = false
             };
 
             try

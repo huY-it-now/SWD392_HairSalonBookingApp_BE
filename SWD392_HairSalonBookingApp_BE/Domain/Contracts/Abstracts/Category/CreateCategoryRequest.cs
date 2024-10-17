@@ -4,11 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Domain.Contracts.DTO.Category
+namespace Domain.Contracts.Abstracts.Category
 {
-    public class CategoryDTO
+    public class CreateCategoryRequest
     {
         public string CategoryName { get; set; }
-        public Guid Id { get; set; }
     }
 }
