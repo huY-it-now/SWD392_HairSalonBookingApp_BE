@@ -50,17 +50,24 @@ namespace Application.Services
             {
                 Address = req.Address,
                 ImageId = cloudinaryResult.PublicImageId,
-                ImageUrl = cloudinaryResult.ImageUrl
+                ImageUrl = cloudinaryResult.ImageUrl,
+                ProvinceId = req.Province
             };
 
             await _unitOfWork.SalonRepository.AddAsync(salon);
             await _unitOfWork.SaveChangeAsync();
 
+            var province = await _unitOfWork.SalonRepository.GetProvinceById(req.Province);
+
+            var salonMapper = _mapper.Map<SalonDTO>(salon);
+            salonMapper.Province = province.Name;
+            salonMapper.Image = salon.ImageUrl;
+
             return new Result<object>
             {
                 Error = 0,
                 Message = "Salon created successfully.",
-                Data = salon
+                Data = salonMapper
             };
         }
     }

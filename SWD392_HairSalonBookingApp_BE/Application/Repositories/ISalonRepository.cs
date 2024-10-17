@@ -9,5 +9,6 @@ namespace Application.Repositories
 {
     public interface ISalonRepository : IGenericRepository<Salon>
     {
+        Task<Province> GetProvinceById(int id);
     }
 }
