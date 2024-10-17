@@ -12,5 +12,6 @@ namespace Application.Repositories
         Task<List<Category>> GetAllCategoryAsync();
         Task<Category> GetCategoryById(Guid id);
         Task<Category> CreateCategory(Category category);
+        Task<Category> UpdateCategory(Category category);
     }
 }

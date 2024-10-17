@@ -108,5 +108,47 @@ namespace Application.Services
             };
 
         }
+
+        public async Task<Result<object>> UpdateCategory(Guid id, UpdateCategoryDTO updateRequest)
+        {
+            var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
+
+            if (category == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Category not found!",
+                    Data = null
+                };
+            }
+
+            category.CategoryName = updateRequest.CategoryName;
+
+            var updateCategory = await _unitOfWork.CategoryRepository.UpdateCategory(category);
+
+            try
+            {
+                await _unitOfWork.SaveChangeAsync();
+            }
+            catch (Exception)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "An error occurred while updating the category.",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<CategoryDTO>(updateCategory);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Category updated successfully!",
+                Data = result
+            };
+        }
     }
 }

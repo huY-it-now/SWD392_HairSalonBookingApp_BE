@@ -41,6 +41,8 @@ namespace Infrastructures.Mappers
             CreateMap<Category, CategoryDTO>();
             CreateMap<CreateCategoryRequest, CreateCategoryDTO>();
             CreateMap<CategoryDTO, CreateCategoryDTO>();
+            CreateMap<UpdateCategoryRequest, UpdateCategoryDTO>();
+            CreateMap<UpdateCategoryDTO, Category>();
 
             //ser
             CreateMap<Service, ServiceDTO>();

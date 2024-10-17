@@ -14,5 +14,6 @@ namespace Application.Interfaces
         Task<Result<object>> GetAllCategory();
         Task<Result<object>> GetCategoryById(Guid id);
         Task<Result<object>> CreateCategory(CreateCategoryDTO request);
+        Task<Result<object>> UpdateCategory(Guid id, UpdateCategoryDTO request);
     }
 }
