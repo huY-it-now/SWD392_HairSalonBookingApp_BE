@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Interfaces;
+using Application.Repositories;
 using Application.Validations.Combo;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Combo;
