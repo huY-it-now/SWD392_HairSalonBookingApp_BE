@@ -9,11 +9,11 @@ namespace Domain.Entities
     public class SalonMemberSchedule : BaseEntity
     {
         public DateTime Date { get; set; }
-        public TimeOnly TimeStart { get; set; }
-        public DateTime TimeEnd { get; set; }
+        public string WorkShift { get; set; }
+        public bool IsDayOff { get; set; }
 
         #region RelationShip
-        public Guid SalonMenberId { get; set; }
+        public Guid StylistId { get; set; }
         public SalonMember SalonMember { get; set; }
         #endregion
     }
