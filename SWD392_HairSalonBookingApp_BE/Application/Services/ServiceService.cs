@@ -23,8 +23,7 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IServiceRepository _serviceRepository;
 
-        public ServiceService(IMapper mapper, IUnitOfWork unitOfWork)
-        public ServiceService(IServiceRepository serviceRepository)
+        public ServiceService(IServiceRepository serviceRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _serviceRepository = serviceRepository;
             _mapper = mapper;
@@ -32,7 +31,16 @@ namespace Application.Services
         }
 
         public async Task<Result<object>> GetAllServices()
-        public async Task<Service> GetServiceById(string id)
+        {
+            var services = await _serviceRepository.GetAllAsync();
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Print all service",
+                Data = services
+            };
+        }
+        public async Task<object> GetServiceById(string id)
         {
             var services = await _unitOfWork.ServiceRepository.GetAllServicesAsync();
             var servicesMapper = _mapper.Map<List<ServiceDTO>>(services);
@@ -193,5 +201,9 @@ namespace Application.Services
 
         }
 
+        Task<Service> IServiceService.GetServiceById(string id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
