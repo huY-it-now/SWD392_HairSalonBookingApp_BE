@@ -317,14 +317,10 @@ namespace Application.Services
                 {
                     Error = 1,
                     Message = "Stylish not found!",
->>>>>>> Tam-edit
-            Data = null
+                    Data = null
                 };
             }
 
-<<<<<<< HEAD
-            
-=======
             var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
 
             if (schedules == null || schedules.Count == 0)
@@ -333,15 +329,10 @@ namespace Application.Services
                 {
                     Error = 1,
                     Message = "No schedules found within the given date range.",
->>>>>>> Tam-edit
                     Data = null
                 };
             }
 
-<<<<<<< HEAD
-
-        
-=======
             var scheduleDTOs = _mapper.Map<List<ScheduleDTO>>(schedules);
 
             return new Result<object>

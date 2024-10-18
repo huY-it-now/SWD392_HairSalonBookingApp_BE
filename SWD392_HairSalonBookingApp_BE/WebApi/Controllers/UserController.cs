@@ -112,7 +112,6 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-<<<<<<< HEAD
         [HttpPost("create-stylist")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
@@ -140,26 +139,26 @@ namespace WebApi.Controllers
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<IActionResult> PrintAllSalonMember() {
             var result = await _userService.PrintAllSalonMember();
-=======
+            return Ok(result);
+        }
+        
+        [HttpPost("get-member-with-role")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetMemberWithRole(int roleId) {
+            var result = await _userService.GetSalonMemberWithRole(roleId);
+            return Ok(result);
+        }
+
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<IActionResult> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
             var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
->>>>>>> Tam-edit
-
             return Ok(result);
         }
 
-<<<<<<< HEAD
-        [HttpPost("get-member-with-role")]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
-        [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> GetMemberWithRole(int roleId) {
-            var result = await _userService.GetSalonMemberWithRole(roleId);
-
-=======
         [HttpPost("register-work-schedule")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
@@ -175,8 +174,8 @@ namespace WebApi.Controllers
         public async Task<IActionResult> RegisterDayOff([FromBody] RegisterDayOffDTO request)
         {
             var result = await _userService.RegisterDayOff(request);
->>>>>>> Tam-edit
             return Ok(result);
         }
+            
     }
 }
