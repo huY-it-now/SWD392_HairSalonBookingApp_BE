@@ -102,16 +102,16 @@ namespace WebApi.Controllers
                 }
             }
 
-            var Salon = await _salonService.GetSalonById(SalonId);
+            //var Salon = await _salonService.GetSalonById(SalonId);
 
-            if (Salon != null)
-            {
-                //foreach (var item in booking.Service.ComboServices)
-                //{
-                //    item.SalonId = SalonId;
-                //    item.Salon = Salon;
-                //}                
-            }
+            //if (Salon != null)
+            //{
+            //    //foreach (var item in booking.Service.ComboServices)
+            //    //{
+            //    //    item.SalonId = SalonId;
+            //    //    item.Salon = Salon;
+            //    //}                
+            //}
 
             var User = await _userService.GetUserById(CustomerId);
             var user = User.Data;

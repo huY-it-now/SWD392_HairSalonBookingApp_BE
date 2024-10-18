@@ -11,5 +11,6 @@ namespace Application.Repositories
     {
         Task<List<Salon>> GetAllSalonAsync();
         Task<Salon> GetSalonByName(string salonName);
+        Task<Salon> GetSalonById(Guid id);
     }
 }
