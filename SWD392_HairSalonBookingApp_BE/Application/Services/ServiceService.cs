@@ -191,10 +191,5 @@ namespace Application.Services
             };
 
         }
-
-        Task<Service> IServiceService.GetServiceById(string id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
