@@ -12,5 +12,8 @@ namespace Application.Interfaces
         Task<Result<object>> Login(LoginUserDTO request);
         Task<Result<object>> Verify(VerifyTokenDTO request);
         Task<Result<object>> GetUserById(Guid id);
+        Task<Result<object>> CreateStylist(CreateStylistDTO request);
+        Task<Result<object>> PrintAllSalonMember();
+        Task<Result<object>> GetSalonMemberWithRole(int roleId);
     }
 }
