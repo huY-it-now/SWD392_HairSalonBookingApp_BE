@@ -181,5 +181,105 @@ namespace Application.Services
                 Data = null
             };
         }
+
+        public async Task<Result<object>> CreateStylist(CreateStylistDTO request) {
+            var stylist = await _unitOfWork.UserRepository.GetUserById(request.UserId);
+            var salon = await _unitOfWork.SalonRepository.GetByIdAsync(request.SalonId);
+
+            if (stylist == null) {
+                return new Result<object> {
+                    Error = 1,
+                    Message = "Not found User",
+                    Data = null
+                };
+            }
+
+            if (salon == null) {
+                return new Result<object> {
+                    Error = 1,
+                    Message = "Salon is not found",
+                    Data = null
+                };
+            }
+
+            if (request.Job.ToLower().StartsWith("stylist")) {
+                stylist.RoleId = 5;
+            } else if (request.Job.StartsWith("manager")) {
+                stylist.RoleId = 3;
+            } else if (request.Job.StartsWith("staff")) {
+                stylist.RoleId = 4;
+            } else {
+                return new Result<object> {
+                    Error = 1,
+                    Message = "Job not found",
+                    Data = null
+                };
+            }
+
+            var salonMember = new SalonMember {
+                Id = Guid.NewGuid(),
+                UserId = stylist.Id,
+                SalonId = salon.Id,
+                Job = request.Job,
+                Rating = "newbie",
+                IsDeleted = false,
+                Status = true
+            };
+
+            await _unitOfWork.SalonMemberRepository.AddAsync(salonMember);
+            await _unitOfWork.SaveChangeAsync();
+            var result = _mapper.Map<StylistDTO>(request);
+            result.FullName = stylist.FullName;
+            result.Email = stylist.Email;
+            result.Job = salonMember.Job;
+            result.Rating = salonMember.Rating;
+            result.Status = salonMember.Status;
+
+            return new Result<object> {
+                Error = 0,
+                Message = "Create stylist successfully",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> PrintAllSalonMember() {
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetAllSalonMember();
+
+            if (salonMember == null) {
+                return new Result<object> {
+                    Error = 1,
+                    Message = "List member is empty",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<List<StylistDTO>>(salonMember);
+
+            return new Result<object> {
+                Error = 0,
+                Message = "Print all member",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> GetSalonMemberWithRole(int roleId) {
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberWithRole(roleId);
+
+            if (salonMember == null) {
+                return new Result<object> {
+                    Error = 1,
+                    Message = "No member with role",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<List<StylistDTO>>(salonMember);
+
+            return new Result<object> {
+                Error = 0,
+                Message = "Print member",
+                Data = result
+            };
+        }
     }
 }

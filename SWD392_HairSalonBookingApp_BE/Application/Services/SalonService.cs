@@ -96,5 +96,26 @@ namespace Application.Services
                 Data = salonDTOList
             };
         }
+
+        public async Task<Result<object>> SearchSalonWithAddress(SalonDTO req) {
+            var salon = await _unitOfWork.SalonRepository.GetSalonByName(req.Address);
+
+            if (salon == null) {
+                return new Result<object> {
+                    Error = 1,
+                    Message = "Not found salon with this address",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<SalonDTO>(salon);
+            result.Image = salon.ImageUrl;
+
+            return new Result<object> {
+                Error = 0,
+                Message = "Found salon with this address",
+                Data = result
+            };
+        }
     }
 }

@@ -10,5 +10,6 @@ namespace Application.Repositories
     public interface ISalonRepository : IGenericRepository<Salon>
     {
         Task<List<Salon>> GetAllSalonAsync();
+        Task<Salon> GetSalonByName(string salonName);
     }
 }
