@@ -19,6 +19,7 @@ namespace Infrastructures
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ISalonService, SalonService>();
             services.AddScoped<ISalonRepository, SalonRepository>();
+            services.AddScoped<ISalonMemberRepository, SalonMemberRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICategoryRepository,CategoryRepository>();
             services.AddScoped<ICategoryService,CategoryService>();
@@ -31,10 +32,10 @@ namespace Infrastructures
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IPaymentsRepository, PaymentsRepository>();
             services.AddSingleton<ICurrentTime, CurrentTime>();
+            services.AddScoped<IScheduleRepository, ScheduleRepository>();
 
             services.AddScoped<IComboServiceRepository, ComboServiceRepository>();
             services.AddScoped<IComboDetailRepository, ComboDetailRepository>();
-            services.AddScoped<ComboServiceService>();
             services.AddScoped<ComboDetailService>();
 
 

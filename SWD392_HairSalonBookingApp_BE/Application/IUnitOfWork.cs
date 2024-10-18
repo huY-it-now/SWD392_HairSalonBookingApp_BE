@@ -11,5 +11,7 @@ namespace Application
         ICategoryRepository CategoryRepository { get; }
         IServiceRepository ServiceRepository { get; }
         ISalonRepository SalonRepository { get; }
+        ISalonMemberRepository SalonMemberRepository {get;}
+        IScheduleRepository ScheduleRepository { get; }
     }
 }

@@ -51,5 +51,15 @@ namespace WebApi.Controllers
             var salon = await _salonService.PrintAllSalon();
             return Ok(salon);
         }
+
+        [HttpPost("search-salon")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> SearchSalonWithAddress(SearchSalonRequest request) {
+            var salonMapper = _mapper.Map<SalonDTO>(request);
+            var result = await _salonService.SearchSalonWithAddress(salonMapper);
+
+            return Ok(result);
+        }
     }
 }

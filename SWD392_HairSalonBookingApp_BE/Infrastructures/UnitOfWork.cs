@@ -12,8 +12,9 @@ namespace Infrastructures
         private readonly ICategoryRepository _categoryRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly ISalonRepository _salonRepository;
-
-        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository, ICategoryRepository categoryRepository, ISalonRepository salonRepository, IServiceRepository serviceRepository)
+        private readonly ISalonMemberRepository _salonMemberRepository;
+        private readonly IScheduleRepository _scheduleRepository;
+        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository, ICategoryRepository categoryRepository, ISalonRepository salonRepository, IServiceRepository serviceRepository, ISalonMemberRepository salonMemberRepository, IScheduleRepository scheduleRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -22,6 +23,8 @@ namespace Infrastructures
             _categoryRepository = categoryRepository;
             _serviceRepository = serviceRepository;
             _salonRepository = salonRepository;
+            _salonMemberRepository = salonMemberRepository;
+            _scheduleRepository = scheduleRepository;
         }
 
         public IUserRepository UserRepository => _userRepository;
@@ -29,8 +32,9 @@ namespace Infrastructures
         public IComboDetailRepository ComboDetailRepository => _comboDetailRepository;
         public ICategoryRepository CategoryRepository => _categoryRepository;
         public IServiceRepository ServiceRepository => _serviceRepository;
-
+        public ISalonMemberRepository SalonMemberRepository => _salonMemberRepository;
         public ISalonRepository SalonRepository => _salonRepository;
+        public IScheduleRepository ScheduleRepository => _scheduleRepository;
 
         public async Task<int> SaveChangeAsync()
         {

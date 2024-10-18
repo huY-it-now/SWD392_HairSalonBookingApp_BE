@@ -23,7 +23,7 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IServiceRepository _serviceRepository;
 
-        public ServiceService(IServiceRepository serviceRepository, IMapper mapper, IUnitOfWork unitOfWork)
+        public ServiceService(IMapper mapper, IUnitOfWork unitOfWork, IServiceRepository serviceRepository)
         {
             _serviceRepository = serviceRepository;
             _mapper = mapper;
@@ -31,16 +31,6 @@ namespace Application.Services
         }
 
         public async Task<Result<object>> GetAllServices()
-        {
-            var services = await _serviceRepository.GetAllAsync();
-            return new Result<object>
-            {
-                Error = 0,
-                Message = "Print all service",
-                Data = services
-            };
-        }
-        public async Task<object> GetServiceById(string id)
         {
             var services = await _unitOfWork.ServiceRepository.GetAllServicesAsync();
             var servicesMapper = _mapper.Map<List<ServiceDTO>>(services);
@@ -52,6 +42,7 @@ namespace Application.Services
                 Data = servicesMapper
             };
         }
+
         public async Task<Result<object>> GetServiceById(Guid id)
         {
             var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
