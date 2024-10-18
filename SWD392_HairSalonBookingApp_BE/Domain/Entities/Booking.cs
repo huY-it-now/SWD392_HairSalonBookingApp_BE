@@ -18,7 +18,6 @@
         public SalonMember SalonMember { get; set; }
         public Guid ServiceId { get; set; }
         public Service Service { get; set; }
-        public ICollection<ComboService> ComboServices { get; set; }
         #endregion
     }
 }
