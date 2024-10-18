@@ -11,71 +11,11 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class ComboController : ControllerBase
     {
-        private readonly ComboServiceService _comboServiceService;
         private readonly ComboDetailService _comboDetailService;
 
-        public ComboController(ComboServiceService comboServiceService, ComboDetailService comboDetailService)
+        public ComboController(ComboDetailService comboDetailService)
         {
-            _comboServiceService = comboServiceService;
             _comboDetailService = comboDetailService;
-        }
-
-        [HttpGet("comboservices")]
-        public async Task<IActionResult> GetAllComboServices()
-        {
-            var result = await _comboServiceService.GetAllComboServices();
-            var comboServices = result.Data as IEnumerable<ComboServiceDTO>;
-            if (comboServices == null || !comboServices.Any())
-            {
-                return NotFound(new { Error = 1, Message = "No combo services found" });
-            }
-            return Ok(new { Error = 0, Message = "All combo services", Data = comboServices });
-        }
-
-        [HttpGet("comboservices/{id}")]
-        public async Task<IActionResult> GetComboServiceById(Guid id)
-        {
-            var comboService = await _comboServiceService.GetComboServiceById(id);
-            if (comboService == null)
-            {
-                return NotFound(new { Error = 1, Message = "Combo service not found" });
-            }
-            return Ok(new { Error = 0, Message = "Combo service details", Data = comboService });
-        }
-
-        [HttpPost("comboservices")]
-        public async Task<IActionResult> AddComboService([FromBody] AddComboServiceRequest createRequest)
-        {
-            try
-            {
-                await _comboServiceService.AddComboService(createRequest);
-                return Ok(new { Error = 0, Message = "Combo service added successfully" });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { Error = 1, Message = ex.Message });
-            }
-        }
-
-        [HttpPut("comboservices")]
-        public async Task<IActionResult> UpdateComboService([FromBody] UpdateComboServiceRequest updateRequest)
-        {
-            try
-            {
-                await _comboServiceService.UpdateComboService(updateRequest);
-                return Ok(new { Error = 0, Message = "Combo service updated successfully" });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { Error = 1, Message = ex.Message });
-            }
-        }
-
-        [HttpDelete("comboservices/{id}")]
-        public async Task<IActionResult> DeleteComboService(Guid id)
-        {
-            await _comboServiceService.DeleteComboService(id);
-            return Ok(new { Error = 0, Message = "Combo service deleted successfully" });
         }
 
         [HttpGet("combodetails")]
