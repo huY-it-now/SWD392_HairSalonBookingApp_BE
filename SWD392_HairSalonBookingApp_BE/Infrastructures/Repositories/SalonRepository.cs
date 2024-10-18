@@ -23,5 +23,11 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Salons.ToListAsync();
         }
+
+        public async Task<Salon> GetSalonByName(string salonName)
+        {
+            return await _dbContext.Salons
+                .FirstOrDefaultAsync(s => s.Address.ToLower().Contains(salonName.ToLower()));
+        }
     }
 }
