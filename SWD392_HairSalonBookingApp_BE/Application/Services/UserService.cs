@@ -1,10 +1,13 @@
 ﻿using Application.Commons;
 using Application.Interfaces;
 using Application.Utils;
+using Application.Validations.Stylist;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Stylish;
+using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
 
@@ -187,36 +190,48 @@ namespace Application.Services
             var salon = await _unitOfWork.SalonRepository.GetByIdAsync(request.SalonId);
 
             if (stylist == null) {
-                return new Result<object> {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "Not found User",
                     Data = null
                 };
             }
 
-            if (salon == null) {
-                return new Result<object> {
+            if (salon == null)
+            {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "Salon is not found",
                     Data = null
                 };
             }
 
-            if (request.Job.ToLower().StartsWith("stylist")) {
+            if (request.Job.ToLower().StartsWith("stylist"))
+            {
                 stylist.RoleId = 5;
-            } else if (request.Job.StartsWith("manager")) {
+            }
+            else if (request.Job.StartsWith("manager"))
+            {
                 stylist.RoleId = 3;
-            } else if (request.Job.StartsWith("staff")) {
+            }
+            else if (request.Job.StartsWith("staff"))
+            {
                 stylist.RoleId = 4;
-            } else {
-                return new Result<object> {
+            }
+            else
+            {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "Job not found",
                     Data = null
                 };
             }
 
-            var salonMember = new SalonMember {
+            var salonMember = new SalonMember
+            {
                 Id = Guid.NewGuid(),
                 UserId = stylist.Id,
                 SalonId = salon.Id,
@@ -235,18 +250,22 @@ namespace Application.Services
             result.Rating = salonMember.Rating;
             result.Status = salonMember.Status;
 
-            return new Result<object> {
+            return new Result<object>
+            {
                 Error = 0,
                 Message = "Create stylist successfully",
                 Data = result
             };
         }
 
-        public async Task<Result<object>> PrintAllSalonMember() {
+        public async Task<Result<object>> PrintAllSalonMember()
+        {
             var salonMember = await _unitOfWork.SalonMemberRepository.GetAllSalonMember();
 
-            if (salonMember == null) {
-                return new Result<object> {
+            if (salonMember == null)
+            {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "List member is empty",
                     Data = null
@@ -255,18 +274,22 @@ namespace Application.Services
 
             var result = _mapper.Map<List<StylistDTO>>(salonMember);
 
-            return new Result<object> {
+            return new Result<object>
+            {
                 Error = 0,
                 Message = "Print all member",
                 Data = result
             };
         }
 
-        public async Task<Result<object>> GetSalonMemberWithRole(int roleId) {
+        public async Task<Result<object>> GetSalonMemberWithRole(int roleId)
+        {
             var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberWithRole(roleId);
 
-            if (salonMember == null) {
-                return new Result<object> {
+            if (salonMember == null)
+            {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "No member with role",
                     Data = null
@@ -275,11 +298,128 @@ namespace Application.Services
 
             var result = _mapper.Map<List<StylistDTO>>(salonMember);
 
-            return new Result<object> {
+            return new Result<object>
+            {
                 Error = 0,
                 Message = "Print member",
                 Data = result
             };
+        }
+
+
+        public async Task<Result<object>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
+        {
+            var stylist = await _unitOfWork.UserRepository.GetUserById(stylistId);
+
+            if (stylist == null || stylist.RoleId != 5)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Stylish not found!",
+>>>>>>> Tam-edit
+            Data = null
+                };
+            }
+
+<<<<<<< HEAD
+            
+=======
+            var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
+
+            if (schedules == null || schedules.Count == 0)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No schedules found within the given date range.",
+>>>>>>> Tam-edit
+                    Data = null
+                };
+            }
+
+<<<<<<< HEAD
+
+        
+=======
+            var scheduleDTOs = _mapper.Map<List<ScheduleDTO>>(schedules);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Work and day-off schedule retrieved successfully!",
+                Data = scheduleDTOs
+            };
+        }
+
+        public async Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request)
+        {
+            var validation = new WorkDayValidation();
+            var validationResult = validation.Validate(request);
+
+            if (!validationResult.IsValid)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Validation failed!",
+                    Data = validationResult.Errors.Select(x => x.ErrorMessage)
+                };
+            }
+
+            var existingSchedule = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(request.StylistId, request.ScheduleDate, request.ScheduleDate.AddDays(1));
+
+            if (existingSchedule.Count + request.WorkShifts.Count > 3)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Cannot register more than 3 shifts for one day.",
+                    Data = null
+                };
+            }
+
+            foreach (var shift in request.WorkShifts)
+            {
+                var schedule = new SalonMemberSchedule
+                {
+                    StylistId = request.StylistId,
+                    Date = request.ScheduleDate,
+                    WorkShift = shift.ShiftName
+                };
+
+                await _unitOfWork.ScheduleRepository.AddAsync(schedule);
+            }
+
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Work schedule registered successfully!",
+                Data = null
+            };
+        }
+
+        public async Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request)
+        {
+            var schedule = new SalonMemberSchedule
+            {
+                StylistId = request.StylistId,
+                Date = request.DayOffDate,
+                IsDayOff = true,
+            };
+
+            await _unitOfWork.ScheduleRepository.AddAsync(schedule);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Day off registered successfully!",
+                Data = null
+            };
+
         }
     }
 }
