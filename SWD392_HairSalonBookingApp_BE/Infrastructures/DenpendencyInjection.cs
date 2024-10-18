@@ -35,7 +35,6 @@ namespace Infrastructures
 
             services.AddScoped<IComboServiceRepository, ComboServiceRepository>();
             services.AddScoped<IComboDetailRepository, ComboDetailRepository>();
-            services.AddScoped<ComboServiceService>();
             services.AddScoped<ComboDetailService>();
 
 
