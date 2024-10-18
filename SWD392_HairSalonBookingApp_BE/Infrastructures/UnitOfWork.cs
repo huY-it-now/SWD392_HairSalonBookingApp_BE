@@ -12,8 +12,9 @@ namespace Infrastructures
         private readonly ICategoryRepository _categoryRepository;
         private readonly IServiceRepository _serviceRepository;
         private readonly ISalonRepository _salonRepository;
+        private readonly ISalonMemberRepository _salonMemberRepository;
 
-        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository, ICategoryRepository categoryRepository, ISalonRepository salonRepository, IServiceRepository serviceRepository)
+        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository, ICategoryRepository categoryRepository, ISalonRepository salonRepository, IServiceRepository serviceRepository, ISalonMemberRepository salonMemberRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -22,6 +23,7 @@ namespace Infrastructures
             _categoryRepository = categoryRepository;
             _serviceRepository = serviceRepository;
             _salonRepository = salonRepository;
+            _salonMemberRepository = salonMemberRepository;
         }
 
         public IUserRepository UserRepository => _userRepository;
@@ -29,6 +31,7 @@ namespace Infrastructures
         public IComboDetailRepository ComboDetailRepository => _comboDetailRepository;
         public ICategoryRepository CategoryRepository => _categoryRepository;
         public IServiceRepository ServiceRepository => _serviceRepository;
+        public ISalonMemberRepository SalonMemberRepository => _salonMemberRepository;
 
         public ISalonRepository SalonRepository => _salonRepository;
 

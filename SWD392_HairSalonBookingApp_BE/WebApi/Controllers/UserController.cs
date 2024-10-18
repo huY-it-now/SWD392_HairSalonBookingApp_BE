@@ -110,5 +110,45 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("create-stylist")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> CreateStylist(CreateStylistRequest request) {
+            var validator = new CreateStylistRequestValidation();
+            var validationResult = validator.Validate(request);
+            if (!validationResult.IsValid)
+            {
+                return BadRequest(new Result<object>
+                {
+                    Error = 1,
+                    Message = "Validation failed!",
+                    Data = validationResult.Errors.Select(x => x.ErrorMessage)
+                });
+            }
+
+            var mapper = _mapper.Map<CreateStylistDTO>(request);
+            var result = await _userService.CreateStylist(mapper);
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> PrintAllSalonMember() {
+            var result = await _userService.PrintAllSalonMember();
+
+            return Ok(result);
+        }
+
+        [HttpPost("get-member-with-role")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetMemberWithRole(int roleId) {
+            var result = await _userService.GetSalonMemberWithRole(roleId);
+
+            return Ok(result);
+        }
     }
 }

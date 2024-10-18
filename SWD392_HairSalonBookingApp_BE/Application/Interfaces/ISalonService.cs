@@ -1,11 +1,6 @@
 ﻿using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Salon;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Interfaces
 {
@@ -13,6 +8,7 @@ namespace Application.Interfaces
     {
         Task<Result<object>> CreateSalon(CreateSalonDTO req);
         Task<Result<object>> PrintAllSalon();
-        Task<Salon> GetSalonById(Guid Id);   
+        Task<Salon> GetSalonById(Guid Id);
+        Task<Result<object>> SearchSalonWithAddress(SalonDTO req);
     }
 }

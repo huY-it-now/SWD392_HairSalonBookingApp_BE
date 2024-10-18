@@ -1,14 +1,7 @@
-﻿using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Application.Repositories;
+using Domain.Entities;
 
-namespace Application.Repositories
-{
-    public interface ISalonMemberRepository : IGenericRepository<SalonMember>
-    {
-
-    }
+public interface ISalonMemberRepository : IGenericRepository<SalonMember> {
+    Task<List<SalonMember>> GetAllSalonMember();
+    Task<List<SalonMember>> GetSalonMemberWithRole(int roleId);
 }
