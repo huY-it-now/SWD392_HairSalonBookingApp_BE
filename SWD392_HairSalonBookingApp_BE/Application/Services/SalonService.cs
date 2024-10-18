@@ -67,6 +67,11 @@ namespace Application.Services
             };
         }
 
+        public async Task<Salon> GetSalonById(Guid Id)
+        {
+            return await _unitOfWork.SalonRepository.GetByIdAsync(Id);
+        }
+
         public async Task<Result<object>> PrintAllSalon()
         {
             var salons = await _unitOfWork.SalonRepository.GetAllSalonAsync();

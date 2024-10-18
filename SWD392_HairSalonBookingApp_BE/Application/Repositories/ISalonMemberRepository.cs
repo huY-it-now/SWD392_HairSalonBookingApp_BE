@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace Application.Repositories
 {
-    public interface IBookingRepository : IGenericRepository<Booking>
+    public interface ISalonMemberRepository : IGenericRepository<SalonMember>
     {
-        Task<Booking> GetBookingWithPayment(Guid id);
-        Task<List<Booking>> GetFullBookingInformation();
+
     }
 }

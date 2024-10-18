@@ -10,7 +10,6 @@ namespace Domain.Entities
     {
         public string StatusName { get; set; }
         public string Discription {  get; set; }
-        public Guid PaymentId { get; set; }
-        public Payments Payments { get; set; }
+        public ICollection<Payments> Payments { get; set; }
     }
 }

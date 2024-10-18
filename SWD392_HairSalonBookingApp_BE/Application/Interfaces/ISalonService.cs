@@ -1,5 +1,6 @@
 ﻿using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Salon;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace Application.Interfaces
     {
         Task<Result<object>> CreateSalon(CreateSalonDTO req);
         Task<Result<object>> PrintAllSalon();
+        Task<Salon> GetSalonById(Guid Id);   
     }
 }

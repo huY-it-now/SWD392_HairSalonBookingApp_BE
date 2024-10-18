@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Application.Interfaces;
+using Application.Repositories;
+using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,14 +21,18 @@ namespace Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IServiceRepository _serviceRepository;
 
         public ServiceService(IMapper mapper, IUnitOfWork unitOfWork)
+        public ServiceService(IServiceRepository serviceRepository)
         {
+            _serviceRepository = serviceRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<object>> GetAllServices()
+        public async Task<Service> GetServiceById(string id)
         {
             var services = await _unitOfWork.ServiceRepository.GetAllServicesAsync();
             var servicesMapper = _mapper.Map<List<ServiceDTO>>(services);

@@ -7,7 +7,7 @@
 
         #region Relationship
         public ICollection<Service> Service { get; set; }
-        public ICollection<ComboDetail> ComboDetails { get; set; }
+        public ICollection<Booking> ComboDetails { get; set; }
         public Guid SalonId { get; set; }
         public Salon Salon { get; set; }
         #endregion

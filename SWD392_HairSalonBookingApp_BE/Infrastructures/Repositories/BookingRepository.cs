@@ -20,6 +20,11 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<Booking> GetBookingWithPayment(Guid id)
+        {
+            return await _dbContext.Bookings.Include(b => b.Payments).FirstOrDefaultAsync(booking => booking.Id == id);
+        }
+
         public async Task<List<Booking>> GetFullBookingInformation()
         {
             return await _dbContext.Bookings
@@ -27,6 +32,8 @@ namespace Infrastructures.Repositories
                .Include(b => b.User)
                .Include(b => b.Payments)
                .Include(b => b.SalonMember)
+               .Include(b => b.ComboServices)
+               .Include(b => b.Service)
                .ToListAsync();
         }
     }

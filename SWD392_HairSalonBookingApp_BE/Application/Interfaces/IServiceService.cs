@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Entities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,5 +18,6 @@ namespace Application.Interfaces
         Task<Result<object>> CreateService(CreateServiceDTO request);
         Task<Result<object>> UpdateService(Guid id, UpdateServiceDTO request);
         Task<Result<object>> DeleteService(Guid id);
+        public Task<Service> GetServiceById (string id);
     }
 }

@@ -62,11 +62,25 @@ namespace WebApi.Controllers
         [HttpPost("QuickLink")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> QuickLink([FromBody] BankRequest bankRequest)
+        public async Task<IActionResult> QuickLink([FromBody] BankRequest bankRequest, Guid BookingId)
         {
-            string linkImage = $"https://img.vietqr.io/image/{bankRequest.BANK_ID}-{bankRequest.ACCOUNT_NO}-{bankRequest.TEMPLATE}.png?amount={bankRequest.AMOUNT}&addInfo={bankRequest.DESCRIPTION}&accountName={bankRequest.ACCOUNT_NAME}";
+            var paymentCheck = await _paymentService.BookingPaymentCheck(BookingId);
 
-            return Ok(linkImage);
+            if(!paymentCheck)
+            {
+                return BadRequest("The booking is not exist!");
+            }
+
+            if (await _paymentService.ChangePaymentStatus(BookingId, "Pending"))
+            {
+                string linkImage = $"https://img.vietqr.io/image/{bankRequest.BANK_ID}-{bankRequest.ACCOUNT_NO}-{bankRequest.TEMPLATE}.png?amount={bankRequest.AMOUNT}&addInfo={bankRequest.DESCRIPTION}&accountName={bankRequest.ACCOUNT_NAME}";
+
+                return Ok(linkImage);
+            }
+            else
+            {
+                return Ok("This booking is paid");
+            }
         }
     }
 }

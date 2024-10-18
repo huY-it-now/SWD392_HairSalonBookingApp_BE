@@ -11,10 +11,12 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork)
         {
+            _unitOfWork = unitOfWork;
             _bookingRepository = bookingRepository;
         }
 
@@ -39,6 +41,20 @@ namespace Application.Services
             }
 
             return true;
+        }
+
+        public async Task<bool> CreateBooking(Booking booking)
+        {
+            if (booking != null)
+            {
+                _bookingRepository.AddAsync(booking);
+            }
+            else
+            {
+                return false;
+            }
+
+            return await  _unitOfWork.SaveChangeAsync() > 0;
         }
 
         public async Task<List<Booking>> ShowAllUncheckedBooking()

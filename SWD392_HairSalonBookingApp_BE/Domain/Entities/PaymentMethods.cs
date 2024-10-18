@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,6 @@ namespace Domain.Entities
         public string MethodName { get; set; }
         public string Description { get; set; }
         public Guid PaymentMethodId { get; set; }
-        public Payments Payments { get; set; }
+        public ICollection<Payments> Payments { get; set; }
     }
 }
