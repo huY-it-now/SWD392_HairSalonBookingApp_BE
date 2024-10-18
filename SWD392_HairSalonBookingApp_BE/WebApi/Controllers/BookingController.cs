@@ -18,12 +18,14 @@ namespace WebApi.Controllers
         private readonly IMapper _mapper;
         private readonly ISalonService _salonService;
         private readonly ISalonMemberService _salonMemberService;
+        private readonly IComboService _comboService;
         private readonly IServiceService _serviceService;
 
-        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IUserService userService, ISalonMemberService salonMemberService, ISalonService salonService)
+        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboService comboService, IUserService userService, ISalonMemberService salonMemberService, ISalonService salonService)
         {
             _salonService = salonService;
             _salonMemberService = salonMemberService;
+            _comboService = comboService;
             _serviceService = serviceService;
             _bookingService = bookingService;
             _userService = userService;
@@ -50,106 +52,118 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        //[HttpPost("AddBooking")]
-        //[ProducesResponseType(200, Type = typeof(Result<object>))]
-        //[ProducesResponseType(400, Type = typeof(Result<object>))]
-        //public async Task<IActionResult> AddBooking([FromForm] Guid CustomerId, Guid SalonId, Guid SalonMemberId, DateTime cuttingDate, string ServiceId, string ComboServiceId)
-        //{
-        //    Decimal TotalAmount = 0;
-        //    Booking booking = new Booking();
+        [HttpPost("AddBooking")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> AddBooking([FromForm] Guid CustomerId, Guid SalonId, Guid SalonMemberId, DateTime cuttingDate, Guid ServiceId, string ComboServiceId)
+        {
+            Decimal TotalAmount = 0;
+            Booking booking = new Booking();
 
-        //    booking.Checked = false;
-        //    booking.BookingDate = DateTime.Now;
-        //    booking.SalonMemberId = SalonMemberId;
-        //    booking.UserId = CustomerId;
+            booking.Checked = false;
+            booking.BookingDate = DateTime.Now;
+            booking.SalonMemberId = SalonMemberId;
+            booking.UserId = CustomerId;
 
-        //    var salonMember = await _salonMemberService.GetSalonMemberById(SalonMemberId);
+            var salonMember = await _salonMemberService.GetSalonMemberById(SalonMemberId);
 
-        //    if (salonMember != null)
-        //    {
-        //        booking.SalonMember = salonMember;
+            if (salonMember != null)
+            {
+                booking.SalonMember = salonMember;
 
-        //        booking.SalonMemberId = SalonMemberId;
-        //    }
+                booking.SalonMemberId = SalonMemberId;
+            }
 
-        //    var service = await _serviceService.GetServiceById(ServiceId);
+            var serviceObj = await _serviceService.GetServiceById(ServiceId);
 
-        //    if (service != null)
-        //    {
-        //        booking.Service = service;
-        //    }
+            if (serviceObj.Data == null)
+            {
+                return BadRequest("Service not found");
+            }
 
-        //    foreach (var id in ExtractValidIds(ComboServiceId))
-        //    {
-        //        var comboService = await _comboServiceService.GetComboServiceByIdAsync(new Guid(id));
+            var service = (Service)serviceObj.Data;
 
-        //        if (comboService != null)
-        //        {
-        //            booking.ComboServices.Add(comboService);
+            if (service != null)
+            {
+                booking.Service = service;
+            }
 
-        //            TotalAmount += comboService.Price;
-        //        }
-        //    }
+            foreach (var id in ExtractValidIds(ComboServiceId))
+            {
+                var comboService = await _comboService.GetComboServiceById(new Guid(id));
 
-        //    var Salon = await _salonService.GetSalonById(SalonId);
+                if (comboService.Data != null)
+                {
+                    var combo = (ComboService)comboService.Data;
 
-        //    if (Salon != null)
-        //    {
-        //        booking.SalonId = SalonId;
-        //        booking.salon = Salon;
-        //    }
+                    booking.Service.ComboServices.Add(combo);
 
-        //    var User = await _userService.GetUserById(CustomerId);
-        //    var user = User.Data;
+                    TotalAmount += combo.Price;
+                }
+            }
 
-        //    if (user != null)
-        //    {
-        //        booking.User = (User)user;
-        //        booking.UserId = CustomerId;
-        //    }
+            var Salon = await _salonService.GetSalonById(SalonId);
 
-        //    booking.TotalMoney = TotalAmount;
+            if (Salon != null)
+            {
+                foreach (var item in booking.Service.ComboServices)
+                {
+                    item.SalonId = SalonId;
+                    item.Salon = Salon;
+                }                
+            }
 
-        //    if (!await _bookingService.CreateBooking(booking))
-        //    {
-        //        return BadRequest("Create booking fail");
-        //    }
+            var User = await _userService.GetUserById(CustomerId);
+            var user = User.Data;
 
-        //    return Ok(booking);
-        //}
+            if (user != null)
+            {
+                booking.User = (User)user;
+                booking.UserId = CustomerId;
+            }
 
-        //List<string> ExtractValidIds(string input)
-        //{
-        //    List<string> result = new List<string>();
-        //    int start = 0;
+            booking.TotalMoney = TotalAmount;
 
-        //    while (start < input.Length)
-        //    {
-        //        bool found = false;
-                
-        //        // Try different lengths starting from the current position
-        //        for (int length = 36; length <= input.Length - start; length++)
-        //        {
-        //            string potentialGuid = input.Substring(start, length);
+            if (!await _bookingService.CreateBooking(booking))
+            {
+                return BadRequest("Create booking fail");
+            }
 
-        //            // Validate if the substring is a valid GUID
-        //            if (Guid.TryParse(potentialGuid, out _))
-        //            {
-        //                result.Add(potentialGuid);  // Add the valid GUID to the result list
-        //                start += length;            // Move start index to the end of the found GUID
-        //                found = true;
-        //                break;                      // Break out to find the next GUID
-        //            }
-        //        }
+            return Ok(booking);
+        }
 
-        //        // If no valid GUID was found, increment the start position
-        //        if (!found)
-        //        {
-        //            start++;
-        //        }
-        //    }
+        List<string> ExtractValidIds(string input)
+        {
+            List<string> result = new List<string>();
+            int start = 0;
 
-        //    return result;
-        //}
+            while (start < input.Length)
+            {
+                bool found = false;
+
+                // Try different lengths starting from the current position
+                for (int length = 36; length <= input.Length - start; length++)
+                {
+                    string potentialGuid = input.Substring(start, length);
+
+                    // Validate if the substring is a valid GUID
+                    if (Guid.TryParse(potentialGuid, out _))
+                    {
+                        result.Add(potentialGuid);  // Add the valid GUID to the result list
+                        start += length;            // Move start index to the end of the found GUID
+                        found = true;
+                        break;                      // Break out to find the next GUID
+                    }
+                }
+
+                // If no valid GUID was found, increment the start position
+                if (!found)
+                {
+                    start++;
+                }
+            }
+
+            return result;
+        }
     }
 }
