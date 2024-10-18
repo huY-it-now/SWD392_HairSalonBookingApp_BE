@@ -18,14 +18,14 @@ namespace WebApi.Controllers
         private readonly IMapper _mapper;
         private readonly ISalonService _salonService;
         private readonly ISalonMemberService _salonMemberService;
-        private readonly IComboServiceService _comboServiceService;
+        private readonly IComboService _comboService;
         private readonly IServiceService _serviceService;
 
-        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboServiceService comboServiceService, IUserService userService, ISalonMemberService salonMemberService, ISalonService salonService)
+        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboService comboService, IUserService userService, ISalonMemberService salonMemberService, ISalonService salonService)
         {
             _salonService = salonService;
             _salonMemberService = salonMemberService;
-            _comboServiceService = comboServiceService;
+            _comboService = comboService;
             _serviceService = serviceService;
             _bookingService = bookingService;
             _userService = userService;
@@ -83,13 +83,15 @@ namespace WebApi.Controllers
 
             foreach (var id in ExtractValidIds(ComboServiceId))
             {
-                var comboService = await _comboServiceService.GetComboServiceByIdAsync(new Guid(id));
+                var comboService = await _comboService.GetComboServiceById(new Guid(id));
 
-                if (comboService != null)
+                if (comboService.Data != null)
                 {
-                    booking.ComboServices.Add(comboService);
+                    var combo = (ComboService)comboService.Data;
 
-                    TotalAmount += comboService.Price;
+                    booking.ComboServices.Add(combo);
+
+                    TotalAmount += combo.Price;
                 }
             }
 

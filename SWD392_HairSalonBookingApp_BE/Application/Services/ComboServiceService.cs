@@ -9,7 +9,7 @@ using Domain.Entities;
 
 namespace Application.Services
 {
-    public class ComboServiceService : IComboServiceService
+    public class ComboServiceService : IComboService
     {
         readonly IComboServiceRepository _comboServiceRepository;
         private readonly IMapper _mapper;
@@ -97,31 +97,6 @@ namespace Application.Services
                 Message = "Combo service deleted successfully",
                 Data = null
             };
-        }
-
-        public Task DeleteComboServiceAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task UpdateComboServiceAsync(ComboService comboService)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ComboService> GetComboServiceByIdAsync(Guid id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<ComboService>> GetAllComboServicesAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<ComboService> CreateComboServiceAsync(ComboService comboService)
-        {
-            throw new NotImplementedException();
-        }
+        }        
     }
 }
