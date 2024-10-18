@@ -3,7 +3,6 @@
     public class Service : BaseEntity
     {
         public string ServiceName { get; set; }
-        public decimal Money { get; set; }
         #region Relationship
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }

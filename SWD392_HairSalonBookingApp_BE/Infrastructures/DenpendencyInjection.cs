@@ -4,6 +4,7 @@ using Application.Repositories;
 using Application.Services;
 using Infrastructures.Mappers;
 using Infrastructures.Repositories;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -15,7 +16,14 @@ namespace Infrastructures
         {
             services.AddScoped<IPasswordHash, PasswordHash>();
             services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ICloudinaryService, CloudinaryService>();
+            services.AddScoped<ISalonService, SalonService>();
+            services.AddScoped<ISalonRepository, SalonRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<ICategoryRepository,CategoryRepository>();
+            services.AddScoped<ICategoryService,CategoryService>();
+            services.AddScoped<IServiceRepository, ServiceRepository>();
+            services.AddScoped<IServiceService, ServiceService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<IBookingRepository, BookingRepository>();

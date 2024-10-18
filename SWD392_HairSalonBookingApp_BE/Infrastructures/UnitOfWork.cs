@@ -9,18 +9,28 @@ namespace Infrastructures
         private readonly IUserRepository _userRepository;
         private readonly IComboServiceRepository _comboServiceRepository;
         private readonly IComboDetailRepository _comboDetailRepository;
+        private readonly ICategoryRepository _categoryRepository;
+        private readonly IServiceRepository _serviceRepository;
+        private readonly ISalonRepository _salonRepository;
 
-        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository)
+        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository, ICategoryRepository categoryRepository, ISalonRepository salonRepository, IServiceRepository serviceRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
             _comboServiceRepository = comboServiceRepository;
             _comboDetailRepository = comboDetailRepository;
+            _categoryRepository = categoryRepository;
+            _serviceRepository = serviceRepository;
+            _salonRepository = salonRepository;
         }
 
         public IUserRepository UserRepository => _userRepository;
         public IComboServiceRepository ComboServiceRepository => _comboServiceRepository;
         public IComboDetailRepository ComboDetailRepository => _comboDetailRepository;
+        public ICategoryRepository CategoryRepository => _categoryRepository;
+        public IServiceRepository ServiceRepository => _serviceRepository;
+
+        public ISalonRepository SalonRepository => _salonRepository;
 
         public async Task<int> SaveChangeAsync()
         {

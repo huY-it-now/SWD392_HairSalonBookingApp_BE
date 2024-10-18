@@ -1,4 +1,6 @@
-﻿namespace Domain.Entities
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Domain.Entities
 {
     public class User : BaseEntity
     {
@@ -11,7 +13,7 @@
         public DateTime? VerifiedAt { get; set; }
 
         #region RelationShip
-        public int RoleId { get; set; }  // Foreign key property
+        public int RoleId { get; set; }
         public Role Role { get; set; }
         public Guid? SalonMemberId { get; set; }
         public SalonMember? SalonMember { get; set; }

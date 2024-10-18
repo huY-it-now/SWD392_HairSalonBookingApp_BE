@@ -2,6 +2,8 @@ using Infrastructures;
 using WebAPI;
 using Application.Commons;
 using Domain.Contracts.Settings;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +12,21 @@ var configuration = builder.Configuration.Get<AppConfiguration>();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
+builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddSwaggerGen();
+builder.Services.ConfigureSwaggerGen(setup =>
+{
+    setup.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+    {
+        Title = "Maverick Deploy",
+        Version = "v1"
+    });
+});
+
 builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.Configure<AppConfiguration>(builder.Configuration.GetSection("JWTSecretKey"));
+builder.Services.Configure<CloudinarySettings>(builder.Configuration.GetSection("CloudinarySettings"));
+
 builder.Services.AddCors(opt =>
 {
     opt.AddDefaultPolicy(builder =>
@@ -34,7 +50,12 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+} else
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
+//app.UseDeveloperExceptionPage();
 
 app.MapHealthChecks("/healthchecks");
 app.UseHttpsRedirection();

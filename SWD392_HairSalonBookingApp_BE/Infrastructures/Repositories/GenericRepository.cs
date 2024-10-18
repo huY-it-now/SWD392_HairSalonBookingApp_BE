@@ -9,8 +9,8 @@ namespace Infrastructures.Repositories
     public class GenericRepository<TEntity> : IGenericRepository<TEntity> where TEntity : BaseEntity
     {
         protected DbSet<TEntity> _dbSet;
-        private readonly ICurrentTime _timeService;
-        private readonly IClaimsService _claimsService;
+        protected readonly ICurrentTime _timeService;
+        protected readonly IClaimsService _claimsService;
 
         public GenericRepository(AppDbContext context, ICurrentTime timeService, IClaimsService claimsService)
         {

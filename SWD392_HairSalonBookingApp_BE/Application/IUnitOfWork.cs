@@ -8,5 +8,8 @@ namespace Application
         IUserRepository UserRepository { get; }
         IComboServiceRepository ComboServiceRepository { get; }
         IComboDetailRepository ComboDetailRepository { get; }
+        ICategoryRepository CategoryRepository { get; }
+        IServiceRepository ServiceRepository { get; }
+        ISalonRepository SalonRepository { get; }
     }
 }

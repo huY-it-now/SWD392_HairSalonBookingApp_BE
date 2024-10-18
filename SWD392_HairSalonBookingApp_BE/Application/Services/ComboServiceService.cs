@@ -1,59 +1,102 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
+using Application.Validations.Combo;
+using AutoMapper;
+using Domain.Contracts.Abstracts.Combo;
+using Domain.Contracts.Abstracts.Shared;
+using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
 
 namespace Application.Services
 {
     public class ComboServiceService : IComboServiceService
     {
-        private readonly IComboServiceRepository _comboServiceRepository;
+        readonly IComboServiceRepository _comboServiceRepository;
+        private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ComboServiceService(IComboServiceRepository comboServiceRepository, IUnitOfWork unitOfWork)
+        public ComboServiceService(IComboServiceRepository comboServiceRepository, IMapper mapper, IUnitOfWork unitOfWork)
         {
             _comboServiceRepository = comboServiceRepository;
+            _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ComboService> CreateComboServiceAsync(ComboService comboService)
+        public async Task<Result<object>> GetAllComboServices()
         {
-            await _comboServiceRepository.AddAsync(comboService);
-            await _unitOfWork.SaveChangeAsync();
-            return comboService;
-        }
+            var cbs = await _comboServiceRepository.GetAllComboServiceAsync();
+            var cbsMapper = _mapper.Map<List<ComboServiceDTO>>(cbs);
 
-        public async Task<IEnumerable<ComboService>> GetAllComboServicesAsync()
-        {
-            return await _comboServiceRepository.GetAllAsync();
-        }
-
-        public async Task<ComboService> GetComboServiceByIdAsync(Guid id)
-        {
-            var comboService = await _comboServiceRepository.GetByIdAsync(id);
-
-            if (comboService == null)
+            return new Result<object>
             {
-                throw new KeyNotFoundException($"ComboService id {id} not found.");
+                Error = 0,
+                Message = "Print all comboservice",
+                Data = cbsMapper
+            };
+        }
+
+        public async Task<Result<object>> GetComboServiceById(Guid id)
+        {
+            var cbs = await _comboServiceRepository.GetComboServiceById(id);
+
+            if (cbs == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Combo service not found",
+                    Data = null
+                };
             }
 
-            return comboService;
-        }
+            var comboServiceDTO = _mapper.Map<ComboServiceDTO>(cbs);
 
-
-        public async Task UpdateComboServiceAsync(ComboService comboService)
-        {
-            _comboServiceRepository.Update(comboService);
-            await _unitOfWork.SaveChangeAsync();
-        }
-
-        public async Task DeleteComboServiceAsync(Guid id)
-        {
-            var comboService = await _comboServiceRepository.GetByIdAsync(id);
-            if (comboService != null)
+            return new Result<object>
             {
-                _comboServiceRepository.SoftRemove(comboService);
-                await _unitOfWork.SaveChangeAsync();
-            }
+                Error = 0,
+                Message = "Combo service details",
+                Data = comboServiceDTO
+            };
+        }
+
+        public async Task<Result<object>> AddComboService(AddComboServiceRequest createRequest)
+        {
+            ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(createRequest));
+            var comboService = _mapper.Map<ComboService>(createRequest);
+            await _comboServiceRepository.AddComboService(comboService);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo service added successfully",
+                Data = null
+            };
+        }
+
+        public async Task<Result<object>> UpdateComboService(UpdateComboServiceRequest updateRequest)
+        {
+            ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(updateRequest));
+            var comboService = _mapper.Map<ComboService>(updateRequest);
+            await _comboServiceRepository.UpdateComboService(comboService);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo service updated successfully",
+                Data = null
+            };
+        }
+
+        public async Task<Result<object>> DeleteComboService(Guid id)
+        {
+            await _comboServiceRepository.DeleteComboService(id);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo service deleted successfully",
+                Data = null
+            };
         }
     }
 }
