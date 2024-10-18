@@ -27,6 +27,8 @@ namespace Infrastructures
         public DbSet<PaymentSatus> PaymentSatus { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<SalonMemberSchedule> SalonMemberSchedules { get; set; }
+        public DbSet<ServiceComboService> ServiceComboServices { get; set; }
+        public DbSet<ComboServiceComboDetail> ComboServiceComboDetails { get; set; }
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -38,12 +40,6 @@ namespace Infrastructures
                 new Role { Id = 4, RoleDetail = "Salon Staff" },
                 new Role { Id = 5, RoleDetail = "Stylist" }
             );
-
-            modelBuilder.Entity<ComboService>()
-                .HasMany(c => c.Service)
-                .WithMany(c => c.ComboServices)
-                .UsingEntity("ComboService_Service",
-                    l => l.HasOne(typeof(Service)).WithMany().HasForeignKey("ServiceId").HasPrincipalKey(nameof(Service.Id)), r => r.HasOne(typeof(ComboService)).WithMany().HasForeignKey("ComboServiceId").HasPrincipalKey(nameof(ComboService.Id)), j => j.HasKey("ServiceId", "ComboServiceId"));
 
             modelBuilder.Entity<Service>()
                 .HasOne(c => c.Category)
@@ -85,6 +81,12 @@ namespace Infrastructures
             modelBuilder.Entity<Category>().HasQueryFilter(c => !c.IsDeleted);
 
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<ServiceComboService>()
+                .HasKey(x => new { x.ServiceId, x.ComboServiceId });
+
+            modelBuilder.Entity<ComboServiceComboDetail>()
+                .HasKey(x => new {x.ComboServiceId, x.ComboDetailId});
         }
 
     }

@@ -11,6 +11,7 @@ namespace Domain.Entities
         public byte[] PasswordSalt { get; set; } = new byte[32];
         public string? VerificationToken { get; set; }
         public DateTime? VerifiedAt { get; set; }
+        public string? Address { get; set; }
 
         #region RelationShip
         public int RoleId { get; set; }

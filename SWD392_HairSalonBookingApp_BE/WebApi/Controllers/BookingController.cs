@@ -96,7 +96,7 @@ namespace WebApi.Controllers
                 {
                     var combo = (ComboService)comboService.Data;
 
-                    booking.Service.ComboServices.Add(combo);
+                    //booking.Service.ServiceComboServices.Add(combo);
 
                     TotalAmount += combo.Price;
                 }
@@ -106,11 +106,11 @@ namespace WebApi.Controllers
 
             if (Salon != null)
             {
-                foreach (var item in booking.Service.ComboServices)
-                {
-                    item.SalonId = SalonId;
-                    item.Salon = Salon;
-                }                
+                //foreach (var item in booking.Service.ComboServices)
+                //{
+                //    item.SalonId = SalonId;
+                //    item.Salon = Salon;
+                //}                
             }
 
             var User = await _userService.GetUserById(CustomerId);
