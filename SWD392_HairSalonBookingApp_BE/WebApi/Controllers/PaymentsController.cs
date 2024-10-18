@@ -20,13 +20,11 @@ namespace WebApi.Controllers
     [ApiController]
     public class PaymentsController : ControllerBase
     {
-        private readonly IBookingService _bookingService;
         private readonly IPaymentService _paymentService;
         private readonly IMapper _mapper;
 
-        public PaymentsController(IPaymentService paymentService, IMapper mapper, IBookingService bookingService)
+        public PaymentsController(IPaymentService paymentService, IMapper mapper)
         {
-            _bookingService = bookingService;
             _paymentService = paymentService;
             _mapper = mapper;
         }
@@ -66,7 +64,14 @@ namespace WebApi.Controllers
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<IActionResult> QuickLink([FromBody] BankRequest bankRequest, Guid BookingId)
         {
-            if(!await _paymentService.BookingPaymentCheck(BookingId))
+            var paymentCheck = await _paymentService.BookingPaymentCheck(BookingId);
+
+            if(!paymentCheck)
+            {
+                return BadRequest("The booking is not exist!");
+            }
+
+            if (await _paymentService.ChangePaymentStatus(BookingId, "Pending"))
             {
                 string linkImage = $"https://img.vietqr.io/image/{bankRequest.BANK_ID}-{bankRequest.ACCOUNT_NO}-{bankRequest.TEMPLATE}.png?amount={bankRequest.AMOUNT}&addInfo={bankRequest.DESCRIPTION}&accountName={bankRequest.ACCOUNT_NAME}";
 

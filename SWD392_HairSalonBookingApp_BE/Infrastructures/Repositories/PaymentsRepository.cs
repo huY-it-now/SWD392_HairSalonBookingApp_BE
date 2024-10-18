@@ -18,6 +18,11 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
+        public void ChangeStatus(Payments payments)
+        {
+            throw new NotImplementedException();
+        }
+
         public bool CheckPayment(Payments payments)
         {
             if (payments.PaymentSatus.StatusName.Equals("paid"))

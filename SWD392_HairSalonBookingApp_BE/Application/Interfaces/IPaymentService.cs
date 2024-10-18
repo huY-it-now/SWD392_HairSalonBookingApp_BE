@@ -10,5 +10,7 @@ namespace Application.Interfaces
     public interface IPaymentService
     {
         Task<bool> BookingPaymentCheck(Guid BookingId); 
+        Task<Payments> GetPaymentsById(Guid Id);
+        Task<bool> ChangePaymentStatus(Guid bookingId, string status);
     }
 }

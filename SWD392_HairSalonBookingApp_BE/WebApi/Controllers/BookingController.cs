@@ -16,12 +16,14 @@ namespace WebApi.Controllers
         private readonly IBookingService _bookingService;
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly ISalonService _salonService;
         private readonly ISalonMemberService _salonMemberService;
         private readonly IComboServiceService _comboServiceService;
         private readonly IServiceService _serviceService;
 
-        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboServiceService comboServiceService, IUserService userService, ISalonMemberService salonMemberService)
+        public BookingController(IBookingService bookingService, IMapper mapper, IServiceService serviceService, IComboServiceService comboServiceService, IUserService userService, ISalonMemberService salonMemberService, ISalonService salonService)
         {
+            _salonService = salonService;
             _salonMemberService = salonMemberService;
             _comboServiceService = comboServiceService;
             _serviceService = serviceService;
@@ -77,8 +79,6 @@ namespace WebApi.Controllers
             if (service != null)
             {
                 booking.Service = service;
-
-                TotalAmount += service.Money;
             }
 
             foreach (var id in ExtractValidIds(ComboServiceId))
@@ -92,6 +92,25 @@ namespace WebApi.Controllers
                     TotalAmount += comboService.Price;
                 }
             }
+
+            var Salon = await _salonService.GetSalonById(SalonId);
+
+            if (Salon != null)
+            {
+                booking.SalonId = SalonId;
+                booking.salon = Salon;
+            }
+
+            var User = await _userService.GetUserById(CustomerId);
+            var user = User.Data;
+
+            if (user != null)
+            {
+                booking.User = (User)user;
+                booking.UserId = CustomerId;
+            }
+
+            booking.TotalMoney = TotalAmount;
 
             if (!await _bookingService.CreateBooking(booking))
             {

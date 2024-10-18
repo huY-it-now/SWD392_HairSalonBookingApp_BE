@@ -32,6 +32,8 @@ namespace Infrastructures.Repositories
                .Include(b => b.User)
                .Include(b => b.Payments)
                .Include(b => b.SalonMember)
+               .Include(b => b.ComboServices)
+               .Include(b => b.Service)
                .ToListAsync();
         }
     }

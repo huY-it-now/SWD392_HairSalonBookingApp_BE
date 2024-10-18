@@ -10,5 +10,6 @@ namespace Application.Repositories
     public interface IPaymentsRepository : IGenericRepository<Payments>
     {
         public bool CheckPayment(Payments payments);
+        public void ChangeStatus(Payments payments);
     }
 }
