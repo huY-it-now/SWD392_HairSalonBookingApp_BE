@@ -70,6 +70,13 @@ namespace Infrastructures.Mappers
             .ForMember(dest => dest.WorkShift, opt => opt.MapFrom(src => src.WorkShift))
             .ForMember(dest => dest.IsDayOff, opt => opt.MapFrom(src => src.IsDayOff))
             .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date));
+            CreateMap<ViewSalonDTO, ViewSalonRequest>();
+            CreateMap<ViewSalonRequest, ViewSalonDTO>();
+            CreateMap<SalonMember, ViewSalonMemberDTO>()
+            .ForMember(dest => dest.SalonMemberId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+            .ForMember(dest => dest.Job, opt => opt.MapFrom(src => src.Job));
         }
     }
 }
