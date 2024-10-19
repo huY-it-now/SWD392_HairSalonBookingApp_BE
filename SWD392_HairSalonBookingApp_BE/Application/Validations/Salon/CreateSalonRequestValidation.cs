@@ -8,6 +8,8 @@ namespace Application.Validations.Salon
     {
         public CreateSalonRequestValidation()
         {
+            RuleFor(x => x.salonName).NotEmpty().WithMessage("Chi nhanh bat buoc");
+            RuleFor(x => x.Address).NotEmpty().WithMessage("address is required!");
             RuleFor(x => x.Image).Must(BeAValidImage).WithMessage("File must be a valid image (jpg, jpeg, png) and less than or equal to 5MB.");
         }
 

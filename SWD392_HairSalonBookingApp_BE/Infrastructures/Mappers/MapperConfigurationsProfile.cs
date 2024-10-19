@@ -30,6 +30,7 @@ namespace Infrastructures.Mappers
             CreateMap<SalonMember, StylistDTO>()
            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+            CreateMap<CreateStylistDTO, StylistDTO>();
 
             //cbs
             CreateMap<ComboService, ComboServiceDTO>();
@@ -62,6 +63,7 @@ namespace Infrastructures.Mappers
             CreateMap<Salon, SalonDTO>();
             CreateMap<SalonDTO, SearchSalonRequest>();
             CreateMap<SearchSalonRequest, SalonDTO>();
+            CreateMap<SearchSalonWithIdRequest, SalonDTO>();
 
             //Schedule
             CreateMap<SalonMemberSchedule, ScheduleDTO>()
