@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Contracts.DTO.Booking;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,10 @@ namespace Application.Interfaces
 {
     public interface IBookingService
     {
-        Task<List<Booking>> ShowAllUncheckedBooking();
+        Task<List<BookingDTO>> ShowAllUncheckedBooking();
         Task<bool> CheckBooking(Guid bookingId, bool Check);
         Task<bool> CreateBooking(Booking booking);
+        Task<bool> UpdateBooking(Booking booking);
+        Task<Booking> GetBookingById(Guid Id);
     }
 }

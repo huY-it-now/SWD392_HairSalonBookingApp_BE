@@ -5,6 +5,8 @@ using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Booking;
+using Domain.Contracts.DTO.Salon;
 using Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.Controllers;
@@ -35,35 +37,108 @@ namespace WebApi.Controllers
         [HttpGet("ShowUncheckedBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> PrintAllUncheckedBooking()
+        public async Task<Result<object>> PrintAllUncheckedBooking()
         {
-            var bookingList = _bookingService.ShowAllUncheckedBooking();
+            var bookingList = await _bookingService.ShowAllUncheckedBooking();
 
-            return Ok(bookingList);
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "Checked",
+                Data = bookingList
+            };
+
+            return result;
         }
 
         [HttpPost("CheckBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> CheckBooking(Guid bookingId, bool Check) // true = ok, false = fake (delete)
+        public async Task<Result<object>> CheckBooking(Guid bookingId, bool Check) // true = ok, false = fake (delete)
         {
-            var result = await _bookingService.CheckBooking(bookingId, Check);
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "Checked",
+                Data = await _bookingService.CheckBooking(bookingId, Check)
+            };
 
-            return Ok(result);
+            return result;
+        }
+
+        [HttpPost("AddStylistToBooking")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<Result<object>> AddStylistToBooking(Guid bookingId, Guid stylistId)
+        {
+            var booking = await _bookingService.GetBookingById(bookingId);
+
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            if (booking == null)
+            {
+                result.Error = 1;
+                result.Message = "Booking is not found";
+                return result;
+            }
+
+            var stylist = await _salonMemberService.GetSalonMemberById(stylistId);
+            
+            if (stylist == null)
+            {
+                result.Error = 1;
+                result.Message = "Stylist is not found";
+                return result;
+            }
+
+            booking.SalonMemberId = stylistId;
+            booking.SalonMember = stylist;
+
+            if (!await _bookingService.UpdateBooking(booking))
+            {
+                result.Error = 1;
+                result.Message = "Add Stylist fail";
+                return result;
+            }
+
+            BookingDTO bookingDTO = new BookingDTO()
+            {
+                BookingDate = booking.BookingDate,
+                Checked = booking.Checked,
+                TotalMoney = booking.TotalMoney,
+            };
+
+            result.Message = "Add Stylist successfully";
+            result.Data = bookingDTO;
+
+            return result;
         }
 
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> AddBooking([FromForm] Guid CustomerId, Guid SalonId, Guid SalonMemberId, DateTime cuttingDate, Guid ServiceId, string ComboServiceId)
+        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, SalonDTO salonDto, Guid SalonMemberId, DateTime cuttingDate, Guid ServiceId, string ComboServiceId)
         {
             Decimal TotalAmount = 0;
             Booking booking = new Booking();
 
+            var Result = new Result<object>
+            {
+                Error = 1,
+                Message = "",
+                Data = null
+            };
+
             booking.Checked = false;
-            booking.BookingDate = DateTime.Now;
+            booking.BookingDate = cuttingDate;
             booking.SalonMemberId = SalonMemberId;
             booking.UserId = CustomerId;
+            booking.CreationDate = DateTime.Now;
 
             var salonMember = await _salonMemberService.GetSalonMemberById(SalonMemberId);
 
@@ -78,7 +153,9 @@ namespace WebApi.Controllers
 
             if (serviceObj.Data == null)
             {
-                return BadRequest("Service not found");
+                Result.Error = 1;
+                Result.Message = "Service not found";
+                return Result;
             }
 
             var service = (Service)serviceObj.Data;
@@ -96,22 +173,32 @@ namespace WebApi.Controllers
                 {
                     var combo = (ComboService)comboService.Data;
 
-                    //booking.Service.ServiceComboServices.Add(combo);
+                    foreach (var item in booking.Service.ServiceComboServices)
+                    {
+                        item.ComboService = combo;
+                    }
 
                     TotalAmount += combo.Price;
                 }
             }
 
-            //var Salon = await _salonService.GetSalonById(SalonId);
+            if (TotalAmount == 0)
+            {
+                Result.Error = 1;
+                Result.Message = "Combo service not found";
+                return Result;
+            }
 
-            //if (Salon != null)
-            //{
-            //    //foreach (var item in booking.Service.ComboServices)
-            //    //{
-            //    //    item.SalonId = SalonId;
-            //    //    item.Salon = Salon;
-            //    //}                
-            //}
+            var Salon = await _salonService.SearchSalonById(salonDto);
+
+            if (Salon.Data != null)
+            {
+                foreach (var item in booking.Service.ServiceComboServices)
+                {
+                    item.ComboService.SalonId = salonDto.SalonId;
+                    item.ComboService.Salon = (Salon)Salon.Data;
+                }
+            }
 
             var User = await _userService.GetUserById(CustomerId);
             var user = User.Data;
@@ -126,10 +213,16 @@ namespace WebApi.Controllers
 
             if (!await _bookingService.CreateBooking(booking))
             {
-                return BadRequest("Create booking fail");
+                Result.Error = 1;
+                Result.Message = "Create booking faild";
+                return Result;
             }
 
-            return Ok(booking);
+            var bookingDTO = _mapper.Map<BookingDTO>(booking);
+
+            Result.Data = bookingDTO;   
+
+            return Result;
         }
 
         List<string> ExtractValidIds(string input)
