@@ -20,5 +20,7 @@ namespace Application.Interfaces
         Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request);
         Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request);
         Task<Result<object>> UpdateProfile(UpdateProfileDTO request);
+        Task<Result<object>> ForgotPassword(string email);
+        Task<Result<object>> ResetPassword(ResetPasswordDTO request);
     }
 }

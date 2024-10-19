@@ -10,6 +10,7 @@ using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Application.Services
 {
@@ -452,6 +453,64 @@ namespace Application.Services
                 Error = 0,
                 Message = "Update profile successfully",
                 Data = result
+            };
+        }
+
+        public async Task<Result<object>> ForgotPassword(string email)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByEmail(email);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            var token = _emailService.GenerateRandomNumber();
+            await _emailService.SendOtpMail(user.FullName, token, user.Email);
+
+            user.VerificationToken = token;
+            user.VerifiedAt = null;
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Change Password successfully"
+            };
+        }
+
+        public async Task<Result<object>> ResetPassword(ResetPasswordDTO request)
+        {
+            var user = await _unitOfWork.UserRepository.Verify(request.Token);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Invalid token"
+                };
+            }
+
+            _passwordHash.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.VerificationToken = null;
+            user.VerifiedAt = DateTime.Now;
+
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Reset Password successfully"
             };
         }
     }
