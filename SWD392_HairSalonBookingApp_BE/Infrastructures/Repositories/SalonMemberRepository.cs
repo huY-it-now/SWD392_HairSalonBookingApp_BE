@@ -18,4 +18,9 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
     public async Task<List<SalonMember>> GetSalonMemberWithRole(int roleId) {
         return await _dbContext.SalonMembers.Include(x => x.User).Where(x => x.User.RoleId == roleId).ToListAsync();
     }
+
+    public async Task<List<SalonMember>> GetSalonMemberBySalonId(Guid salonId) {
+        return await _dbContext.SalonMembers.Where(x => x.SalonId == salonId)
+            .Include(x => x.User).Include(x => x.Salon).ToListAsync();
+    }
 }

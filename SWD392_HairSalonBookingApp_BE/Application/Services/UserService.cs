@@ -185,11 +185,13 @@ namespace Application.Services
             };
         }
 
-        public async Task<Result<object>> CreateStylist(CreateStylistDTO request) {
+        public async Task<Result<object>> CreateStylist(CreateStylistDTO request)
+        {
             var stylist = await _unitOfWork.UserRepository.GetUserById(request.UserId);
             var salon = await _unitOfWork.SalonRepository.GetByIdAsync(request.SalonId);
 
-            if (stylist == null) {
+            if (stylist == null)
+            {
                 return new Result<object>
                 {
                     Error = 1,
@@ -411,6 +413,46 @@ namespace Application.Services
                 Data = null
             };
 
+        }
+
+        public async Task<Result<object>> UpdateProfile(UpdateProfileDTO request)
+        {
+            var userExist = await _unitOfWork.UserRepository.GetUserById(request.Id);
+
+            if (userExist == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found",
+                    Data = null
+                };
+            }
+
+            userExist.FullName = request.FullName;
+            userExist.PhoneNumber = request.PhoneNumber;
+            userExist.Address = request.Address;
+
+            if (request.Email != userExist.Email)
+            {
+                var token = _emailService.GenerateRandomNumber();
+                await _emailService.SendOtpMail(request.FullName, token, request.Email);
+                userExist.VerifiedAt = null;
+                userExist.VerificationToken = token;
+                userExist.Email = request.Email;
+            }
+
+            _unitOfWork.UserRepository.Update(userExist);
+            await _unitOfWork.SaveChangeAsync();
+
+            var result = _mapper.Map<UpdateProfileDTO>(userExist);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Update profile successfully",
+                Data = result
+            };
         }
     }
 }

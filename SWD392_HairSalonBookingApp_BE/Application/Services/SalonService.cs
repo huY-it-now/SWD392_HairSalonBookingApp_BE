@@ -97,11 +97,14 @@ namespace Application.Services
             };
         }
 
-        public async Task<Result<object>> SearchSalonWithAddress(SalonDTO req) {
+        public async Task<Result<object>> SearchSalonWithAddress(SalonDTO req)
+        {
             var salon = await _unitOfWork.SalonRepository.GetSalonByName(req.Address);
 
-            if (salon == null) {
-                return new Result<object> {
+            if (salon == null)
+            {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "Not found salon with this address",
                     Data = null
@@ -112,18 +115,22 @@ namespace Application.Services
             result.Image = salon.ImageUrl;
             result.SalonId = req.SalonId;
 
-            return new Result<object> {
+            return new Result<object>
+            {
                 Error = 0,
                 Message = "Found salon with this address",
                 Data = result
             };
         }
 
-        public async Task<Result<object>> SearchSalonById(SalonDTO req) {
+        public async Task<Result<object>> SearchSalonById(SalonDTO req)
+        {
             var salon = await _unitOfWork.SalonRepository.GetSalonById(req.SalonId);
 
-            if (salon == null) {
-                return new Result<object> {
+            if (salon == null)
+            {
+                return new Result<object>
+                {
                     Error = 1,
                     Message = "Not found salon",
                     Data = null
@@ -136,9 +143,38 @@ namespace Application.Services
             result.Address = salon.Address;
             result.Image = salon.ImageUrl;
 
-            return new Result<object> {
+            return new Result<object>
+            {
                 Error = 0,
                 Message = "Salon with this id",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> ViewSalonMemberBySalonId(ViewSalonDTO req)
+        {
+            var salonMembers = await _unitOfWork.SalonMemberRepository.GetSalonMemberBySalonId(req.SalonId);
+
+            if (salonMembers == null || !salonMembers.Any())
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No salon members in this salon",
+                    Data = null
+                };
+            }
+
+            var result = new ViewSalonDTO
+            {
+                SalonId = req.SalonId,
+                SalonMembers = _mapper.Map<List<ViewSalonMemberDTO>>(salonMembers)
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "These are all the salon members in this salon",
                 Data = result
             };
         }
