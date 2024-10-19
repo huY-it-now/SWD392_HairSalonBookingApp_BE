@@ -25,6 +25,9 @@ namespace Infrastructures.Mappers
             CreateMap<LoginUserRequest, LoginUserDTO>();
             CreateMap<VerifyTokenRequest, VerifyTokenDTO>();
             CreateMap<User, UserDTO>();
+            CreateMap<UpdateProfileDTO, User>();
+            CreateMap<User, UpdateProfileDTO>();
+            CreateMap<UpdateProfileRequest, UpdateProfileDTO>();
             CreateMap<CreateStylistDTO, CreateStylistRequest>();
             CreateMap<CreateStylistRequest, CreateStylistDTO>();
             CreateMap<SalonMember, StylistDTO>()

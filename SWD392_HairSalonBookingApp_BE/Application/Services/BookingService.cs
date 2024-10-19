@@ -47,7 +47,7 @@ namespace Application.Services
         {
             if (booking != null)
             {
-                _bookingRepository.AddAsync(booking);
+                await _bookingRepository.AddAsync(booking);
             }
             else
             {
