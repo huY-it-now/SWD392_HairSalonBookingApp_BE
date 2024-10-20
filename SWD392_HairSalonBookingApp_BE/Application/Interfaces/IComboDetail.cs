@@ -14,5 +14,8 @@ namespace Application.Interfaces
         Task<Result<object>> AddComboDetail(AddComboDetailRequest request);
         Task<Result<object>> UpdateComboDetail(UpdateComboDetailRequest request);
         Task<Result<object>> DeleteComboDetail(Guid id);
+
+        // Thêm phương thức để lấy ComboService liên quan qua bảng trung gian
+        Task<Result<object>> GetComboServicesByComboDetailId(Guid comboDetailId);
     }
 }

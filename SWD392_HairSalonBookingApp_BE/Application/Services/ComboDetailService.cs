@@ -12,11 +12,15 @@ namespace Application.Services
     public class ComboDetailService
     {
         private readonly IComboDetailRepository _comboDetailRepository;
+        private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository; // Thêm repo cho bảng trung gian
         private readonly IMapper _mapper;
 
-        public ComboDetailService(IComboDetailRepository comboDetailRepository, IMapper mapper)
+        public ComboDetailService(IComboDetailRepository comboDetailRepository,
+                                  IComboServiceComboDetailRepository comboServiceComboDetailRepository, // Thêm repo bảng trung gian vào constructor
+                                  IMapper mapper)
         {
             _comboDetailRepository = comboDetailRepository;
+            _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _mapper = mapper;
         }
 
@@ -47,7 +51,12 @@ namespace Application.Services
                 };
             }
 
+            // Lấy danh sách ComboService liên quan đến ComboDetail qua bảng trung gian
+            var comboServices = await _comboServiceComboDetailRepository.GetComboServicesByComboDetailId(id);
+            var comboServiceDTOs = _mapper.Map<List<ComboServiceDTO>>(comboServices);
+
             var comboDetailDTO = _mapper.Map<ComboDetailDTO>(comboDetail);
+            comboDetailDTO.ComboServices = comboServiceDTOs; // Gán danh sách ComboServices vào DTO
 
             return new Result<object>
             {
