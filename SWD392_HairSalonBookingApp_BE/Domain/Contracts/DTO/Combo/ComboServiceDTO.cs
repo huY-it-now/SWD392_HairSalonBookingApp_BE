@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Domain.Contracts.DTO.Combo
 {
@@ -12,5 +9,7 @@ namespace Domain.Contracts.DTO.Combo
         public string ComboServiceName { get; set; }
         public decimal Price { get; set; }
         public Guid SalonId { get; set; }
+        public string ImageUrl { get; set; }
+        public List<ComboDetailDTO> ComboDetails { get; set; }
     }
 }
