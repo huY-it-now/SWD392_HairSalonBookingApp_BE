@@ -10,6 +10,6 @@ namespace Domain.Contracts.Abstracts.Combo
     {
         public string Content { get; set; }
         public string? ImageUrl { get; set; }
-        public Guid ComboServiceId { get; set; }
     }
 }
+
