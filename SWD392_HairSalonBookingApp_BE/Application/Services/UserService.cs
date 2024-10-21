@@ -345,42 +345,34 @@ namespace Application.Services
 
         public async Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request)
         {
-            var validation = new WorkDayValidation();
-            var validationResult = validation.Validate(request);
+            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
 
-            if (!validationResult.IsValid)
+            if (schedule != null && schedule.WorkShifts.Count + request.WorkShifts.Count > 3)
             {
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "Validation failed!",
-                    Data = validationResult.Errors.Select(x => x.ErrorMessage)
-                };
-            }
-
-            var existingSchedule = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(request.StylistId, request.ScheduleDate, request.ScheduleDate.AddDays(1));
-
-            if (existingSchedule.Count + request.WorkShifts.Count > 3)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Cannot register more than 3 shifts for one day.",
+                    Message = "You can only register up to shifts per day.",
                     Data = null
                 };
             }
 
-            foreach (var shift in request.WorkShifts)
+           if (schedule == null)
             {
-                var schedule = new SalonMemberSchedule
+                schedule = new SalonMemberSchedule
                 {
                     StylistId = request.StylistId,
-                    Date = request.ScheduleDate,
-                    WorkShift = shift.ShiftName
+                    ScheduleDate = request.ScheduleDate,
+                    WorkShifts = request.WorkShifts
                 };
-
+                
                 await _unitOfWork.ScheduleRepository.AddAsync(schedule);
             }
+           else
+            {
+                schedule.WorkShifts.AddRange(request.WorkShifts);
+            }
+
 
             await _unitOfWork.SaveChangeAsync();
 
@@ -392,12 +384,24 @@ namespace Application.Services
             };
         }
 
+        public async Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime)
+        {
+            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime.TimeOfDay >= s.StartTime && bookingTime.TimeOfDay < s.EndTime);
+            if (shift == null)
+            {
+                return new List<StylistDTO>();
+            }
+
+            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByShift(shift.Shift, bookingTime.Date);    
+            return availableStylists;
+        }
+
         public async Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request)
         {
             var schedule = new SalonMemberSchedule
             {
                 StylistId = request.StylistId,
-                Date = request.DayOffDate,
+                ScheduleDate = request.DayOffDate,
                 IsDayOff = true,
             };
 

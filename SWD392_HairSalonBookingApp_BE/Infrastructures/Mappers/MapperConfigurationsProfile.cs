@@ -13,6 +13,7 @@ using Domain.Contracts.Abstracts.Salon;
 using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.Abstracts.Category;
 using Domain.Contracts.DTO.Stylish;
+using Domain.Contracts.DTO.Stylist;
 
 namespace Infrastructures.Mappers
 {
@@ -67,7 +68,12 @@ namespace Infrastructures.Mappers
             CreateMap<SalonMemberSchedule, ScheduleDTO>()
             .ForMember(dest => dest.WorkShift, opt => opt.MapFrom(src => src.WorkShift))
             .ForMember(dest => dest.IsDayOff, opt => opt.MapFrom(src => src.IsDayOff))
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.Date));
+            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.ScheduleDate));
+            CreateMap<RegisterWorkScheduleDTO, SalonMemberSchedule>()
+            .ForMember(dest => dest.WorkShifts, opt => opt.MapFrom(src => src.WorkShifts));
+
+            CreateMap<RegisterDayOffDTO, SalonMemberSchedule>()
+                .ForMember(dest => dest.IsDayOff, opt => opt.MapFrom(src => true));
         }
     }
 }

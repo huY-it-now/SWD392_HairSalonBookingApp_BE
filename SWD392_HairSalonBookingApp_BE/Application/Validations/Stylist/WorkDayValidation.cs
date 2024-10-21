@@ -10,28 +10,15 @@ namespace Application.Validations.Stylist
 {
     public class WorkDayValidation : AbstractValidator<RegisterWorkScheduleDTO>
     {
-        public WorkDayValidation() 
+        public WorkDayValidation()
         {
             RuleFor(x => x.StylistId).NotEmpty().WithMessage("Stylist ID is required.");
             RuleFor(x => x.ScheduleDate).NotEmpty().WithMessage("Date is required.");
             RuleFor(x => x.WorkShifts)
-            .NotEmpty()
-            .WithMessage("Work shift is required.")
-            .Must(WorkShiftsAreValid)
-            .WithMessage("Work shifts must be 'Morning', 'Afternoon', or 'Evening'.");
-        }
-
-        private bool WorkShiftsAreValid(List<WorkShiftDTO> workShifts)
-        {
-            foreach (var shift in workShifts)
-            {
-                if (shift == null ||
-                    (shift.ShiftName != "Morning" && shift.ShiftName != "Afternoon" && shift.ShiftName != "Evening"))
-                {
-                    return false;
-                }
-            }
-            return true;
+                .NotEmpty().WithMessage("Work shift is required.")
+                .Must(x => x.All(shift => shift == "Morning" || shift == "Afternoon" || shift == "Evening"))
+                .WithMessage("Work shift must be 'Morning', 'Afternoon', or 'Evening'.")
+                .Must(x => x.Count <= 3).WithMessage("You can register up to 3 shifts per day.");
         }
     }
 }

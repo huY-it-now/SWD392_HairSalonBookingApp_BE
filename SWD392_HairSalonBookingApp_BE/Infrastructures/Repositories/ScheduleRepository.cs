@@ -20,7 +20,19 @@ namespace Infrastructures.Repositories
 
         public async Task<List<SalonMemberSchedule>> GetSchedulesByUserIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
-            return await _dbContext.SalonMemberSchedules.Where(s => s.StylistId == stylistId && s.Date >= fromDate && s.Date <= toDate).ToListAsync();
+            return await _dbContext.SalonMemberSchedules.Where(s => s.StylistId == stylistId && s.ScheduleDate >= fromDate && s.ScheduleDate <= toDate).ToListAsync();
+        }
+
+        public async Task<SalonMemberSchedule> GetScheduleByDateAsync (Guid stylistId, DateTime date)
+        {
+            return await _dbContext.SalonMemberSchedules.FirstOrDefaultAsync(s => s.StylistId == stylistId && s.ScheduleDate == date);
+        }
+
+        public async Task<List<StylistDTO>> GetAvailableStylistsByShift(string shift, DateTime date)
+        {
+            var schedules = await _dbContext.SalonMemberSchedules.Where(s => s.ScheduleDate == date && s.WorkShifts.Contains(shift) && !s.IsDayOff).Select(s => new StylistDTO { StylistId = s.StylistId}).ToListAsync();
+
+            return schedules;
         }
     }
 }

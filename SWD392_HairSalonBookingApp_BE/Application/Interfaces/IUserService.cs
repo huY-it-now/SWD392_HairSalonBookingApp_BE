@@ -19,5 +19,6 @@ namespace Application.Interfaces
         Task<Result<object>> ViewWorkAndDayOffSchedule (Guid StylistId, DateTime fromDate, DateTime toDate);
         Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request);
         Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request);
+        Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime);
     }
 }

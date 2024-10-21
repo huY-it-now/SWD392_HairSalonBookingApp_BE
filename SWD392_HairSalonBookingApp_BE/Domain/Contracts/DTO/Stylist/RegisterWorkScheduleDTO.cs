@@ -10,6 +10,6 @@ namespace Domain.Contracts.DTO.Stylist
     {
         public Guid StylistId { get; set; }
         public DateTime ScheduleDate { get; set; }
-        public List<WorkShiftDTO> WorkShifts {  get; set; }
+        public List<string> WorkShifts {  get; set; }
     }
 }
