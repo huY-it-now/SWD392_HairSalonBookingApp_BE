@@ -1,4 +1,4 @@
-﻿using Application.Services;
+﻿using Application.Interfaces;
 using Domain.Contracts.Abstracts.Combo;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Combo;
@@ -14,10 +14,10 @@ namespace WebApi.Controllers
     [Route("api/[controller]")]
     public class ComboController : ControllerBase
     {
-        private readonly ComboDetailService _comboDetailService;
-        private readonly ComboServiceService _comboServiceService;
+        private readonly IComboDetail _comboDetailService;
+        private readonly IComboService _comboServiceService;
 
-        public ComboController(ComboDetailService comboDetailService, ComboServiceService comboServiceService)
+        public ComboController(IComboDetail comboDetailService, IComboService comboServiceService)
         {
             _comboDetailService = comboDetailService;
             _comboServiceService = comboServiceService;
@@ -31,13 +31,11 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAllComboDetails()
         {
             var result = await _comboDetailService.GetAllComboDetails();
-            var comboDetails = result.Data as IEnumerable<ComboDetailDTO>;
-
-            if (comboDetails == null || !comboDetails.Any())
+            if (result.Data == null || ((IEnumerable<ComboDetailDTO>)result.Data).Any() == false)
             {
                 return NotFound(new { Error = 1, Message = "No combo detail found" });
             }
-            return Ok(new { Error = 0, Message = "All combo details", Data = comboDetails });
+            return Ok(result);
         }
 
         [HttpGet("get-comboDetails/{id}")]
@@ -46,14 +44,11 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetComboDetailById(Guid id)
         {
             var result = await _comboDetailService.GetComboDetailById(id);
-            var comboDetail = result.Data as ComboDetailDTO;
-
-            if (comboDetail == null)
+            if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo detail not found" });
             }
-
-            return Ok(new { Error = 0, Message = "Combo detail details", Data = comboDetail });
+            return Ok(result);
         }
 
         [HttpPost("add-comboDetails")]
@@ -68,8 +63,8 @@ namespace WebApi.Controllers
 
             try
             {
-                await _comboDetailService.AddComboDetail(createRequest);
-                return Ok(new { Error = 0, Message = "Combo detail added successfully" });
+                var result = await _comboDetailService.AddComboDetail(createRequest);
+                return Ok(result);
             }
             catch (ArgumentException ex)
             {
@@ -89,15 +84,15 @@ namespace WebApi.Controllers
             }
 
             var result = await _comboDetailService.GetComboDetailById(id);
-            if (result == null)
+            if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo detail not found" });
             }
 
             try
             {
-                await _comboDetailService.UpdateComboDetail(updateRequest);
-                return Ok(new { Error = 0, Message = "Combo detail updated successfully" });
+                var updateResult = await _comboDetailService.UpdateComboDetail(updateRequest);
+                return Ok(updateResult);
             }
             catch (ArgumentException ex)
             {
@@ -111,13 +106,13 @@ namespace WebApi.Controllers
         public async Task<IActionResult> DeleteComboDetail(Guid id)
         {
             var result = await _comboDetailService.GetComboDetailById(id);
-            if (result == null)
+            if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo detail not found" });
             }
 
-            await _comboDetailService.DeleteComboDetail(id);
-            return Ok(new { Error = 0, Message = "Combo detail deleted successfully" });
+            var deleteResult = await _comboDetailService.DeleteComboDetail(id);
+            return Ok(deleteResult);
         }
 
         // ComboService API methods
@@ -128,14 +123,12 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetAllComboServices()
         {
             var result = await _comboServiceService.GetAllComboServices();
-            var comboServices = result.Data as IEnumerable<ComboServiceDTO>;
-
-            if (comboServices == null || !comboServices.Any())
+            if (result.Data == null || ((IEnumerable<ComboServiceDTO>)result.Data).Any() == false)
             {
                 return NotFound(new { Error = 1, Message = "No combo service found" });
             }
 
-            return Ok(new { Error = 0, Message = "All combo services", Data = comboServices });
+            return Ok(result);
         }
 
         [HttpGet("get-comboServices/{id}")]
@@ -144,14 +137,12 @@ namespace WebApi.Controllers
         public async Task<IActionResult> GetComboServiceById(Guid id)
         {
             var result = await _comboServiceService.GetComboServiceById(id);
-            var comboService = result.Data as ComboServiceDTO;
-
-            if (comboService == null)
+            if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo service not found" });
             }
 
-            return Ok(new { Error = 0, Message = "Combo service details", Data = comboService });
+            return Ok(result);
         }
 
         [HttpPost("add-comboServices")]
@@ -166,8 +157,8 @@ namespace WebApi.Controllers
 
             try
             {
-                await _comboServiceService.AddComboService(createRequest);
-                return Ok(new { Error = 0, Message = "Combo service added successfully" });
+                var result = await _comboServiceService.AddComboService(createRequest);
+                return Ok(result);
             }
             catch (ArgumentException ex)
             {
@@ -187,15 +178,15 @@ namespace WebApi.Controllers
             }
 
             var result = await _comboServiceService.GetComboServiceById(id);
-            if (result == null)
+            if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo service not found" });
             }
 
             try
             {
-                await _comboServiceService.UpdateComboService(updateRequest);
-                return Ok(new { Error = 0, Message = "Combo service updated successfully" });
+                var updateResult = await _comboServiceService.UpdateComboService(updateRequest);
+                return Ok(updateResult);
             }
             catch (ArgumentException ex)
             {
@@ -209,13 +200,13 @@ namespace WebApi.Controllers
         public async Task<IActionResult> DeleteComboService(Guid id)
         {
             var result = await _comboServiceService.GetComboServiceById(id);
-            if (result == null)
+            if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo service not found" });
             }
 
-            await _comboServiceService.DeleteComboService(id);
-            return Ok(new { Error = 0, Message = "Combo service deleted successfully" });
+            var deleteResult = await _comboServiceService.DeleteComboService(id);
+            return Ok(deleteResult);
         }
     }
 }
