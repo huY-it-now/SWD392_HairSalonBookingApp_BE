@@ -1,22 +1,31 @@
-﻿using Application.Repositories;
+﻿using Application.Interfaces;
+using Application.Repositories;
 using Application.Validations.Combo;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Combo;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class ComboServiceService
+    public class ComboServiceService : IComboService
     {
         readonly IComboServiceRepository _comboServiceRepository;
+        private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ComboServiceService(IComboServiceRepository comboServiceRepository, IMapper mapper, IUnitOfWork unitOfWork)
+        public ComboServiceService(IComboServiceRepository comboServiceRepository,
+                                   IComboServiceComboDetailRepository comboServiceComboDetailRepository,
+                                   IMapper mapper,
+                                   IUnitOfWork unitOfWork)
         {
             _comboServiceRepository = comboServiceRepository;
+            _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
         }
@@ -29,7 +38,7 @@ namespace Application.Services
             return new Result<object>
             {
                 Error = 0,
-                Message = "Print all comboservice",
+                Message = "Print all combo services",
                 Data = cbsMapper
             };
         }
@@ -48,7 +57,11 @@ namespace Application.Services
                 };
             }
 
+            var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(id);
+            var comboDetailDTOs = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
+
             var comboServiceDTO = _mapper.Map<ComboServiceDTO>(cbs);
+            comboServiceDTO.ComboDetails = comboDetailDTOs;
 
             return new Result<object>
             {
@@ -95,6 +108,19 @@ namespace Application.Services
                 Error = 0,
                 Message = "Combo service deleted successfully",
                 Data = null
+            };
+        }
+
+        public async Task<Result<object>> GetComboDetailsByComboServiceId(Guid comboServiceId)
+        {
+            var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(comboServiceId);
+            var comboDetailDTOs = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo details for the combo service",
+                Data = comboDetailDTOs
             };
         }
     }

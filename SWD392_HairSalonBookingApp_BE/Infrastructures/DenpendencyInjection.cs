@@ -33,10 +33,11 @@ namespace Infrastructures
             services.AddScoped<IPaymentsRepository, PaymentsRepository>();
             services.AddSingleton<ICurrentTime, CurrentTime>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
-
+            services.AddScoped<IComboServiceComboDetailRepository, ComboServiceComboDetailRepository>();
             services.AddScoped<IComboServiceRepository, ComboServiceRepository>();
             services.AddScoped<IComboDetailRepository, ComboDetailRepository>();
             services.AddScoped<ComboDetailService>();
+            services.AddScoped<IComboService, ComboServiceService>();
 
 
             // ATTENTION: if you do migration please check file README.md

@@ -9,7 +9,8 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public ComboDetailRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public ComboDetailRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService)
+            : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
@@ -46,6 +47,15 @@ namespace Infrastructures.Repositories
                 SoftRemove(comboDetail);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        // Thêm phương thức để lấy danh sách ComboService liên quan đến ComboDetail qua bảng trung gian
+        public async Task<List<ComboService>> GetComboServicesByComboDetailId(Guid comboDetailId)
+        {
+            return await _dbContext.ComboServiceComboDetails
+                                   .Where(cscd => cscd.ComboDetailId == comboDetailId)
+                                   .Select(cscd => cscd.ComboService)
+                                   .ToListAsync();
         }
     }
 }

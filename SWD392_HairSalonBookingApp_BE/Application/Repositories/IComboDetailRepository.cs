@@ -9,5 +9,8 @@ namespace Application.Repositories
         Task<ComboDetail> AddComboDetail(ComboDetail comboDetail);
         Task<ComboDetail> UpdateComboDetail(ComboDetail comboDetail);
         Task DeleteComboDetail(Guid id);
+
+        // Thêm phương thức để lấy ComboService liên quan
+        Task<List<ComboService>> GetComboServicesByComboDetailId(Guid comboDetailId);
     }
 }
