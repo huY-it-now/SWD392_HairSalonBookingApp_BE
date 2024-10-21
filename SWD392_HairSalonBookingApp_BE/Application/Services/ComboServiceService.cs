@@ -2,10 +2,12 @@
 using Application.Repositories;
 using Application.Validations.Combo;
 using AutoMapper;
+using Domain.Contracts.Abstracts.Cloudinary;
 using Domain.Contracts.Abstracts.Combo;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
+using Org.BouncyCastle.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -18,16 +20,18 @@ namespace Application.Services
         private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICloudinaryService _cloudinaryService;
 
         public ComboServiceService(IComboServiceRepository comboServiceRepository,
                                    IComboServiceComboDetailRepository comboServiceComboDetailRepository,
                                    IMapper mapper,
-                                   IUnitOfWork unitOfWork)
+                                   IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
         {
             _comboServiceRepository = comboServiceRepository;
             _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<Result<object>> GetAllComboServices()
@@ -74,8 +78,24 @@ namespace Application.Services
         public async Task<Result<object>> AddComboService(AddComboServiceRequest createRequest)
         {
             ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(createRequest));
+
+            string fileExtension = Path.GetExtension(createRequest.ImageUrl.FileName);
+            string newFileName = $"{Guid.NewGuid()}{fileExtension}";
+            CloudinaryResponse cloudinaryResult = await _cloudinaryService.UploadImage(newFileName, createRequest.ImageUrl);
+
+            if (cloudinaryResult == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Error uploading image. Please try again.",
+                    Data = null
+                };
+            }
+
             var comboService = _mapper.Map<ComboService>(createRequest);
             await _comboServiceRepository.AddComboService(comboService);
+            await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {
