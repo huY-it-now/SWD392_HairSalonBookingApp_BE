@@ -35,7 +35,6 @@ namespace Infrastructures.Mappers
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
             CreateMap<CreateStylistDTO, StylistDTO>();
             CreateMap<ResetPasswordRequest, ResetPasswordDTO>();
-            CreateMap<ChangePasswordRequest, ChangePasswordDTO>();
 
             //cbs
             CreateMap<ComboService, ComboServiceDTO>();
