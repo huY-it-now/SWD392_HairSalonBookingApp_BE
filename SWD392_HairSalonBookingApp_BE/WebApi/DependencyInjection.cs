@@ -1,4 +1,5 @@
 ﻿using Application.Interfaces;
+using Application.Services;
 using FluentValidation.AspNetCore;
 using System.Diagnostics;
 using WebApi.Services;
@@ -20,6 +21,9 @@ namespace WebAPI
             services.AddHttpContextAccessor();
             services.AddFluentValidationAutoValidation();
             services.AddFluentValidationClientsideAdapters();
+            services.AddScoped<IComboDetail, ComboDetailService>();
+            services.AddScoped<IComboService, ComboServiceService>();
+
             return services;
         }
     }
