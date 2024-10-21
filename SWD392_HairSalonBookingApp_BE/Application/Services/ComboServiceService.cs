@@ -1,4 +1,5 @@
-﻿using Application.Repositories;
+﻿using Application.Interfaces;
+using Application.Repositories;
 using Application.Validations.Combo;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Combo;
@@ -8,7 +9,7 @@ using Domain.Entities;
 
 namespace Application.Services
 {
-    public class ComboServiceService
+    public class ComboServiceService : IComboService
     {
         readonly IComboServiceRepository _comboServiceRepository;
         private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository; // Thêm repository cho bảng trung gian
