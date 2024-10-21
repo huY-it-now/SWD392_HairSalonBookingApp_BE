@@ -148,7 +148,7 @@ namespace WebApi.Controllers
         [HttpPost("add-comboServices")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> AddComboService([FromBody] AddComboServiceRequest createRequest)
+        public async Task<IActionResult> AddComboService([FromForm] AddComboServiceRequest createRequest)
         {
             if (!ModelState.IsValid)
             {

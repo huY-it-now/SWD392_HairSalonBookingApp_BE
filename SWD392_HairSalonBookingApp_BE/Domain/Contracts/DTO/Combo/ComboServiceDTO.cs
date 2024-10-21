@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Domain.Entities;
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 
 namespace Domain.Contracts.DTO.Combo
@@ -9,7 +11,7 @@ namespace Domain.Contracts.DTO.Combo
         public string ComboServiceName { get; set; }
         public decimal Price { get; set; }
         public Guid SalonId { get; set; }
-        public string ImageUrl { get; set; }
-        public List<ComboDetailDTO> ComboDetails { get; set; }
+        public string? Image { get; set; }
+        public List<ComboServiceComboDetail> ComboDetails { get; set; }
     }
 }

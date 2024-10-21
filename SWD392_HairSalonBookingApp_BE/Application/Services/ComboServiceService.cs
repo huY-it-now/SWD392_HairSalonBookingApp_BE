@@ -2,13 +2,11 @@
 using Application.Repositories;
 using Application.Validations.Combo;
 using AutoMapper;
+using Domain.Contracts.Abstracts.Cloudinary;
 using Domain.Contracts.Abstracts.Combo;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 
 namespace Application.Services
 {
@@ -18,30 +16,48 @@ namespace Application.Services
         private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICloudinaryService _cloudinaryService;
 
         public ComboServiceService(IComboServiceRepository comboServiceRepository,
                                    IComboServiceComboDetailRepository comboServiceComboDetailRepository,
                                    IMapper mapper,
-                                   IUnitOfWork unitOfWork)
+                                   IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
         {
             _comboServiceRepository = comboServiceRepository;
             _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
+            _cloudinaryService = cloudinaryService;
         }
 
         public async Task<Result<object>> GetAllComboServices()
         {
             var cbs = await _comboServiceRepository.GetAllComboServiceAsync();
-            var cbsMapper = _mapper.Map<List<ComboServiceDTO>>(cbs);
+            var cbsList = new List<ComboServiceDTO>();
+
+            foreach (var cb in cbs)
+            {
+                var cbDTO = new ComboServiceDTO
+                {
+                    Id = cb.Id,
+                    ComboServiceName = cb.ComboServiceName,
+                    Price = cb.Price,
+                    SalonId = cb.SalonId,
+                    Image = cb.ImageUrl,
+                    //ComboDetails = cb.ComboDetails
+                };
+
+                cbsList.Add(cbDTO);
+            }
 
             return new Result<object>
             {
                 Error = 0,
                 Message = "Print all combo services",
-                Data = cbsMapper
+                Data = cbsList
             };
         }
+
 
         public async Task<Result<object>> GetComboServiceById(Guid id)
         {
@@ -61,7 +77,6 @@ namespace Application.Services
             var comboDetailDTOs = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
 
             var comboServiceDTO = _mapper.Map<ComboServiceDTO>(cbs);
-            comboServiceDTO.ComboDetails = comboDetailDTOs;
 
             return new Result<object>
             {
@@ -74,8 +89,33 @@ namespace Application.Services
         public async Task<Result<object>> AddComboService(AddComboServiceRequest createRequest)
         {
             ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(createRequest));
-            var comboService = _mapper.Map<ComboService>(createRequest);
-            await _comboServiceRepository.AddComboService(comboService);
+
+            string fileExtension = Path.GetExtension(createRequest.ImageUrl.FileName);
+            string newFileName = $"{Guid.NewGuid()}{fileExtension}";
+            CloudinaryResponse cloudinaryResult = await _cloudinaryService.UploadImage(newFileName, createRequest.ImageUrl);
+
+            if (cloudinaryResult == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Error uploading image. Please try again.",
+                    Data = null
+                };
+            }
+
+            var comboService = new ComboService
+            {
+                ComboServiceName = createRequest.ComboServiceName,
+                SalonId = createRequest.SalonId,
+                ImageId = cloudinaryResult.PublicImageId,
+                ImageUrl = cloudinaryResult.ImageUrl,
+            };
+
+            await _unitOfWork.ComboServiceRepository.AddAsync(comboService);
+            await _unitOfWork.SaveChangeAsync();
+
+            var result = _mapper.Map<ComboServiceDTO>(comboService);
 
             return new Result<object>
             {
