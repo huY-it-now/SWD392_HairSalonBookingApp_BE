@@ -115,7 +115,8 @@ namespace WebApi.Controllers
         [HttpPost("create-stylist")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> CreateStylist(CreateStylistRequest request) {
+        public async Task<IActionResult> CreateStylist(CreateStylistRequest request)
+        {
             var validator = new CreateStylistRequestValidation();
             var validationResult = validator.Validate(request);
             if (!validationResult.IsValid)
@@ -137,25 +138,18 @@ namespace WebApi.Controllers
         [HttpGet]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> PrintAllSalonMember() {
+        public async Task<IActionResult> PrintAllSalonMember()
+        {
             var result = await _userService.PrintAllSalonMember();
             return Ok(result);
         }
-        
+
         [HttpPost("get-member-with-role")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> GetMemberWithRole(int roleId) {
-            var result = await _userService.GetSalonMemberWithRole(roleId);
-            return Ok(result);
-        }
-
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
-        [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
+        public async Task<IActionResult> GetMemberWithRole(int roleId)
         {
-            var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
+            var result = await _userService.GetSalonMemberWithRole(roleId);
             return Ok(result);
         }
 
@@ -168,14 +162,70 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("register-day-off")]
+        [HttpGet("view-work-and-day-off-schedule")]
+        [ProducesResponseType(200, Type = typeof(List<WorkAndDayOffScheduleDTO>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ViewWorkAndDayOffSchedule([FromQuery] Guid stylistId, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
+        {
+            var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
+
+            return Ok(result);
+
+        }
+        [HttpPost("udpate-profile")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> RegisterDayOff([FromBody] RegisterDayOffDTO request)
+        public async Task<IActionResult> UpdateProfile([FromForm]  UpdateProfileRequest req)
         {
-            var result = await _userService.RegisterDayOff(request);
+            var validator = new UpdateProfileValidation();
+            var validatorResult = validator.Validate(req);
+
+            if (!validatorResult.IsValid)
+            {
+                return BadRequest(new Result<object>
+                {
+                    Error = 1,
+                    Message = "Validation failed!",
+                    Data = validatorResult.Errors.Select(x => x.ErrorMessage),
+                });
+            }
+
+            var userMapper = _mapper.Map<UpdateProfileDTO>(req);
+            var result = await _userService.UpdateProfile(userMapper);
+
             return Ok(result);
         }
-            
+
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var result = await _userService.ForgotPassword(email);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ResetPassword([FromForm] ResetPasswordRequest req)
+        {
+            var validator = new ResetPasswordRequestValidator();
+            var validatorResult = validator.Validate(req);
+
+            if (!validatorResult.IsValid)
+            {
+                return BadRequest(new Result<object>
+                {
+                    Error = 1,
+                    Message = "Validation failed!",
+                    Data = validatorResult.Errors.Select(x => x.ErrorMessage),
+                });
+            }
+
+            var mapper = _mapper.Map<ResetPasswordDTO>(req);
+            var result = await _userService.ResetPassword(mapper);
+            return Ok(result);
+        }
     }
 }

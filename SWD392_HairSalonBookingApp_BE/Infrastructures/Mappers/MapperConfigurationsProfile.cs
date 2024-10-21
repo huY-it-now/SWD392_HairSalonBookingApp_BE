@@ -26,11 +26,19 @@ namespace Infrastructures.Mappers
             CreateMap<LoginUserRequest, LoginUserDTO>();
             CreateMap<VerifyTokenRequest, VerifyTokenDTO>();
             CreateMap<User, UserDTO>();
+            CreateMap<UpdateProfileDTO, User>();
+            CreateMap<User, UpdateProfileDTO>();
+            CreateMap<UpdateProfileRequest, UpdateProfileDTO>();
             CreateMap<CreateStylistDTO, CreateStylistRequest>();
             CreateMap<CreateStylistRequest, CreateStylistDTO>();
             CreateMap<SalonMember, StylistDTO>()
            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+            CreateMap<CreateStylistDTO, StylistDTO>();
+            CreateMap<ResetPasswordRequest, ResetPasswordDTO>();
+            CreateMap<AddComboServiceRequest, ComboServiceDTO>();
+            CreateMap<ComboService, ComboServiceDTO>()
+                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.ImageUrl));
 
             //cbs
             CreateMap<ComboService, ComboServiceDTO>();
@@ -63,17 +71,23 @@ namespace Infrastructures.Mappers
             CreateMap<Salon, SalonDTO>();
             CreateMap<SalonDTO, SearchSalonRequest>();
             CreateMap<SearchSalonRequest, SalonDTO>();
+            CreateMap<SearchSalonWithIdRequest, SalonDTO>();
 
             //Schedule
             CreateMap<SalonMemberSchedule, ScheduleDTO>()
-            .ForMember(dest => dest.WorkShift, opt => opt.MapFrom(src => src.WorkShift))
+            .ForMember(dest => dest.WorkShift, opt => opt.MapFrom(src => src.WorkShifts))
             .ForMember(dest => dest.IsDayOff, opt => opt.MapFrom(src => src.IsDayOff))
             .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.ScheduleDate));
             CreateMap<RegisterWorkScheduleDTO, SalonMemberSchedule>()
             .ForMember(dest => dest.WorkShifts, opt => opt.MapFrom(src => src.WorkShifts));
 
-            CreateMap<RegisterDayOffDTO, SalonMemberSchedule>()
-                .ForMember(dest => dest.IsDayOff, opt => opt.MapFrom(src => true));
+            CreateMap<ViewSalonDTO, ViewSalonRequest>();
+            CreateMap<ViewSalonRequest, ViewSalonDTO>();
+            CreateMap<SalonMember, ViewSalonMemberDTO>()
+            .ForMember(dest => dest.SalonMemberId, opt => opt.MapFrom(src => src.Id))
+            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+            .ForMember(dest => dest.Job, opt => opt.MapFrom(src => src.Job));
         }
     }
 }

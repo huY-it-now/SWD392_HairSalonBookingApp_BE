@@ -6,17 +6,24 @@ using Domain.Contracts.Abstracts.Combo;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Application.Services
 {
-    public class ComboDetailService
+    public class ComboDetailService : IComboDetail
     {
         private readonly IComboDetailRepository _comboDetailRepository;
+        private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
         private readonly IMapper _mapper;
 
-        public ComboDetailService(IComboDetailRepository comboDetailRepository, IMapper mapper)
+        public ComboDetailService(IComboDetailRepository comboDetailRepository,
+                                  IComboServiceComboDetailRepository comboServiceComboDetailRepository,
+                                  IMapper mapper)
         {
             _comboDetailRepository = comboDetailRepository;
+            _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _mapper = mapper;
         }
 
@@ -47,13 +54,30 @@ namespace Application.Services
                 };
             }
 
+            var comboServices = await _comboServiceComboDetailRepository.GetComboServicesByComboDetailId(id);
+            var comboServiceDTOs = _mapper.Map<List<ComboServiceDTO>>(comboServices);
+
             var comboDetailDTO = _mapper.Map<ComboDetailDTO>(comboDetail);
+            comboDetailDTO.ComboServices = comboServiceDTOs;
 
             return new Result<object>
             {
                 Error = 0,
                 Message = "Combo detail details",
                 Data = comboDetailDTO
+            };
+        }
+
+        public async Task<Result<object>> GetComboServicesByComboDetailId(Guid comboDetailId)
+        {
+            var comboServices = await _comboServiceComboDetailRepository.GetComboServicesByComboDetailId(comboDetailId);
+            var comboServiceDTOs = _mapper.Map<List<ComboServiceDTO>>(comboServices);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo services for the combo detail",
+                Data = comboServiceDTOs
             };
         }
 

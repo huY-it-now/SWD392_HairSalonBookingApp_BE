@@ -52,12 +52,45 @@ namespace WebApi.Controllers
             return Ok(salon);
         }
 
-        [HttpPost("search-salon")]
+        [HttpPost("search-salon-address")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<IActionResult> SearchSalonWithAddress(SearchSalonRequest request) {
             var salonMapper = _mapper.Map<SalonDTO>(request);
             var result = await _salonService.SearchSalonWithAddress(salonMapper);
+
+            return Ok(result);
+        }
+
+        [HttpPost("search-salon-id")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> SearchSalonWithId(SearchSalonWithIdRequest request) {
+            var salonMapper = _mapper.Map<SalonDTO>(request);
+            var result = await _salonService.SearchSalonById(salonMapper);
+
+            return Ok(result);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ViewSalonMemberBySalonId([FromForm] ViewSalonRequest request) {
+            var validator = new ViewSalonRequestValidator();
+            var validatorResult = validator.Validate(request);
+
+            if (!validatorResult.IsValid)
+            {
+                return BadRequest(new Result<object>
+                {
+                    Error = 1,
+                    Message = "Validation failed!",
+                    Data = validatorResult.Errors.Select(x => x.ErrorMessage).ToList(),
+                });
+            }
+
+            var mapper = _mapper.Map<ViewSalonDTO>(request);
+            var result = await _salonService.ViewSalonMemberBySalonId(mapper);
 
             return Ok(result);
         }

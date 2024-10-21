@@ -29,5 +29,9 @@ namespace Infrastructures.Repositories
             return await _dbContext.Salons
                 .FirstOrDefaultAsync(s => s.Address.ToLower().Contains(salonName.ToLower()));
         }
+
+        public async Task<Salon> GetSalonById(Guid id) {
+            return await _dbContext.Salons.FirstOrDefaultAsync(x => x.Id == id);
+        }
     }
 }

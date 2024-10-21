@@ -10,6 +10,7 @@ using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
+using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Application.Services
 {
@@ -185,11 +186,13 @@ namespace Application.Services
             };
         }
 
-        public async Task<Result<object>> CreateStylist(CreateStylistDTO request) {
+        public async Task<Result<object>> CreateStylist(CreateStylistDTO request)
+        {
             var stylist = await _unitOfWork.UserRepository.GetUserById(request.UserId);
             var salon = await _unitOfWork.SalonRepository.GetByIdAsync(request.SalonId);
 
-            if (stylist == null) {
+            if (stylist == null)
+            {
                 return new Result<object>
                 {
                     Error = 1,
@@ -306,43 +309,6 @@ namespace Application.Services
             };
         }
 
-
-        public async Task<Result<object>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
-        {
-            var stylist = await _unitOfWork.UserRepository.GetUserById(stylistId);
-
-            if (stylist == null || stylist.RoleId != 5)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Stylish not found!",
-                    Data = null
-                };
-            }
-
-            var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
-
-            if (schedules == null || schedules.Count == 0)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "No schedules found within the given date range.",
-                    Data = null
-                };
-            }
-
-            var scheduleDTOs = _mapper.Map<List<ScheduleDTO>>(schedules);
-
-            return new Result<object>
-            {
-                Error = 0,
-                Message = "Work and day-off schedule retrieved successfully!",
-                Data = scheduleDTOs
-            };
-        }
-
         public async Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request)
         {
             var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
@@ -357,18 +323,18 @@ namespace Application.Services
                 };
             }
 
-           if (schedule == null)
+            if (schedule == null)
             {
                 schedule = new SalonMemberSchedule
                 {
-                    StylistId = request.StylistId,
+                    SalonMemberId = request.StylistId,
                     ScheduleDate = request.ScheduleDate,
                     WorkShifts = request.WorkShifts
                 };
-                
+
                 await _unitOfWork.ScheduleRepository.AddAsync(schedule);
             }
-           else
+            else
             {
                 schedule.WorkShifts.AddRange(request.WorkShifts);
             }
@@ -384,6 +350,7 @@ namespace Application.Services
             };
         }
 
+
         public async Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime)
         {
             var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime.TimeOfDay >= s.StartTime && bookingTime.TimeOfDay < s.EndTime);
@@ -396,25 +363,123 @@ namespace Application.Services
             return availableStylists;
         }
 
-        public async Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request)
+        public async Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
-            var schedule = new SalonMemberSchedule
-            {
-                StylistId = request.StylistId,
-                ScheduleDate = request.DayOffDate,
-                IsDayOff = true,
-            };
+            var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
 
-            await _unitOfWork.ScheduleRepository.AddAsync(schedule);
+            List<WorkAndDayOffScheduleDTO> scheduleList = new List<WorkAndDayOffScheduleDTO>();
+
+            for (DateTime date = fromDate; date <= toDate; date = date.AddDays(1))
+            {
+                var schedule = schedules.FirstOrDefault(s => s.ScheduleDate.Date == date.Date);
+                scheduleList.Add(new WorkAndDayOffScheduleDTO
+                {
+                    Date = date,
+                    IsDayOff = schedule?.IsDayOff ?? true,
+                    WorkShifts = schedule?.WorkShifts ?? new List<string>()
+                });
+            }
+
+            return scheduleList;
+        }
+
+
+        public async Task<Result<object>> UpdateProfile(UpdateProfileDTO request)
+        {
+            var userExist = await _unitOfWork.UserRepository.GetUserById(request.Id);
+
+            if (userExist == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found",
+                    Data = null
+                };
+            }
+
+            userExist.FullName = request.FullName;
+            userExist.PhoneNumber = request.PhoneNumber;
+            userExist.Address = request.Address;
+
+            if (request.Email != userExist.Email)
+            {
+                var token = _emailService.GenerateRandomNumber();
+                await _emailService.SendOtpMail(request.FullName, token, request.Email);
+                userExist.VerifiedAt = null;
+                userExist.VerificationToken = token;
+                userExist.Email = request.Email;
+            }
+
+            _unitOfWork.UserRepository.Update(userExist);
+            await _unitOfWork.SaveChangeAsync();
+
+            var result = _mapper.Map<UpdateProfileDTO>(userExist);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Update profile successfully",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> ForgotPassword(string email)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByEmail(email);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            var token = _emailService.GenerateRandomNumber();
+            await _emailService.SendOtpMail(user.FullName, token, user.Email);
+
+            user.VerificationToken = token;
+            user.VerifiedAt = null;
+
+            _unitOfWork.UserRepository.Update(user);
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Day off registered successfully!",
-                Data = null
+                Message = "Change Password successfully"
             };
+        }
 
+        public async Task<Result<object>> ResetPassword(ResetPasswordDTO request)
+        {
+            var user = await _unitOfWork.UserRepository.Verify(request.Token);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Invalid token"
+                };
+            }
+
+            _passwordHash.CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
+
+            user.PasswordHash = passwordHash;
+            user.PasswordSalt = passwordSalt;
+            user.VerificationToken = null;
+            user.VerifiedAt = DateTime.Now;
+
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Reset Password successfully"
+            };
         }
     }
 }

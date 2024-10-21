@@ -14,7 +14,18 @@ namespace Infrastructures
         private readonly ISalonRepository _salonRepository;
         private readonly ISalonMemberRepository _salonMemberRepository;
         private readonly IScheduleRepository _scheduleRepository;
-        public UnitOfWork(AppDbContext dbContext, IUserRepository userRepository, IComboServiceRepository comboServiceRepository, IComboDetailRepository comboDetailRepository, ICategoryRepository categoryRepository, ISalonRepository salonRepository, IServiceRepository serviceRepository, ISalonMemberRepository salonMemberRepository, IScheduleRepository scheduleRepository)
+        private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
+
+        public UnitOfWork(AppDbContext dbContext,
+                          IUserRepository userRepository,
+                          IComboServiceRepository comboServiceRepository,
+                          IComboDetailRepository comboDetailRepository,
+                          ICategoryRepository categoryRepository,
+                          ISalonRepository salonRepository,
+                          IServiceRepository serviceRepository,
+                          ISalonMemberRepository salonMemberRepository,
+                          IScheduleRepository scheduleRepository,
+                          IComboServiceComboDetailRepository comboServiceComboDetailRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -25,6 +36,7 @@ namespace Infrastructures
             _salonRepository = salonRepository;
             _salonMemberRepository = salonMemberRepository;
             _scheduleRepository = scheduleRepository;
+            _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
         }
 
         public IUserRepository UserRepository => _userRepository;
@@ -35,6 +47,7 @@ namespace Infrastructures
         public ISalonMemberRepository SalonMemberRepository => _salonMemberRepository;
         public ISalonRepository SalonRepository => _salonRepository;
         public IScheduleRepository ScheduleRepository => _scheduleRepository;
+        public IComboServiceComboDetailRepository ComboServiceComboDetailRepository => _comboServiceComboDetailRepository;
 
         public async Task<int> SaveChangeAsync()
         {
