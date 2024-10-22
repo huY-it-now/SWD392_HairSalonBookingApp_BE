@@ -72,12 +72,11 @@ namespace Application.Services
                     Data = null
                 };
             }
-
             var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(id);
             var comboDetailDTOs = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
 
             var comboServiceDTO = _mapper.Map<ComboServiceDTO>(cbs);
-
+            
             return new Result<object>
             {
                 Error = 0,
@@ -85,6 +84,7 @@ namespace Application.Services
                 Data = comboServiceDTO
             };
         }
+
 
         public async Task<Result<object>> AddComboService(AddComboServiceRequest createRequest)
         {

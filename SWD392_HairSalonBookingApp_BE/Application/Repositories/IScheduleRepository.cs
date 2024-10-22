@@ -10,5 +10,7 @@ namespace Application.Repositories
     public interface IScheduleRepository : IGenericRepository<SalonMemberSchedule>
     {
         Task<List<SalonMemberSchedule>> GetSchedulesByUserIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate);
+        Task<SalonMemberSchedule> GetScheduleByDateAsync(Guid StylistId, DateTime date);
+        Task<List<StylistDTO>> GetAvailableStylistsByShift(string shift, DateTime date);
     }
 }
