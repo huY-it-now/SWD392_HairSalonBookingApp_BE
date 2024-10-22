@@ -55,7 +55,8 @@ namespace Application.Services
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                Phone = user.PhoneNumber
+                Phone = user.PhoneNumber,
+                Address = user.Address,
             };
 
             return new Result<object>
