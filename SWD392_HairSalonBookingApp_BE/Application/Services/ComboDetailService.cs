@@ -63,7 +63,7 @@ namespace Application.Services
             return new Result<object>
             {
                 Error = 0,
-                Message = "Combo detail details",
+                Message = "Combo details",
                 Data = comboDetailDTO
             };
         }
@@ -120,5 +120,18 @@ namespace Application.Services
                 Data = null
             };
         }
+
+        //public async Task<Result<object>> GetComboDetailsByComboServiceId(Guid comboServiceId)
+        //{
+        //    var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(comboServiceId);
+        //    var comboDetailDTOs = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
+
+        //    return new Result<object>
+        //    {
+        //        Error = 0,
+        //        Message = "Combo details found",
+        //        Data = comboDetailDTOs
+        //    };
+        //}
     }
 }

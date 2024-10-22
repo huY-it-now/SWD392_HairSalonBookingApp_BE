@@ -9,7 +9,6 @@ namespace Domain.Contracts.Abstracts.Combo
     public class AddComboDetailRequest
     {
         public string Content { get; set; }
-        public string? ImageUrl { get; set; }
     }
 }
 
