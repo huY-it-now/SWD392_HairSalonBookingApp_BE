@@ -1,9 +1,5 @@
 ﻿using Domain.Contracts.DTO.Combo;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Application.Validations.Combo
 {
@@ -18,6 +14,10 @@ namespace Application.Validations.Combo
             if (comboServiceDTO.Price <= 0)
             {
                 throw new ArgumentException("Price must be greater than zero");
+            }
+            if (comboServiceDTO.SalonId == Guid.Empty)
+            {
+                throw new ArgumentException("SalonId is required");
             }
         }
     }
