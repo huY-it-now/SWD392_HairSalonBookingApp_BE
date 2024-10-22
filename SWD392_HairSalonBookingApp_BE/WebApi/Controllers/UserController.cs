@@ -153,15 +153,6 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
-        [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
-        {
-            var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
-            return Ok(result);
-        }
-
         [HttpPost("register-work-schedule")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
@@ -171,15 +162,16 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("register-day-off")]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [HttpGet("view-work-and-day-off-schedule")]
+        [ProducesResponseType(200, Type = typeof(List<WorkAndDayOffScheduleDTO>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> RegisterDayOff([FromBody] RegisterDayOffDTO request)
+        public async Task<IActionResult> ViewWorkAndDayOffSchedule([FromQuery] Guid stylistId, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
         {
-            var result = await _userService.RegisterDayOff(request);
-            return Ok(result);
-        }
+            var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
 
+            return Ok(result);
+
+        }
         [HttpPost("udpate-profile")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
