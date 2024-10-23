@@ -4,6 +4,7 @@ using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Stylist;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -225,6 +226,24 @@ namespace WebApi.Controllers
 
             var mapper = _mapper.Map<ResetPasswordDTO>(req);
             var result = await _userService.ResetPassword(mapper);
+            return Ok(result);
+        }
+
+        [HttpGet("view-appointments")]
+        [ProducesResponseType(200, Type = typeof(List<AppointmentDTO>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ViewAppointments([FromQuery] Guid stylistId, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
+        {
+            var result = await _userService.ViewAppointments(stylistId, fromDate, toDate);
+            return Ok(result);
+        }
+
+        [HttpPost("update-appointment-status")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> UpdateAppointmentStatus([FromBody] UpdateAppointmentStatusDTO request)
+        {
+            var result = await _userService.UpdateAppointmentStatus(request);
             return Ok(result);
         }
     }

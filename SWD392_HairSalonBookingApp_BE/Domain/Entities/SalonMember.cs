@@ -12,6 +12,7 @@
         public User User { get; set; }
         public Guid SalonId { get; set; }
         public Salon Salon { get; set; }
+        public ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
         #endregion
     }
 }

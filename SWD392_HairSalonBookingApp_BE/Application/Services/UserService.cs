@@ -6,6 +6,7 @@ using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
@@ -480,6 +481,26 @@ namespace Application.Services
                 Error = 0,
                 Message = "Reset Password successfully"
             };
+        }
+
+        public async Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate)
+        {
+            var appointments = await _unitOfWork.AppointmentRepository.GetAppointmentsByStylistIdAndDateRange(stylistId, fromDate, toDate);
+            return _mapper.Map<List<AppointmentDTO>>(appointments);
+        }
+
+        public async Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request)
+        {
+            var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
+            if (appointment == null)
+            {
+                return new Result<object> { Error = 1, Message = "Appointment not found.", Data = null };
+            }
+
+            appointment.Status = request.Status;
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object> { Error = 0, Message = "Appointment status updated successfully.", Data = null };
         }
     }
 }
