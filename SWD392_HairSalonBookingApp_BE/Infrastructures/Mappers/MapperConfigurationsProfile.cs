@@ -14,6 +14,7 @@ using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.Abstracts.Category;
 using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
+using Domain.Contracts.DTO.Appointment;
 
 namespace Infrastructures.Mappers
 {
@@ -88,6 +89,15 @@ namespace Infrastructures.Mappers
             .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.Job, opt => opt.MapFrom(src => src.Job));
+
+            //Appointment
+            CreateMap<Appointment, AppointmentDTO>()
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
+            .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.ServiceName))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+            CreateMap<UpdateAppointmentStatusDTO, Appointment>()
+                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
         }
     }
 }
