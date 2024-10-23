@@ -115,6 +115,19 @@ namespace WebApi.Controllers
             return Ok(deleteResult);
         }
 
+        [HttpGet("get-comboServiceByComboDetail/{comboDetailId}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(404, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetComboServicesByComboDetailId(Guid comboDetailId)
+        {
+            var result = await _comboDetailService.GetComboServicesByComboDetailId(comboDetailId);
+            if (result.Data == null || ((IEnumerable<ComboServiceDTO>)result.Data).Any() == false)
+            {
+                return NotFound(new { Error = 1, Message = "No combo services found for this combo detail" });
+            }
+            return Ok(result);
+        }
+
         // ComboService API methods
 
         [HttpGet("getAll-comboServices")]
@@ -207,6 +220,20 @@ namespace WebApi.Controllers
 
             var deleteResult = await _comboServiceService.DeleteComboService(id);
             return Ok(deleteResult);
+        }
+
+
+        [HttpGet("get-comboDetailsByComboService/{comboServiceId}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(404, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetComboDetailsByComboServiceId(Guid comboServiceId)
+        {
+            var result = await _comboServiceService.GetComboDetailsByComboServiceId(comboServiceId);
+            if (result.Data == null || ((IEnumerable<ComboDetailDTO>)result.Data).Any() == false)
+            {
+                return NotFound(new { Error = 1, Message = "No combo details found for this service" });
+            }
+            return Ok(result);
         }
     }
 }
