@@ -49,7 +49,7 @@ namespace Infrastructures.Repositories
             }
         }
 
-        // Thêm phương thức để lấy danh sách ComboService liên quan đến ComboDetail qua bảng trung gian
+        // 
         public async Task<List<ComboService>> GetComboServicesByComboDetailId(Guid comboDetailId)
         {
             return await _dbContext.ComboServiceComboDetails
@@ -57,5 +57,13 @@ namespace Infrastructures.Repositories
                                    .Select(cscd => cscd.ComboService)
                                    .ToListAsync();
         }
+
+        //public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)
+        //{
+        //    return await _dbContext.ComboServiceComboDetails
+        //                           .Where(cscd => cscd.ComboServiceId == comboServiceId)
+        //                           .Select(cscd => cscd.ComboDetail)
+        //                           .ToListAsync();
+        //}
     }
 }

@@ -7,6 +7,7 @@
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
         public ICollection<ServiceComboService> ServiceComboServices { get; set; }
+        public List<Appointment> Appointments { get; set; }
         public ICollection<Booking> Bookings { get; set; }
         #endregion
     }

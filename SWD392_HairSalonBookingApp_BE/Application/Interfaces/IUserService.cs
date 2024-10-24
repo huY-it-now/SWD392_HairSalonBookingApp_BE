@@ -1,6 +1,7 @@
 ﻿using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Stylist;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -16,11 +17,13 @@ namespace Application.Interfaces
         Task<Result<object>> CreateStylist(CreateStylistDTO request);
         Task<Result<object>> PrintAllSalonMember();
         Task<Result<object>> GetSalonMemberWithRole(int roleId);
-        Task<Result<object>> ViewWorkAndDayOffSchedule (Guid StylistId, DateTime fromDate, DateTime toDate);
         Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request);
-        Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request);
+        Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime);
+        Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate);
         Task<Result<object>> UpdateProfile(UpdateProfileDTO request);
         Task<Result<object>> ForgotPassword(string email);
         Task<Result<object>> ResetPassword(ResetPasswordDTO request);
+        Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate);
+        Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request);
     }
 }

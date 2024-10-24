@@ -29,6 +29,9 @@ namespace Infrastructures
         public DbSet<SalonMemberSchedule> SalonMemberSchedules { get; set; }
         public DbSet<ServiceComboService> ServiceComboServices { get; set; }
         public DbSet<ComboServiceComboDetail> ComboServiceComboDetails { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<Customer> Customers { get; set; }
+
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -74,6 +77,19 @@ namespace Infrastructures
                 .WithOne(s => s.Salon)
                 .HasForeignKey(s => s.SalonId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Appointment>()
+            .HasOne(a => a.Stylist)
+            .WithMany(s => s.Appointments)
+            .HasForeignKey(a => a.StylistId);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Customer)
+                .WithMany(c => c.Appointments)
+                .HasForeignKey(a => a.CustomerId);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.Service).WithMany(c => c.Appointments).HasForeignKey(s => s.ServiceId);
 
             // Áp dụng bộ lọc toàn cục cho Service
             modelBuilder.Entity<Service>().HasQueryFilter(c => !c.IsDeleted);

@@ -7,7 +7,6 @@ namespace Domain.Contracts.DTO.Combo
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
-        public string? ImageUrl { get; set; }
         public List<ComboServiceDTO> ComboServices { get; set; }
     }
 }

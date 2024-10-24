@@ -2,6 +2,8 @@
 using Application.Interfaces;
 using Application.Repositories;
 using Application.Services;
+using Application.Validations.Stylist;
+using FluentValidation;
 using Infrastructures.Mappers;
 using Infrastructures.Repositories;
 using Microsoft.AspNetCore.Hosting;
@@ -19,6 +21,7 @@ namespace Infrastructures
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ISalonService, SalonService>();
             services.AddScoped<ISalonRepository, SalonRepository>();
+
             services.AddScoped<ISalonMemberRepository, SalonMemberRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<ICategoryRepository,CategoryRepository>();
@@ -33,12 +36,12 @@ namespace Infrastructures
             services.AddScoped<IPaymentsRepository, PaymentsRepository>();
             services.AddSingleton<ICurrentTime, CurrentTime>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
+            services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IComboServiceComboDetailRepository, ComboServiceComboDetailRepository>();
             services.AddScoped<IComboServiceRepository, ComboServiceRepository>();
             services.AddScoped<IComboDetailRepository, ComboDetailRepository>();
             services.AddScoped<ComboDetailService>();
             services.AddScoped<IComboService, ComboServiceService>();
-
 
             // ATTENTION: if you do migration please check file README.md
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(databaseConnection));

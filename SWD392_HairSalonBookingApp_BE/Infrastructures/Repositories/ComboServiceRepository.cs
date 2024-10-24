@@ -54,8 +54,7 @@ namespace Infrastructures.Repositories
                 await _dbContext.SaveChangesAsync();
             }
         }
-
-        // Thêm phương thức để lấy danh sách ComboDetail liên quan đến ComboService qua bảng trung gian
+     
         public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)
         {
             return await _dbContext.ComboServiceComboDetails

@@ -4,6 +4,7 @@ using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Stylist;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -153,15 +154,6 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
-        [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
-        {
-            var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
-            return Ok(result);
-        }
-
         [HttpPost("register-work-schedule")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
@@ -171,15 +163,16 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("register-day-off")]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [HttpGet("view-work-and-day-off-schedule")]
+        [ProducesResponseType(200, Type = typeof(List<WorkAndDayOffScheduleDTO>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> RegisterDayOff([FromBody] RegisterDayOffDTO request)
+        public async Task<IActionResult> ViewWorkAndDayOffSchedule([FromQuery] Guid stylistId, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
         {
-            var result = await _userService.RegisterDayOff(request);
-            return Ok(result);
-        }
+            var result = await _userService.ViewWorkAndDayOffSchedule(stylistId, fromDate, toDate);
 
+            return Ok(result);
+
+        }
         [HttpPost("udpate-profile")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
@@ -233,6 +226,24 @@ namespace WebApi.Controllers
 
             var mapper = _mapper.Map<ResetPasswordDTO>(req);
             var result = await _userService.ResetPassword(mapper);
+            return Ok(result);
+        }
+
+        [HttpGet("view-appointments")]
+        [ProducesResponseType(200, Type = typeof(List<AppointmentDTO>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ViewAppointments([FromQuery] Guid stylistId, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
+        {
+            var result = await _userService.ViewAppointments(stylistId, fromDate, toDate);
+            return Ok(result);
+        }
+
+        [HttpPost("update-appointment-status")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> UpdateAppointmentStatus([FromBody] UpdateAppointmentStatusDTO request)
+        {
+            var result = await _userService.UpdateAppointmentStatus(request);
             return Ok(result);
         }
     }
