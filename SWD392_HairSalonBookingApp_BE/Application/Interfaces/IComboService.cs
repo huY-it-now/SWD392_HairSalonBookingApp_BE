@@ -11,10 +11,11 @@ namespace Application.Interfaces
     public interface IComboService
     {
         Task<Result<object>> GetAllComboServices();
-        Task<Result<object>> GetComboServiceById(Guid id);
+        Task<Result<object>> GetAllComboDetailByComboServiceId(Guid id);
         Task<Result<object>> AddComboService(AddComboServiceRequest request);
         Task<Result<object>> UpdateComboService(UpdateComboServiceRequest request);
         Task<Result<object>> DeleteComboService(Guid id);
         Task<Result<object>> GetComboDetailsByComboServiceId(Guid comboServiceId);
+        Task<Result<object>> AddComboDetailIntoComboService(Guid comboServiceId, Guid comboDetailId);
     }
 }
