@@ -23,4 +23,9 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
         return await _dbContext.SalonMembers.Where(x => x.SalonId == salonId)
             .Include(x => x.User).Include(x => x.Salon).ToListAsync();
     }
+
+    public Task<List<SalonMember>> GetSalonMembersFree(DateTime dateTime, Salon salon)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -26,6 +26,17 @@ namespace Application.Services
             _bookingRepository = bookingRepository;
         }
 
+        public async Task<BookingDTO> AddRandomStylist(Guid Id)
+        {
+            var booking = await _bookingRepository.GetByIdAsync(Id);
+
+            var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(booking.BookingDate, booking.salon);
+
+            booking.SalonMember = stylistListFree.ElementAt(new Random().Next(stylistListFree.Count));
+
+            return _mapper.Map<BookingDTO>(booking);
+        }
+
         public async Task<bool> CheckBooking(Guid bookingId, bool Check)
         {
             var booking = await _bookingRepository.GetByIdAsync(bookingId);

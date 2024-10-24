@@ -19,5 +19,6 @@ namespace Application.Interfaces
         Task<bool> CreateBooking(Booking booking);
         Task<bool> UpdateBooking(Booking booking);
         Task<Booking> GetBookingById(Guid Id);
+        Task<BookingDTO> AddRandomStylist(Guid Id);
     }
 }
