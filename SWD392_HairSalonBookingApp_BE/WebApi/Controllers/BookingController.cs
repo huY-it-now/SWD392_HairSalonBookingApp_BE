@@ -56,6 +56,8 @@ namespace WebApi.Controllers
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<Result<object>> CheckBooking(Guid bookingId, bool Check) // true = ok, false = fake (delete)
         {
+
+
             var result = new Result<object>
             {
                 Error = 0,
@@ -66,7 +68,48 @@ namespace WebApi.Controllers
             return result;
         }
 
-        [HttpPost("AddStylistToBooking")]
+        [HttpPut("AddRandomStylist")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<Result<object>> AddRandomStylist(Guid bookingId)
+        {
+            var booking = await _bookingService.AddRandomStylist(bookingId);
+
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = booking
+            };
+
+            if (booking == null)
+            {
+                result.Message = "Add random stylist fail";
+            }
+            else
+            {
+                result.Message = "Add random stylist success";
+            }
+
+            return result;
+        }
+
+        [HttpDelete("CacelBooking")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<Result<object>> CacelBooking(Guid bookingId)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "Cancel completed",
+                Data = await _bookingService.CheckBooking(bookingId, false)
+            };
+
+            return result;
+        }
+
+            [HttpPut("AddStylistToBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<Result<object>> AddStylistToBooking(Guid bookingId, Guid stylistId)
