@@ -1,6 +1,8 @@
-﻿using Application.Repositories;
+﻿using Application.Interfaces;
+using Application.Repositories;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using Org.BouncyCastle.Asn1;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +18,11 @@ namespace Infrastructures.Repositories
         public ComboServiceComboDetailRepository(AppDbContext dbContext)
         {
             _dbContext = dbContext;
+        }
+
+        public async Task AddAsync(ComboServiceComboDetail comboServiceComboDetail)
+        {
+            await _dbContext.AddAsync(comboServiceComboDetail);
         }
 
         public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)

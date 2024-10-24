@@ -9,5 +9,6 @@ namespace Application.Repositories
     {
         Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId);
         Task<List<ComboService>> GetComboServicesByComboDetailId(Guid comboDetailId);
+        Task AddAsync(ComboServiceComboDetail comboServiceComboDetail);
     }
 }

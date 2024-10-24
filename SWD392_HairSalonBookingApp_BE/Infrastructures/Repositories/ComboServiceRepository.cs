@@ -62,5 +62,13 @@ namespace Infrastructures.Repositories
                                    .Select(cscd => cscd.ComboDetail)
                                    .ToListAsync();
         }
+
+        public async Task<List<ComboServiceComboDetail>> GetComboDetailByComboServiceId(Guid comboServiceId)
+        {
+            return await _dbContext.ComboServiceComboDetails
+                .Include(detail => detail.ComboDetail) // Eagerly load ComboDetail
+                .Where(detail => detail.ComboServiceId == comboServiceId)
+                .ToListAsync();
+        }
     }
 }
