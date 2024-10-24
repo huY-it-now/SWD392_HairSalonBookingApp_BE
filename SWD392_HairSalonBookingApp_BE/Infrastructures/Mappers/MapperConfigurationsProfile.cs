@@ -52,6 +52,9 @@ namespace Infrastructures.Mappers
             CreateMap<AddComboDetailRequest, ComboDetail>()
                 .ForMember(dest => dest.Id, opt => opt.Ignore());
             CreateMap<UpdateComboDetailRequest, ComboDetail>();
+            CreateMap<AddComboDetailRequest, ComboDetailDTO>();
+            CreateMap<ComboServiceComboDetail, ComboDetailDTO>()
+            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ComboDetailId));
 
             //cate
             CreateMap<Category, CategoryDTO>();

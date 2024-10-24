@@ -13,5 +13,6 @@ namespace Domain.Contracts.Abstracts.Combo
         public decimal Price { get; set; }
         public Guid SalonId { get; set; }
         public IFormFile? ImageUrl { get; set; }
+        public Guid ComboDetailId { get; set; }
     }
 }

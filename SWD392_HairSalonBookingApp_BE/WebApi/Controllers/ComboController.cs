@@ -149,7 +149,7 @@ namespace WebApi.Controllers
         [ProducesResponseType(404, Type = typeof(Result<object>))]
         public async Task<IActionResult> GetComboServiceById(Guid id)
         {
-            var result = await _comboServiceService.GetComboServiceById(id);
+            var result = await _comboServiceService.GetAllComboDetailByComboServiceId(id);
             if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo service not found" });
@@ -190,7 +190,7 @@ namespace WebApi.Controllers
                 return BadRequest(new { Error = 1, Message = "Invalid data" });
             }
 
-            var result = await _comboServiceService.GetComboServiceById(id);
+            var result = await _comboServiceService.GetAllComboDetailByComboServiceId(id);
             if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo service not found" });
@@ -212,7 +212,7 @@ namespace WebApi.Controllers
         [ProducesResponseType(404, Type = typeof(Result<object>))]
         public async Task<IActionResult> DeleteComboService(Guid id)
         {
-            var result = await _comboServiceService.GetComboServiceById(id);
+            var result = await _comboServiceService.GetAllComboDetailByComboServiceId(id);
             if (result.Data == null)
             {
                 return NotFound(new { Error = 1, Message = "Combo service not found" });
@@ -233,6 +233,16 @@ namespace WebApi.Controllers
             {
                 return NotFound(new { Error = 1, Message = "No combo details found for this service" });
             }
+            return Ok(result);
+        }
+
+        [HttpPost("detail-into-service")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(404, Type = typeof(Result<object>))]
+        public async Task<IActionResult> AddComboDetailIntoComboService(Guid comboDetailId, Guid comboServiceId)
+        {
+            var result = await _comboServiceService.AddComboDetailIntoComboService(comboServiceId, comboDetailId);
+
             return Ok(result);
         }
     }
