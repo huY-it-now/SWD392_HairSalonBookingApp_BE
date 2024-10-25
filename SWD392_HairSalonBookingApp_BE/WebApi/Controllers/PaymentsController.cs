@@ -7,6 +7,7 @@ using Azure;
 using Domain.Contracts.Abstracts.Bank;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Bank;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
@@ -23,12 +24,14 @@ namespace WebApi.Controllers
     [ApiController]
     public class PaymentsController : ControllerBase
     {
+        private readonly IBookingService _bookingService;
         private readonly PayOS _payOS;
         private readonly IPaymentService _paymentService;
         private readonly IMapper _mapper;
 
-        public PaymentsController(IPaymentService paymentService, IMapper mapper, PayOS payOS)
+        public PaymentsController(IPaymentService paymentService, IMapper mapper, PayOS payOS, IBookingService bookingService)
         {
+            _bookingService = bookingService;
             _payOS = payOS;
             _paymentService = paymentService;
             _mapper = mapper;
@@ -89,7 +92,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<Result<object>> CreatePaymentLink(string productName, string description, int price, string returnUrl, string cancelUrl)
+        public async Task<Result<object>> CreatePaymentLink(string productName, string description, int price, string returnUrl, string cancelUrl, Guid bookingId)
         {
             var result = new Result<object>
             {
@@ -100,13 +103,16 @@ namespace WebApi.Controllers
 
             try
             {
+                var booking = await _bookingService.GetBookingById(bookingId);
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
-                ItemData item = new ItemData(productName, 1, price);
+                ItemData item = new ItemData(productName, 1, decimal.ToInt32(booking.TotalMoney));
                 List<ItemData> items = new List<ItemData>();
                 items.Add(item);
                 PaymentData paymentData = new PaymentData(orderCode, price, description, items, cancelUrl, returnUrl);
 
                 CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
+
+                //await _paymentService. 
 
                 result.Message = "success";
                 result.Data = createPayment;

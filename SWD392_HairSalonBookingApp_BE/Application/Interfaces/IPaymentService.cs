@@ -12,5 +12,6 @@ namespace Application.Interfaces
         Task<bool> BookingPaymentCheck(Guid BookingId); 
         Task<Payments> GetPaymentsById(Guid Id);
         Task<bool> ChangePaymentStatus(Guid bookingId, string status);
+        Task<bool> CreatePayment();
     }
 }

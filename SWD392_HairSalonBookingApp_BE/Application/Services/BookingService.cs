@@ -65,8 +65,8 @@ namespace Application.Services
                 appointment.StylistId = booking.SalonMemberId;
                 appointment.CustomerId = cus.Id;
                 appointment.Customer = cus;
-                appointment.Service = booking.Service;
-                appointment.ServiceId = booking.ServiceId;
+                //appointment.Service = booking.Service;
+                //appointment.ServiceId = booking.ServiceId;
 
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
@@ -196,9 +196,7 @@ namespace Application.Services
             {
                 booking.User = User;
                 booking.UserId = CustomerId;
-            }
-
-            booking.TotalMoney = TotalAmount;
+            }            
 
             if (!await CreateBooking(booking))
             {
@@ -206,6 +204,16 @@ namespace Application.Services
                 Result.Message = "Create booking faild";
                 return Result;
             }
+
+            var payment = new Payments();
+
+            payment.PaymentAmount = TotalAmount;
+            payment.BookingId = CustomerId;
+            payment.Booking = booking;
+            payment.PaymentMethods.MethodName = "Qr";
+            payment.PaymentSatus.StatusName = "Pending";
+
+
 
             var bookingDTO = _mapper.Map<BookingDTO>(booking);
 
