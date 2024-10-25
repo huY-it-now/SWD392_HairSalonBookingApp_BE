@@ -18,8 +18,8 @@ namespace Domain.Entities
         public Guid CustomerId { get; set; }
         public Customer Customer { get; set; }
 
-        public Guid ServiceId { get; set; }
-        public Service Service { get; set; }
+        public Guid ComboServiceId { get; set; }
+        public ComboService ComboService { get; set; }
         #endregion
     }
 }

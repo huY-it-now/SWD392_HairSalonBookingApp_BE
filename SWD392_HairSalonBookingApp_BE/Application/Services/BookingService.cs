@@ -65,8 +65,8 @@ namespace Application.Services
                 appointment.StylistId = booking.SalonMemberId;
                 appointment.CustomerId = cus.Id;
                 appointment.Customer = cus;
-                appointment.Service = booking.Service;
-                appointment.ServiceId = booking.ServiceId;
+                //appointment.Service = booking.Service;
+                //appointment.ServiceId = booking.ServiceId;
 
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
@@ -137,10 +137,10 @@ namespace Application.Services
 
                 if (comboService != null)
                 {
-                    foreach (var item in booking.Service.ServiceComboServices)
-                    {
-                        item.ComboService = comboService;
-                    }
+                    //foreach (var item in booking.Service.ServiceComboServices)
+                    //{
+                    //    item.ComboService = comboService;
+                    //}
 
                     service = comboService.Service.First();
 
@@ -173,8 +173,8 @@ namespace Application.Services
 
             if (service != null)
             {
-                booking.Service = service;
-                booking.ServiceId = service.Id;
+                //booking.Service = service;
+                //booking.ServiceId = service.Id;
             }
             else
             {
