@@ -102,7 +102,7 @@ namespace Application.Services
             return salonMember;
         }
 
-        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId, Guid ServiceId)
+        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId)
         {
             Decimal TotalAmount = 0;
             Booking booking = new Booking();
@@ -129,20 +129,22 @@ namespace Application.Services
                 booking.SalonMemberId = SalonMemberId;
             }
 
+            var service = new Service();
+
             foreach (var id in ExtractValidIds(ComboServiceId))
             {
                 var comboService = await _unitOfWork.ComboServiceRepository.GetByIdAsync(new Guid(id));
 
                 if (comboService != null)
                 {
-                    var combo = comboService;
-
                     foreach (var item in booking.Service.ServiceComboServices)
                     {
-                        item.ComboService = combo;
+                        item.ComboService = comboService;
                     }
 
-                    TotalAmount += combo.Price;
+                    service = comboService.Service.First();
+
+                    TotalAmount += comboService.Price;
                 }
             }
 
@@ -167,12 +169,12 @@ namespace Application.Services
                 return Result;
             }
 
-            var service = await _unitOfWork.ServiceRepository.GetByIdAsync(ServiceId);
+            service = await _unitOfWork.ServiceRepository.GetByIdAsync(service.Id);
 
             if (service != null)
             {
                 booking.Service = service;
-                booking.ServiceId = ServiceId;
+                booking.ServiceId = service.Id;
             }
             else
             {
