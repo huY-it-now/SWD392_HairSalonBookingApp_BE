@@ -137,10 +137,10 @@ namespace Application.Services
 
                 if (comboService != null)
                 {
-                    foreach (var item in booking.Service.ServiceComboServices)
-                    {
-                        item.ComboService = comboService;
-                    }
+                    //foreach (var item in booking.Service.ServiceComboServices)
+                    //{
+                    //    item.ComboService = comboService;
+                    //}
 
                     service = comboService.Service.First();
 
@@ -173,8 +173,8 @@ namespace Application.Services
 
             if (service != null)
             {
-                booking.Service = service;
-                booking.ServiceId = service.Id;
+                //booking.Service = service;
+                //booking.ServiceId = service.Id;
             }
             else
             {
