@@ -13,6 +13,7 @@
         public List<Appointment> Appointments { get; set; }
         public Guid SalonId { get; set; }
         public Salon Salon { get; set; }
+        public ICollection<Booking> Bookings { get; set; }
         #endregion
     }
 }
