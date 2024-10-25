@@ -109,7 +109,7 @@ namespace WebApi.Controllers
             return result;
         }
 
-            [HttpPut("AddStylistToBooking")]
+        [HttpPut("AddStylistToBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<Result<object>> AddStylistToBooking(Guid bookingId, Guid stylistId)
@@ -165,9 +165,23 @@ namespace WebApi.Controllers
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ServiceId, string ComboServiceId)
+        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId)
         {
-            var result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, cuttingDate, ServiceId, ComboServiceId);
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            if (string.IsNullOrEmpty(ComboServiceId))
+            {
+                result.Error = 1;
+                result.Message = "ComboService Id is null";
+                return result;
+            }
+
+            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, cuttingDate, ComboServiceId);
 
             return result;
         }
