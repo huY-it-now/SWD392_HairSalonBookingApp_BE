@@ -65,9 +65,8 @@ namespace Application.Services
                 appointment.StylistId = booking.SalonMemberId;
                 appointment.CustomerId = cus.Id;
                 appointment.Customer = cus;
-                //appointment.Service = booking.Service;
-                //appointment.ServiceId = booking.ServiceId;
-
+                appointment.ComboService = booking.ComboService;
+                appointment.ComboServiceId = booking.ComboServiceId;
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
             }
@@ -102,7 +101,7 @@ namespace Application.Services
             return salonMember;
         }
 
-        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId)
+        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId)
         {
             Decimal TotalAmount = 0;
             Booking booking = new Booking();
@@ -129,24 +128,21 @@ namespace Application.Services
                 booking.SalonMemberId = SalonMemberId;
             }
 
-            var service = new Service();
+            var comboService = await _unitOfWork.ComboServiceRepository.GetByIdAsync(ComboServiceId);
 
-            foreach (var id in ExtractValidIds(ComboServiceId))
+            if (comboService == null)
             {
-                var comboService = await _unitOfWork.ComboServiceRepository.GetByIdAsync(new Guid(id));
-
-                if (comboService != null)
-                {
-                    //foreach (var item in booking.Service.ServiceComboServices)
-                    //{
-                    //    item.ComboService = comboService;
-                    //}
-
-                    service = comboService.Service.First();
-
-                    TotalAmount += comboService.Price;
-                }
+                Result.Error = 1;
+                Result.Message = "Combo service not found";
+                return Result;
             }
+            else
+            {
+                booking.ComboServiceId = comboService.Id;
+                booking.ComboService = comboService;
+            }
+
+            
 
             if (TotalAmount == 0)
             {
@@ -161,20 +157,6 @@ namespace Application.Services
             {
                 booking.salon = Salon;
                 booking.SalonId = salonId;
-            }
-            else
-            {
-                Result.Error = 1;
-                Result.Message = "Salon not found";
-                return Result;
-            }
-
-            service = await _unitOfWork.ServiceRepository.GetByIdAsync(service.Id);
-
-            if (service != null)
-            {
-                //booking.Service = service;
-                //booking.ServiceId = service.Id;
             }
             else
             {

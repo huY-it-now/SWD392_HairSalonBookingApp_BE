@@ -165,7 +165,7 @@ namespace WebApi.Controllers
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, int hour, int minute, string ComboServiceId)
+        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, int hour, int minute, Guid ComboServiceId)
         {
             var result = new Result<object>
             {
@@ -186,7 +186,7 @@ namespace WebApi.Controllers
                 return result;
             }
 
-            if (string.IsNullOrEmpty(ComboServiceId))
+            if (string.IsNullOrEmpty(ComboServiceId.ToString()))
             {
                 result.Error = 1;
                 result.Message = "ComboService Id is null";
