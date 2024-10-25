@@ -52,12 +52,21 @@ namespace Application.Services
 
                 _bookingRepository.Update(booking);
 
+                var cus = await _unitOfWork.CustomerRepository.GetByIdAsync(booking.UserId);
+
+                if (cus == null)
+                {
+                    return false;
+                }
+
                 Appointment appointment = new();
                 appointment.AppointmentDate = booking.BookingDate;
                 appointment.Stylist = booking.SalonMember;
                 appointment.StylistId = booking.SalonMemberId;
-                appointment.CustomerId = booking.UserId;
-                //appointment.Service = booking.Service;
+                appointment.CustomerId = cus.Id;
+                appointment.Customer = cus;
+                appointment.Service = booking.Service;
+                appointment.ServiceId = booking.ServiceId;
 
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
@@ -93,7 +102,7 @@ namespace Application.Services
             return salonMember;
         }
 
-        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId)
+        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId, Guid ServiceId)
         {
             Decimal TotalAmount = 0;
             Booking booking = new Booking();
@@ -148,11 +157,22 @@ namespace Application.Services
 
             if (Salon != null)
             {
-                foreach (var item in booking.Service.ServiceComboServices)
-                {
-                    item.ComboService.SalonId = salonId;
-                    item.ComboService.Salon = Salon;
-                }
+                booking.salon = Salon;
+                booking.SalonId = salonId;
+            }
+            else
+            {
+                Result.Error = 1;
+                Result.Message = "Salon not found";
+                return Result;
+            }
+
+            var service = await _unitOfWork.ServiceRepository.GetByIdAsync(ServiceId);
+
+            if (service != null)
+            {
+                booking.Service = service;
+                booking.ServiceId = ServiceId;
             }
             else
             {

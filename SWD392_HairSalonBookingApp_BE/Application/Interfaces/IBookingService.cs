@@ -13,7 +13,7 @@ namespace Application.Interfaces
 {
     public interface IBookingService
     {
-        Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId);
+        Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId, Guid ServiceId);
         Task<List<BookingDTO>> ShowAllUncheckedBooking();
         Task<bool> CheckBooking(Guid bookingId, bool Check);
         Task<bool> CreateBooking(Booking booking);
