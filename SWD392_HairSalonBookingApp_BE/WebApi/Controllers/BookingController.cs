@@ -165,7 +165,7 @@ namespace WebApi.Controllers
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId)
+        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, int hour, int minute, string ComboServiceId, Guid serviceId)
         {
             var result = new Result<object>
             {
@@ -174,6 +174,18 @@ namespace WebApi.Controllers
                 Data = null
             };
 
+            TimeSpan timeOfDate = new TimeSpan(hour, minute, 0);
+
+            cuttingDate.AddHours(timeOfDate.Hours);
+            cuttingDate.AddMinutes(timeOfDate.Minutes);
+
+            if ((cuttingDate - DateTime.Now) < TimeSpan.FromHours(1))
+            {
+                result.Error = 1;
+                result.Message = "Please booking at least 1 hour after now";
+                return result;
+            }
+
             if (string.IsNullOrEmpty(ComboServiceId))
             {
                 result.Error = 1;
@@ -181,7 +193,7 @@ namespace WebApi.Controllers
                 return result;
             }
 
-            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, cuttingDate, ComboServiceId);
+            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, cuttingDate, ComboServiceId, serviceId);
 
             return result;
         }
