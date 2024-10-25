@@ -16,8 +16,8 @@
         public Salon salon { get; set; }
         public Guid SalonMemberId { get; set; }
         public SalonMember SalonMember { get; set; }
-        public Guid ServiceId { get; set; }
-        public Service Service { get; set; }
+        public Guid ComboServiceId { get; set; }
+        public ComboService ComboService { get; set; }
         #endregion
     }
 }

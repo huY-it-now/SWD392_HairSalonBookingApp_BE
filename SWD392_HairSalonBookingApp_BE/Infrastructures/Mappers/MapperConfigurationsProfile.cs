@@ -96,7 +96,7 @@ namespace Infrastructures.Mappers
             //Appointment
             CreateMap<Appointment, AppointmentDTO>()
             .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.Name))
-            .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.Service.ServiceName))
+            .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ComboService.ComboServiceName))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
             CreateMap<UpdateAppointmentStatusDTO, Appointment>()

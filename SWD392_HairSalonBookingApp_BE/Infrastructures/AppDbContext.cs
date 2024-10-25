@@ -89,7 +89,7 @@ namespace Infrastructures
                 .HasForeignKey(a => a.CustomerId);
 
             modelBuilder.Entity<Appointment>()
-                .HasOne(a => a.Service).WithMany(c => c.Appointments).HasForeignKey(s => s.ServiceId);
+                .HasOne(a => a.ComboService).WithMany(c => c.Appointments).HasForeignKey(s => s.ComboServiceId);
 
             // Áp dụng bộ lọc toàn cục cho Service
             modelBuilder.Entity<Service>().HasQueryFilter(c => !c.IsDeleted);

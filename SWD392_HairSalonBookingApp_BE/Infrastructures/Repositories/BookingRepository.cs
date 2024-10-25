@@ -32,7 +32,7 @@ namespace Infrastructures.Repositories
                .Include(b => b.User)
                .Include(b => b.Payments)
                .Include(b => b.SalonMember)
-               .Include(b => b.Service)
+               .Include(b => b.ComboService)
                .ToListAsync();
         }
     }
