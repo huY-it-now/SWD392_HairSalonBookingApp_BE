@@ -10,6 +10,7 @@ namespace Domain.Entities
     {
         public Decimal PaymentAmount { get; set; }
         public DateTime PaymentDate { get; set; }
+
         public Guid BookingId { get; set; }
         public Booking Booking { get; set; }
 

@@ -15,12 +15,14 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly IComboServiceRepository _comboService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService)
         {
+            _comboService = comboService;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _bookingRepository = bookingRepository;
@@ -65,9 +67,8 @@ namespace Application.Services
                 appointment.StylistId = booking.SalonMemberId;
                 appointment.CustomerId = cus.Id;
                 appointment.Customer = cus;
-                //appointment.Service = booking.Service;
-                //appointment.ServiceId = booking.ServiceId;
-
+                appointment.ComboService = booking.ComboService;
+                appointment.ComboServiceId = booking.ComboServiceId;
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
             }
@@ -102,14 +103,13 @@ namespace Application.Services
             return salonMember;
         }
 
-        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, string ComboServiceId)
+        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId)
         {
-            Decimal TotalAmount = 0;
             Booking booking = new Booking();
 
             var Result = new Result<object>
             {
-                Error = 1,
+                Error = 0,
                 Message = "",
                 Data = null
             };
@@ -126,33 +126,21 @@ namespace Application.Services
             {
                 booking.SalonMember = salonMember;
 
-                booking.SalonMemberId = SalonMemberId;
+                booking.SalonMemberId = salonMember.Id;
             }
 
-            var service = new Service();
+            var comboService = await _comboService.GetComboServiceById(ComboServiceId);
 
-            foreach (var id in ExtractValidIds(ComboServiceId))
-            {
-                var comboService = await _unitOfWork.ComboServiceRepository.GetByIdAsync(new Guid(id));
-
-                if (comboService != null)
-                {
-                    //foreach (var item in booking.Service.ServiceComboServices)
-                    //{
-                    //    item.ComboService = comboService;
-                    //}
-
-                    service = comboService.Service.First();
-
-                    TotalAmount += comboService.Price;
-                }
-            }
-
-            if (TotalAmount == 0)
+            if (comboService == null)
             {
                 Result.Error = 1;
-                Result.Message = "Combo service not found";
+                Result.Message = "Combo service is not found";
                 return Result;
+            }
+            else
+            {
+                booking.ComboServiceId = comboService.Id;
+                booking.ComboService = comboService;
             }
 
             var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
@@ -161,20 +149,6 @@ namespace Application.Services
             {
                 booking.salon = Salon;
                 booking.SalonId = salonId;
-            }
-            else
-            {
-                Result.Error = 1;
-                Result.Message = "Salon not found";
-                return Result;
-            }
-
-            service = await _unitOfWork.ServiceRepository.GetByIdAsync(service.Id);
-
-            if (service != null)
-            {
-                //booking.Service = service;
-                //booking.ServiceId = service.Id;
             }
             else
             {
@@ -196,9 +170,7 @@ namespace Application.Services
             {
                 booking.User = User;
                 booking.UserId = CustomerId;
-            }
-
-            booking.TotalMoney = TotalAmount;
+            }            
 
             if (!await CreateBooking(booking))
             {
@@ -207,8 +179,17 @@ namespace Application.Services
                 return Result;
             }
 
+            var payment = new Payments();
+
+            payment.PaymentAmount = comboService.Price;
+            payment.BookingId = CustomerId;
+            payment.Booking = booking;
+
+
+
             var bookingDTO = _mapper.Map<BookingDTO>(booking);
 
+            Result.Message = "Create success";
             Result.Data = bookingDTO;
 
             return Result;

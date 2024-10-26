@@ -4,11 +4,21 @@ using Application.Commons;
 using Domain.Contracts.Settings;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
+using Net.payOS;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // parse the configuration in appsettings
 var configuration = builder.Configuration.Get<AppConfiguration>();
+
+IConfiguration configurationPayOs = new ConfigurationBuilder().AddJsonFile("appsettings.Development.json").Build();
+
+PayOS payOS = new PayOS(configurationPayOs["Environment:PAYOS_CLIENT_ID"] ?? throw new Exception("Cannot find environment"),
+                    configurationPayOs["Environment:PAYOS_API_KEY"] ?? throw new Exception("Cannot find environment"),
+                    configurationPayOs["Environment:PAYOS_CHECKSUM_KEY"] ?? throw new Exception("Cannot find environment"));
+
+builder.Services.AddSingleton(payOS);
+
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 builder.Services.AddSingleton(configuration);
