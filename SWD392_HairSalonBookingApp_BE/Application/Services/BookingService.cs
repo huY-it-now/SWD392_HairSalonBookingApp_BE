@@ -109,7 +109,7 @@ namespace Application.Services
 
             var Result = new Result<object>
             {
-                Error = 1,
+                Error = 0,
                 Message = "",
                 Data = null
             };
@@ -134,7 +134,7 @@ namespace Application.Services
             if (comboService == null)
             {
                 Result.Error = 1;
-                Result.Message = "";
+                Result.Message = "Combo service is not found";
                 return Result;
             }
             else
@@ -184,13 +184,12 @@ namespace Application.Services
             payment.PaymentAmount = comboService.Price;
             payment.BookingId = CustomerId;
             payment.Booking = booking;
-            payment.PaymentMethods.MethodName = "Qr";
-            payment.PaymentSatus.StatusName = "Pending";
 
 
 
             var bookingDTO = _mapper.Map<BookingDTO>(booking);
 
+            Result.Message = "Create success";
             Result.Data = bookingDTO;
 
             return Result;

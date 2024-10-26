@@ -89,28 +89,10 @@ namespace Infrastructures
                 .HasForeignKey(a => a.CustomerId);
 
             modelBuilder.Entity<Booking>()
-        .HasOne(b => b.Payments)
-        .WithMany()  // Assuming Payments can be related to multiple Bookings
-        .HasForeignKey(b => b.PaymentId)
-        .OnDelete(DeleteBehavior.Restrict); // Avoid cascading delete
-
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.User)
-                .WithMany()  // Assuming User can have multiple Bookings
-                .HasForeignKey(b => b.UserId)
-                .OnDelete(DeleteBehavior.Cascade); // Set cascade delete if it makes sense
-
-            modelBuilder.Entity<Booking>()
                 .HasOne(b => b.salon)
                 .WithMany()  // Assuming Salon can have multiple Bookings
                 .HasForeignKey(b => b.SalonId)
                 .OnDelete(DeleteBehavior.Restrict); // Avoid multiple cascade paths
-
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.SalonMember)
-                .WithMany()  // Assuming SalonMember can have multiple Bookings
-                .HasForeignKey(b => b.SalonMemberId)
-                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.ComboService).WithMany(c => c.Appointments).HasForeignKey(s => s.ComboServiceId);

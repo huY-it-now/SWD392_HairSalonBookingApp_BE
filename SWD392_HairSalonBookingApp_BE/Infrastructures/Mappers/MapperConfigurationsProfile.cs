@@ -15,6 +15,7 @@ using Domain.Contracts.Abstracts.Category;
 using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.Appointment;
+using Domain.Contracts.DTO.Booking;
 
 namespace Infrastructures.Mappers
 {
@@ -101,6 +102,9 @@ namespace Infrastructures.Mappers
 
             CreateMap<UpdateAppointmentStatusDTO, Appointment>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+
+            //Booking 
+            CreateMap<Booking, BookingDTO>();
         }
     }
 }
