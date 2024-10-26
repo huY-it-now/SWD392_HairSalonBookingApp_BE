@@ -4,7 +4,6 @@
     {
         public string? Feedback { get; set; }
         public DateTime BookingDate { get; set; }
-        public decimal TotalMoney { get; set; }
         public bool Checked { get; set; }
 
         #region Relationship

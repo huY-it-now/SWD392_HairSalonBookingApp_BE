@@ -15,13 +15,15 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly IPaymentsRepository _paymentsRepository;
         private readonly IComboServiceRepository _comboService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository)
         {
+            _paymentsRepository = paymentsRepository;
             _comboService = comboService;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -180,12 +182,24 @@ namespace Application.Services
             }
 
             var payment = new Payments();
+            var paymentStatus = new PaymentSatus();
+
+            paymentStatus.StatusName = "Pending";
+            paymentStatus.Discription = "Waiting for pay";
 
             payment.PaymentAmount = comboService.Price;
             payment.BookingId = CustomerId;
             payment.Booking = booking;
+            payment.PaymentSatus = paymentStatus;
 
+            await _paymentsRepository.AddAsync(payment);
 
+            if (!(await _unitOfWork.SaveChangeAsync() > 0))
+            {
+                Result.Error = 1;
+                Result.Message = "Create payment faild";
+                return Result;
+            }
 
             var bookingDTO = _mapper.Map<BookingDTO>(booking);
 
@@ -198,11 +212,6 @@ namespace Application.Services
         public async Task<Booking> GetBookingById(Guid Id)
         {
             return await _bookingRepository.GetByIdAsync(Id);
-        }
-
-        public async Task<List<BookingDTO>> ShowAllUncheckedBooking()
-        {
-            return _mapper.Map<List<BookingDTO>>(await _bookingRepository.GetFullBookingInformation());
         }
 
         public async Task<bool> UpdateBooking(Booking booking)
@@ -244,6 +253,41 @@ namespace Application.Services
             }
 
             return result;
+        }
+
+        public async Task<List<ViewCheckedBookingDTO>> ShowAllCheckedBooking()
+        {
+            var booking = await _bookingRepository.GetCheckedBookingInformation();
+
+            var checkedBooking = _mapper.Map<List<ViewCheckedBookingDTO>>(booking);
+
+            foreach (var item in checkedBooking)
+            {
+                for (int i = 0; i < booking.Count; i++)
+                {
+                    item.Total = booking[i].ComboService.Price;
+                    item.PaymentStatus = booking[i].Payments.PaymentSatus.StatusName;
+                }
+            }
+
+            return checkedBooking;
+        }
+
+        public async Task<List<ViewUncheckBookingDTO>> ShowAllUncheckedBooking()
+        {
+            var booking = await _bookingRepository.GetUncheckBookingInformation();
+
+            var uncheckBooking = _mapper.Map<List<ViewUncheckBookingDTO>>(booking);
+
+            foreach (var item in uncheckBooking)
+            {
+                for(int i = 0; i < booking.Count; i++)
+                {
+                    item.Total = booking[i].ComboService.Price;
+                }
+            }
+
+            return uncheckBooking;
         }
     }
 }

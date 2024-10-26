@@ -14,7 +14,8 @@ namespace Application.Interfaces
     public interface IBookingService
     {
         Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId);
-        Task<List<BookingDTO>> ShowAllUncheckedBooking();
+        Task<List<ViewUncheckBookingDTO>> ShowAllUncheckedBooking();
+        Task<List<ViewCheckedBookingDTO>> ShowAllCheckedBooking();
         Task<bool> CheckBooking(Guid bookingId, bool Check);
         Task<bool> CreateBooking(Booking booking);
         Task<bool> UpdateBooking(Booking booking);

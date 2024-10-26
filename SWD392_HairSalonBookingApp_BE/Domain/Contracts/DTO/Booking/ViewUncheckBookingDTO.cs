@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Contracts.DTO.Booking
 {
-    public class BookingDTO
+    public class ViewUncheckBookingDTO
     {
+        public Guid BookingId { get; set; }
         public DateTime BookingDate { get; set; }
-        public bool Checked { get; set; }
+        public Decimal Total { get; set; }
     }
 }

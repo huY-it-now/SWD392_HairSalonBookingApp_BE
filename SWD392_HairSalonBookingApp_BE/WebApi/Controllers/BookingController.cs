@@ -34,6 +34,23 @@ namespace WebApi.Controllers
             _mapper = mapper;
         }
 
+        [HttpGet("ShowCheckedBooking")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<Result<object>> ShowCheckedBooking()
+        {
+            var bookingList = await _bookingService.ShowAllUncheckedBooking();
+
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "Get uncheck booking success",
+                Data = bookingList
+            };
+
+            return result;
+        }
+
         [HttpGet("ShowUncheckedBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
@@ -44,7 +61,7 @@ namespace WebApi.Controllers
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Checked",
+                Message = "Get uncheck booking success",
                 Data = bookingList
             };
 
@@ -153,7 +170,6 @@ namespace WebApi.Controllers
             {
                 BookingDate = booking.BookingDate,
                 Checked = booking.Checked,
-                TotalMoney = booking.TotalMoney,
             };
 
             result.Message = "Add Stylist successfully";
