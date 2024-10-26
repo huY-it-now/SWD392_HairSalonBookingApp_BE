@@ -15,12 +15,14 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly IComboServiceRepository _comboService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService)
         {
+            _comboService = comboService;
             _mapper = mapper;
             _unitOfWork = unitOfWork;
             _bookingRepository = bookingRepository;
@@ -103,7 +105,6 @@ namespace Application.Services
 
         public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId)
         {
-            Decimal TotalAmount = 0;
             Booking booking = new Booking();
 
             var Result = new Result<object>
@@ -125,30 +126,21 @@ namespace Application.Services
             {
                 booking.SalonMember = salonMember;
 
-                booking.SalonMemberId = SalonMemberId;
+                booking.SalonMemberId = salonMember.Id;
             }
 
-            var comboService = await _unitOfWork.ComboServiceRepository.GetByIdAsync(ComboServiceId);
+            var comboService = await _comboService.GetComboServiceById(ComboServiceId);
 
             if (comboService == null)
             {
                 Result.Error = 1;
-                Result.Message = "Combo service not found";
+                Result.Message = "";
                 return Result;
             }
             else
             {
                 booking.ComboServiceId = comboService.Id;
                 booking.ComboService = comboService;
-            }
-
-            
-
-            if (TotalAmount == 0)
-            {
-                Result.Error = 1;
-                Result.Message = "Combo service not found";
-                return Result;
             }
 
             var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
@@ -189,7 +181,7 @@ namespace Application.Services
 
             var payment = new Payments();
 
-            payment.PaymentAmount = TotalAmount;
+            payment.PaymentAmount = comboService.Price;
             payment.BookingId = CustomerId;
             payment.Booking = booking;
             payment.PaymentMethods.MethodName = "Qr";

@@ -174,12 +174,9 @@ namespace WebApi.Controllers
                 Data = null
             };
 
-            TimeSpan timeOfDate = new TimeSpan(hour, minute, 0);
+            DateTime dateTime = new DateTime(cuttingDate.Year, cuttingDate.Month, cuttingDate.Day, hour, minute, 0);
 
-            cuttingDate.AddHours(timeOfDate.Hours);
-            cuttingDate.AddMinutes(timeOfDate.Minutes);
-
-            if ((cuttingDate - DateTime.Now) < TimeSpan.FromHours(1))
+            if ((dateTime - DateTime.Now) < TimeSpan.FromHours(1))
             {
                 result.Error = 1;
                 result.Message = "Please booking at least 1 hour after now";
@@ -193,7 +190,7 @@ namespace WebApi.Controllers
                 return result;
             }
 
-            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, cuttingDate, ComboServiceId);
+            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, dateTime, ComboServiceId);
 
             return result;
         }
