@@ -42,7 +42,6 @@ namespace Application.Services
                     Id = cb.Id,
                     ComboServiceName = cb.ComboServiceName,
                     Price = cb.Price,
-                    SalonId = cb.SalonId,
                     Image = cb.ImageUrl,
                     //ComboDetails = cb.ComboDetails
                 };
@@ -111,6 +110,17 @@ namespace Application.Services
         {
             ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(createRequest));
 
+            var comboDetail = await _unitOfWork.ComboDetailRepository.GetByIdAsync(createRequest.ComboDetailId);
+            if (comboDetail == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "The specified combo detail does not exist.",
+                    Data = null
+                };
+            }
+
             string fileExtension = Path.GetExtension(createRequest.ImageUrl.FileName);
             string newFileName = $"{Guid.NewGuid()}{fileExtension}";
             CloudinaryResponse cloudinaryResult = await _cloudinaryService.UploadImage(newFileName, createRequest.ImageUrl);
@@ -128,15 +138,15 @@ namespace Application.Services
             var comboService = new ComboService
             {
                 ComboServiceName = createRequest.ComboServiceName,
-                SalonId = createRequest.SalonId,
+                Price = createRequest.Price,
                 ImageId = cloudinaryResult.PublicImageId,
                 ImageUrl = cloudinaryResult.ImageUrl,
                 ComboServiceComboDetails = new List<ComboServiceComboDetail>
-                {
-                    new ComboServiceComboDetail
-                    {
-                        ComboDetailId = createRequest.ComboDetailId
-                    }
+                 {
+                        new ComboServiceComboDetail
+                         {
+                                ComboDetailId = createRequest.ComboDetailId
+                         }
                 }
             };
 
