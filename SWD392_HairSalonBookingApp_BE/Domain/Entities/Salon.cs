@@ -10,7 +10,7 @@ namespace Domain.Entities
         public string? ImageId { get; set; }
 
         #region RelationShip
-        public ICollection<ComboService> ComboServices { get; set; }
+        public ICollection<Booking> Bookings { get; set; }
         public ICollection<SalonMember> SalonMembers { get; set; }
         #endregion
     }
