@@ -105,7 +105,7 @@ namespace WebApi.Controllers
             {
                 var booking = await _bookingService.GetBookingById(bookingId);
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
-                ItemData item = new ItemData(productName, 1, decimal.ToInt32(booking.TotalMoney));
+                ItemData item = new ItemData(productName, 1, decimal.ToInt32(price));
                 List<ItemData> items = new List<ItemData>();
                 items.Add(item);
                 PaymentData paymentData = new PaymentData(orderCode, price, description, items, cancelUrl, returnUrl);
