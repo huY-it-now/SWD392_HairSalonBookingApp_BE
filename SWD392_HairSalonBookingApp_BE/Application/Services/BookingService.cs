@@ -265,7 +265,7 @@ namespace Application.Services
             {
                 for (int i = 0; i < booking.Count; i++)
                 {
-                    item.Total = booking[i].Payments.PaymentAmount;
+                    item.Total = booking[i].ComboService.Price;
                     item.PaymentStatus = booking[i].Payments.PaymentSatus.StatusName;
                 }
             }
