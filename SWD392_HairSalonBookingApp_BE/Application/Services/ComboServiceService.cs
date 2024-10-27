@@ -88,27 +88,25 @@ namespace Application.Services
                 };
             }
 
-            // Create a list of combo detail objects
             var comboDetailDTOs = comboDetails.Select(detail => new
             {
                 ComboDetailId = detail.ComboDetailId,
                 Content = detail.ComboDetail?.Content ?? "No Content Available"
             }).ToList();
 
-            // Create a single combo service object that includes the combo details
             var comboServiceDTO = new
             {
                 ComboServiceId = comboService.Id,
                 ComboServiceName = comboService.ComboServiceName,
                 Image = comboService.ImageUrl,
-                ComboDetails = comboDetailDTOs // Nest the combo details inside
+                ComboDetails = comboDetailDTOs
             };
 
             return new Result<object>
             {
                 Error = 0,
                 Message = "Combo service details retrieved successfully",
-                Data = new List<object> { comboServiceDTO } // Return as a list with one item
+                Data = new List<object> { comboServiceDTO }
             };
         }
 
@@ -147,6 +145,7 @@ namespace Application.Services
                 Price = createRequest.Price,
                 ImageId = cloudinaryResult.PublicImageId,
                 ImageUrl = cloudinaryResult.ImageUrl,
+                IsDeleted = false,
                 ComboServiceComboDetails = new List<ComboServiceComboDetail>
                  {
                         new ComboServiceComboDetail
@@ -183,13 +182,27 @@ namespace Application.Services
 
         public async Task<Result<object>> DeleteComboService(Guid id)
         {
-            await _comboServiceRepository.DeleteComboService(id);
+            var cbs = await _unitOfWork.ComboServiceRepository.GetComboServiceById(id);
+
+            if (cbs == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found"
+                };
+            }
+
+            cbs.IsDeleted = true;
+
+            _unitOfWork.ComboServiceRepository.Update(cbs);
+
+            await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Combo service deleted successfully",
-                Data = null
+                Message = "delete successfully"
             };
         }
 
