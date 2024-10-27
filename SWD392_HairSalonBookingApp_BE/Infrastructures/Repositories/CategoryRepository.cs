@@ -23,12 +23,12 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Category>> GetAllCategoryAsync()
         {
-            return await _dbContext.Categories.ToListAsync();
+            return await _dbContext.Categories.Include(c => c.Services).ToListAsync();
         }
 
         public async Task<Category> GetCategoryById(Guid id)
         {
-            return await _dbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Categories.Include(c => c.Services).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Category> CreateCategory(Category category)

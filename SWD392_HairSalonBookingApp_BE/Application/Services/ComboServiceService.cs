@@ -43,7 +43,13 @@ namespace Application.Services
                     ComboServiceName = cb.ComboServiceName,
                     Price = cb.Price,
                     Image = cb.ImageUrl,
-                    //ComboDetails = cb.ComboDetails
+                    ComboDetails = cb.ComboServiceComboDetails
+                        .Where(cd => cd.ComboDetail != null)
+                        .Select(cd => new ComboDetailDTO
+                        {
+                            Id = cd.ComboDetail.Id,
+                            Content = cd.ComboDetail.Content
+                        }).ToList()
                 };
 
                 cbsList.Add(cbDTO);
@@ -52,7 +58,7 @@ namespace Application.Services
             return new Result<object>
             {
                 Error = 0,
-                Message = "Print all combo services",
+                Message = "Print all combo services with details",
                 Data = cbsList
             };
         }
