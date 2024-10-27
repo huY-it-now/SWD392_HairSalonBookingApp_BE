@@ -15,14 +15,16 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly ISalonMemberScheduleRepository _salonMemberScheduleRepository;
         private readonly IPaymentsRepository _paymentsRepository;
         private readonly IComboServiceRepository _comboService;
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository, ISalonMemberScheduleRepository salonMemberScheduleRepository)
         {
+            _salonMemberScheduleRepository = salonMemberScheduleRepository;
             _paymentsRepository = paymentsRepository;
             _comboService = comboService;
             _mapper = mapper;
@@ -130,12 +132,15 @@ namespace Application.Services
 
             var salonMember = await _unitOfWork.SalonMemberRepository.GetByIdAsync(SalonMemberId);
 
-            if (salonMember != null)
+            if (salonMember == null)
             {
-                booking.SalonMember = salonMember;
-
-                booking.SalonMemberId = salonMember.Id;
+                Result.Error = 1;
+                Result.Message = "Stylist is not found";
+                return Result;
             }
+
+            booking.SalonMember = salonMember;
+            booking.SalonMemberId = salonMember.Id;
 
             var comboService = await _comboService.GetComboServiceById(ComboServiceId);
 
@@ -145,11 +150,74 @@ namespace Application.Services
                 Result.Message = "Combo service is not found";
                 return Result;
             }
-            else
+
+            var schedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
+
+            if (schedule == null)
             {
-                booking.ComboServiceId = comboService.Id;
-                booking.ComboService = comboService;
+                SalonMemberSchedule salonMemberSchedule = new();
+                salonMemberSchedule.ScheduleDate = booking.BookingDate;
+                salonMemberSchedule.WorkShifts = booking.ComboService.ComboServiceName;
+                salonMemberSchedule.SalonMember = salonMember;
+                salonMemberSchedule.SalonMemberId = SalonMemberId;
+                await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
+
+                if (!(await _unitOfWork.SaveChangeAsync() > 0))
+                {
+                    Result.Error = 1;
+                    Result.Message = "Create stylist schedule fail";
+                }
             }
+
+            TimeSpan comboTime = CheckComboSericeTime(comboService.ComboServiceName);
+
+            TimeSpan timeEndPredict = new TimeSpan(booking.BookingDate.Hour + comboTime.Hours, booking.BookingDate.Minute + comboTime.Minutes, 0);
+
+            foreach (var item in schedule) //check xem co trung lich ko
+            {
+                if(item.ScheduleDate == booking.BookingDate)
+                {
+                    Result.Error = 1;
+                    Result.Message = "This time has been booked";
+                }
+                
+                TimeSpan timeOfWork = CheckComboSericeTime(item.WorkShifts);
+                
+                if ((timeEndPredict.Hours - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0)
+                {
+                    Result.Error = 1;
+                    Result.Message = $"Please choose another time before {timeEndPredict.Hours - item.ScheduleDate.Hour} hour";
+                    return Result;
+                }else if ((timeEndPredict.Hours - item.ScheduleDate.Hour) == 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0 && (item.ScheduleDate.Minute - timeEndPredict.Minutes) < 0)
+                {
+                    Result.Error = 1;
+                    Result.Message = $"Please choose another time before 30 minutes";
+                    return Result;
+                }
+                else if ((booking.BookingDate.Hour - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour + timeOfWork.Hours) < 0)
+                {
+                    Result.Error = 1;
+                    Result.Message = $"Please choose another time after {item.ScheduleDate.Hour + timeOfWork.Hours - booking.BookingDate.Hour} hour";
+                    return Result;
+                }
+            }
+
+            SalonMemberSchedule salonMemberSchedule = new();
+            salonMemberSchedule.ScheduleDate = booking.BookingDate;
+            salonMemberSchedule.WorkShifts = booking.ComboService.ComboServiceName;
+            salonMemberSchedule.SalonMember = salonMember;
+            salonMemberSchedule.SalonMemberId = SalonMemberId;
+            await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
+
+            if (!(await _unitOfWork.SaveChangeAsync() > 0))
+            {
+                Result.Error = 1;
+                Result.Message = "Create stylist schedule fail";
+            }
+
+            booking.ComboServiceId = comboService.Id;
+            booking.ComboService = comboService;
+            
 
             var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
 
@@ -217,7 +285,7 @@ namespace Application.Services
 
         public async Task<Booking> GetBookingById(Guid Id)
         {
-            return await _bookingRepository.GetByIdAsync(Id);
+            return await _bookingRepository.GetBookingByIdWithComboAndPayment(Id);
         }
 
         public async Task<bool> UpdateBooking(Booking booking)
@@ -225,6 +293,18 @@ namespace Application.Services
             _bookingRepository.Update(booking);
 
             return await _unitOfWork.SaveChangeAsync() > 0;
+        }
+
+        public TimeSpan CheckComboSericeTime(string comboServiceName)
+        {
+            switch (comboServiceName)
+            {
+                case "Cắt tóc + Nhuộm": return new TimeSpan(1, 30, 0); 
+                case "Cắt tóc + Cạo mặt + Ráy tai": return new TimeSpan(1, 0, 0); 
+                case "Cắt tóc + Gội đầu + Uốn tóc": return new TimeSpan(3, 30, 0); 
+                case "Cắt tóc + Duỗi": return new TimeSpan(4, 30, 0); 
+                default: return TimeSpan.Zero;
+            }
         }
 
         List<string> ExtractValidIds(string input)
