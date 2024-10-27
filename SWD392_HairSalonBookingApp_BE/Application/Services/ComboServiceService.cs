@@ -44,7 +44,7 @@ namespace Application.Services
                     Price = cb.Price,
                     Image = cb.ImageUrl,
                     ComboDetails = cb.ComboServiceComboDetails
-                        .Where(cd => cd.ComboDetail != null) // Ensure ComboDetail is not null
+                        .Where(cd => cd.ComboDetail != null)
                         .Select(cd => new ComboDetailDTO
                         {
                             Id = cd.ComboDetail.Id,

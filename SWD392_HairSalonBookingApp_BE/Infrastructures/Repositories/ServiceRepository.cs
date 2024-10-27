@@ -23,12 +23,18 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Service>> GetAllServicesAsync()
         {
-            return await _dbContext.Services.ToListAsync();
+            return await _dbContext.Services.Include(s => s.ServiceComboServices)
+            .ThenInclude(scs => scs.ComboService)
+                .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
+                    .ThenInclude(csDetails => csDetails.ComboDetail).ToListAsync();
         }
 
         public async Task<Service> GetServiceById(Guid id)
         {
-            return await _dbContext.Services.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Services.Include(s => s.ServiceComboServices)
+            .ThenInclude(scs => scs.ComboService)
+                .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
+                    .ThenInclude(csDetails => csDetails.ComboDetail).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Service> CreateService(Service service)
