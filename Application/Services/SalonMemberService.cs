@@ -3,8 +3,6 @@ using Application.Repositories;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Application.Services
@@ -17,9 +15,20 @@ namespace Application.Services
         {
             _salonMemberRepository = salonMemberRepository;
         }
+
         public async Task<SalonMember> GetSalonMemberById(Guid id)
         {
             return await _salonMemberRepository.GetByIdAsync(id);
+        }
+
+        public async Task<List<SalonMember>> GetAllStylists()
+        {
+            return await _salonMemberRepository.GetSalonMemberWithRole(5);
+        }
+
+        public async Task<List<SalonMember>> GetAllSalonStaff()
+        {
+            return await _salonMemberRepository.GetSalonMemberWithRole(4);
         }
     }
 }

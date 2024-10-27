@@ -10,5 +10,7 @@ namespace Application.Interfaces
     public interface ISalonMemberService
     {
         public Task<SalonMember> GetSalonMemberById(Guid id);
+        Task<List<SalonMember>> GetAllStylists();
+        Task<List<SalonMember>> GetAllSalonStaff();
     }
 }

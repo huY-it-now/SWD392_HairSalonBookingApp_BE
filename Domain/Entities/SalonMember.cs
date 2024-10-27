@@ -2,6 +2,8 @@
 {
     public class SalonMember : BaseEntity
     {
+        public string FullName { get; set; }  
+        public string Email { get; set; }
         public string Job { get; set; }
         public Guid UserId { get; set; }
         public string? Rating { get; set; }
