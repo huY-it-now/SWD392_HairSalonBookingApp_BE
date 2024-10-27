@@ -6,7 +6,6 @@ namespace Infrastructures
 {
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly ICustomerRepository _customerRepository;
         private readonly AppDbContext _dbContext;
         private readonly IUserRepository _userRepository;
         private readonly IComboServiceRepository _comboServiceRepository;
@@ -29,10 +28,8 @@ namespace Infrastructures
                           ISalonMemberRepository salonMemberRepository,
                           IScheduleRepository scheduleRepository,
                           IComboServiceComboDetailRepository comboServiceComboDetailRepository,
-                          IAppointmentRepository appointmentRepository,
-                          ICustomerRepository customerRepository)
+                          IAppointmentRepository appointmentRepository)
         {
-            _customerRepository = customerRepository;
             _dbContext = dbContext;
             _userRepository = userRepository;
             _comboServiceRepository = comboServiceRepository;
@@ -46,7 +43,6 @@ namespace Infrastructures
             _appointmentRepository = appointmentRepository;
         }
         
-        public ICustomerRepository CustomerRepository => _customerRepository;
         public IUserRepository UserRepository => _userRepository;
         public IComboServiceRepository ComboServiceRepository => _comboServiceRepository;
         public IComboDetailRepository ComboDetailRepository => _comboDetailRepository;
