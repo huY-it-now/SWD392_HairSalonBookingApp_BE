@@ -41,13 +41,13 @@ namespace Application.Services
             return _mapper.Map<BookingDTO>(booking);
         }
 
-        public async Task<bool> CheckBooking(Guid bookingId, bool Check)
+        public async Task<string> CheckBooking(Guid bookingId, bool Check)
         {
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
 
             if (booking == null)
             {
-                return false;
+                return "Booking is not found";
             }
 
             if (Check)
@@ -60,17 +60,16 @@ namespace Application.Services
 
                 if (cus == null)
                 {
-                    return false;
+                    return "Customer is not found";
                 }
 
                 Appointment appointment = new();
                 appointment.AppointmentDate = booking.BookingDate;
                 appointment.Stylist = booking.SalonMember;
                 appointment.StylistId = booking.SalonMemberId;
-                appointment.CustomerId = cus.Id;
-                appointment.Customer = cus;
                 appointment.ComboService = booking.ComboService;
                 appointment.ComboServiceId = booking.ComboServiceId;
+                appointment.Status = "Hadn't done";
 
                 await _unitOfWork.AppointmentRepository.AddAsync(appointment);
             }
@@ -79,7 +78,12 @@ namespace Application.Services
                 _bookingRepository.SoftRemove(booking);
             }
 
-            return await _unitOfWork.SaveChangeAsync() > 0;
+            if (!(await _unitOfWork.SaveChangeAsync() > 0))
+            {
+                return "Save change fail";
+            }
+
+            return "Check success";
         }
 
         public async Task<bool> CreateBooking(Booking booking)
@@ -266,7 +270,7 @@ namespace Application.Services
                 for (int i = 0; i < booking.Count; i++)
                 {
                     item.Total = booking[i].ComboService.Price;
-                    item.PaymentStatus = booking[i].Payments.PaymentSatus.StatusName;
+                    //item.PaymentStatus = booking[i].Payments.PaymentSatus.StatusName;
                 }
             }
 

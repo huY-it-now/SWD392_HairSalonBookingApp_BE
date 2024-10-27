@@ -92,7 +92,7 @@ namespace WebApi.Controllers
         }
 
         [HttpPost("create")]
-        public async Task<Result<object>> CreatePaymentLink(string productName, string description, int price, string returnUrl, string cancelUrl, Guid bookingId)
+        public async Task<Result<object>> CreatePaymentLink(Guid bookingId)
         {
             var result = new Result<object>
             {
@@ -105,14 +105,14 @@ namespace WebApi.Controllers
             {
                 var booking = await _bookingService.GetBookingById(bookingId);
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
-                ItemData item = new ItemData(productName, 1, decimal.ToInt32(price));
+                ItemData item = new ItemData(booking.ComboService.ComboServiceName, 1, decimal.ToInt32(booking.ComboService.Price));
+                var cancelUrl = "CancelPayment";
+                var returnUrl = "";
                 List<ItemData> items = new List<ItemData>();
                 items.Add(item);
-                PaymentData paymentData = new PaymentData(orderCode, price, description, items, cancelUrl, returnUrl);
+                PaymentData paymentData = new PaymentData(orderCode, decimal.ToInt32(booking.ComboService.Price), "Thanh toan doan hang", items, cancelUrl, returnUrl);
 
                 CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
-
-                //await _paymentService. 
 
                 result.Message = "success";
                 result.Data = createPayment;
