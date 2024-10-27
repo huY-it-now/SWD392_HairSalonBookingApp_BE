@@ -58,7 +58,6 @@ namespace Application.Services
             var comboServiceDTOs = _mapper.Map<List<ComboServiceDTO>>(comboServices);
 
             var comboDetailDTO = _mapper.Map<ComboDetailDTO>(comboDetail);
-            comboDetailDTO.ComboServices = comboServiceDTOs;
 
             return new Result<object>
             {

@@ -39,6 +39,7 @@ namespace Infrastructures
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
             services.AddScoped<IComboServiceComboDetailRepository, ComboServiceComboDetailRepository>();
+            services.AddScoped<IServiceComboServiceRepository, ServiceComboRepository>();
             services.AddScoped<IComboServiceRepository, ComboServiceRepository>();
             services.AddScoped<IComboDetailRepository, ComboDetailRepository>();
             services.AddScoped<ComboDetailService>();

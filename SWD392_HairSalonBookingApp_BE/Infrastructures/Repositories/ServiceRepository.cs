@@ -23,12 +23,18 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Service>> GetAllServicesAsync()
         {
-            return await _dbContext.Services.ToListAsync();
+            return await _dbContext.Services.Where(d => d.IsDeleted == false).Include(s => s.ServiceComboServices)
+            .ThenInclude(scs => scs.ComboService)
+                .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
+                    .ThenInclude(csDetails => csDetails.ComboDetail).ToListAsync();
         }
 
         public async Task<Service> GetServiceById(Guid id)
         {
-            return await _dbContext.Services.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Services.Where(d => d.IsDeleted == false).Include(s => s.ServiceComboServices)
+            .ThenInclude(scs => scs.ComboService)
+                .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
+                    .ThenInclude(csDetails => csDetails.ComboDetail).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Service> CreateService(Service service)
@@ -59,14 +65,6 @@ namespace Infrastructures.Repositories
             await _dbContext.SaveChangesAsync();
 
             return existingService;
-        }
-
-        public async Task<bool> DeleteService(Service service)
-        {
-            _dbContext.Services.Remove(service);
-            var result = await _dbContext.SaveChangesAsync();
-
-            return result > 0;
         }
     }
 }

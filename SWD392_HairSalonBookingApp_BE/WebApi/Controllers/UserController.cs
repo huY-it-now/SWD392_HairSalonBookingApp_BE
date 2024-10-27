@@ -102,25 +102,6 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
-
-        [HttpGet]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
-        [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> PrintAllSalonMember()
-        {
-            var result = await _userService.PrintAllSalonMember();
-            return Ok(result);
-        }
-
-        [HttpPost("get-member-with-role")]
-        [ProducesResponseType(200, Type = typeof(Result<object>))]
-        [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> GetMemberWithRole(int roleId)
-        {
-            var result = await _userService.GetSalonMemberWithRole(roleId);
-            return Ok(result);
-        }
-
         
         [HttpPost("udpate-profile")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
