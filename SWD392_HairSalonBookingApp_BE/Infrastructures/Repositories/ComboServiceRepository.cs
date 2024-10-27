@@ -17,7 +17,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<ComboService>> GetAllComboServiceAsync()
         {
-            return await _dbContext.ComboServices
+            return await _dbContext.ComboServices.Where(d => d.IsDeleted == false)
         .Include(cs => cs.ComboServiceComboDetails)
             .ThenInclude(cs => cs.ComboDetail)
         .ToListAsync();
@@ -25,7 +25,8 @@ namespace Infrastructures.Repositories
 
         public async Task<ComboService> GetComboServiceById(Guid id)
         {
-            return await _dbContext.ComboServices.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+            return await _dbContext.ComboServices.Where(d => d.IsDeleted == false).Include(cs => cs.ComboServiceComboDetails)
+            .ThenInclude(cs => cs.ComboDetail).FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
         }
 
         public async Task<ComboService> AddComboService(ComboService comboService)
@@ -44,26 +45,6 @@ namespace Infrastructures.Repositories
             _dbSet.Update(comboService);
             await _dbContext.SaveChangesAsync();
             return comboService;
-        }
-
-        public async Task DeleteComboService(Guid id)
-        {
-            var comboService = await _dbSet.FirstOrDefaultAsync(cs => cs.Id == id);
-            if (comboService != null)
-            {
-                comboService.IsDeleted = true;
-                comboService.DeleteBy = _claimsService.GetCurrentUserId;
-                _dbSet.Update(comboService);
-                await _dbContext.SaveChangesAsync();
-            }
-        }
-     
-        public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)
-        {
-            return await _dbContext.ComboServiceComboDetails
-                                   .Where(cscd => cscd.ComboServiceId == comboServiceId)
-                                   .Select(cscd => cscd.ComboDetail)
-                                   .ToListAsync();
         }
 
         public async Task<List<ComboServiceComboDetail>> GetComboDetailByComboServiceId(Guid comboServiceId)
