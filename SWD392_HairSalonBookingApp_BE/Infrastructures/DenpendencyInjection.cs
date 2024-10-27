@@ -21,7 +21,6 @@ namespace Infrastructures
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ISalonService, SalonService>();
             services.AddScoped<ISalonRepository, SalonRepository>();
-            services.AddScoped<ICustomerRepository, CustomerRepository>();
 
             services.AddScoped<ISalonMemberService, SalonMemberService>();
             services.AddScoped<ISalonMemberRepository, SalonMemberRepository>();
