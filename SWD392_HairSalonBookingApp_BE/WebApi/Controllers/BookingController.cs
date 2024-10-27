@@ -39,12 +39,12 @@ namespace WebApi.Controllers
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<Result<object>> ShowCheckedBooking()
         {
-            var bookingList = await _bookingService.ShowAllUncheckedBooking();
+            var bookingList = await _bookingService.ShowAllCheckedBooking();
 
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Get uncheck booking success",
+                Message = "Get checked booking success",
                 Data = bookingList
             };
 

@@ -20,9 +20,20 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
+        {
+            return await _dbContext.Bookings
+               .Where(b => b.Id == id)
+               .Include(b => b.Payments)
+               .Include(b => b.ComboService)
+               .SingleOrDefaultAsync();
+        }
+
         public async Task<Booking> GetBookingWithPayment(Guid id)
         {
-            return await _dbContext.Bookings.Include(b => b.Payments).FirstOrDefaultAsync(booking => booking.Id == id);
+            return await _dbContext.Bookings
+                .Include(b => b.Payments)
+                .FirstOrDefaultAsync(booking => booking.Id == id);
         }
 
         public async Task<List<Booking>> GetCheckedBookingInformation()
