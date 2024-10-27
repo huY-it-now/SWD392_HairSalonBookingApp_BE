@@ -257,6 +257,10 @@ namespace Application.Services
 
             var payment = new Payments();
             var paymentStatus = new PaymentSatus();
+            var paymentMethod = new PaymentMethods();
+
+            paymentMethod.MethodName = "Qr";
+            paymentMethod.Description = "Pay through Qr";
 
             paymentStatus.StatusName = "Pending";
             paymentStatus.Discription = "Waiting for pay";
@@ -265,6 +269,7 @@ namespace Application.Services
             payment.BookingId = CustomerId;
             payment.Booking = booking;
             payment.PaymentSatus = paymentStatus;
+            payment.PaymentMethods = paymentMethod;
 
             await _paymentsRepository.AddAsync(payment);
 
