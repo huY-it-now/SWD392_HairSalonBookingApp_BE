@@ -87,12 +87,6 @@ namespace Infrastructures
                 .WithMany(c => c.Appointments)
                 .HasForeignKey(a => a.UserId);
 
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.salon)
-                .WithMany()  // Assuming Salon can have multiple Bookings
-                .HasForeignKey(b => b.SalonId)
-                .OnDelete(DeleteBehavior.Restrict); // Avoid multiple cascade paths
-
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.ComboService).WithMany(c => c.Appointments).HasForeignKey(s => s.ComboServiceId);
 
