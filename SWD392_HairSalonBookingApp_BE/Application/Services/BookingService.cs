@@ -56,7 +56,7 @@ namespace Application.Services
 
                 _bookingRepository.Update(booking);
 
-                var cus = await _unitOfWork.CustomerRepository.GetByIdAsync(booking.UserId);
+                var cus = await _unitOfWork.UserRepository.GetUserById(booking.UserId);
 
                 if (cus == null)
                 {
@@ -67,6 +67,8 @@ namespace Application.Services
                 appointment.AppointmentDate = booking.BookingDate;
                 appointment.Stylist = booking.SalonMember;
                 appointment.StylistId = booking.SalonMemberId;
+                appointment.UserId = cus.Id;
+                appointment.User = cus;
                 appointment.ComboService = booking.ComboService;
                 appointment.ComboServiceId = booking.ComboServiceId;
                 appointment.Status = "Hadn't done";

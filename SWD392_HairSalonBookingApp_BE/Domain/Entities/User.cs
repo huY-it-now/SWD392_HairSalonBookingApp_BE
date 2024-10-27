@@ -19,6 +19,7 @@ namespace Domain.Entities
         public Guid? SalonMemberId { get; set; }
         public SalonMember? SalonMember { get; set; }
         public ICollection<Feedback>? Feedbacks { get; set; }
+        public List<Appointment> Appointments { get; set; }
         #endregion
     }
 }

@@ -15,8 +15,8 @@ namespace Domain.Entities
         public Guid StylistId { get; set; }
         public SalonMember Stylist { get; set; }
 
-        public Guid CustomerId { get; set; }
-        public Customer Customer { get; set; }
+        public Guid UserId { get; set; }
+        public User User { get; set; }
 
         public Guid ComboServiceId { get; set; }
         public ComboService ComboService { get; set; }
