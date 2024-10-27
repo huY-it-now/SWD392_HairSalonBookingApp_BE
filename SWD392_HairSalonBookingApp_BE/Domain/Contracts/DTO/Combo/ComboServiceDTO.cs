@@ -10,8 +10,7 @@ namespace Domain.Contracts.DTO.Combo
         public Guid Id { get; set; }
         public string ComboServiceName { get; set; }
         public decimal Price { get; set; }
-        public Guid SalonId { get; set; }
         public string? Image { get; set; }
-        public List<ComboServiceComboDetail> ComboDetails { get; set; }
+        public List<ComboDetailDTO> ComboDetails { get; set; } // Use ComboDetailDTO here
     }
 }

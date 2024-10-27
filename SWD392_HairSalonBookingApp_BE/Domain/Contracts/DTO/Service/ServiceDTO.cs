@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Domain.Contracts.DTO.Combo;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,6 +11,6 @@ namespace Domain.Contracts.DTO.Service
     {
         public Guid Id { get; set; }
         public string ServiceName { get; set; }
-        public Guid CategoryId { get; set; }
+        public List<ComboServiceDTO> ComboServiceDTOs { get; set; }
     }
 }

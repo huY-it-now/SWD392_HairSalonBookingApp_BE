@@ -74,5 +74,14 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> AddComboServiceIntoService(Guid comboServiceId, Guid serviceId)
+        {
+            var result = await _serviceService.AddComboIntoService(serviceId, comboServiceId);
+            return Ok(result);
+        }
     }
 }

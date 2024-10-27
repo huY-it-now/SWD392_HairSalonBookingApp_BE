@@ -29,6 +29,8 @@ namespace Infrastructures
         public DbSet<SalonMemberSchedule> SalonMemberSchedules { get; set; }
         public DbSet<ServiceComboService> ServiceComboServices { get; set; }
         public DbSet<ComboServiceComboDetail> ComboServiceComboDetails { get; set; }
+        public DbSet<Appointment> Appointments { get; set; }
+
         #endregion
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -75,6 +77,19 @@ namespace Infrastructures
                 .HasForeignKey(s => s.SalonId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Appointment>()
+            .HasOne(a => a.Stylist)
+            .WithMany(s => s.Appointments)
+            .HasForeignKey(a => a.StylistId);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.User)
+                .WithMany(c => c.Appointments)
+                .HasForeignKey(a => a.UserId);
+
+            modelBuilder.Entity<Appointment>()
+                .HasOne(a => a.ComboService).WithMany(c => c.Appointments).HasForeignKey(s => s.ComboServiceId);
+
             // Áp dụng bộ lọc toàn cục cho Service
             modelBuilder.Entity<Service>().HasQueryFilter(c => !c.IsDeleted);
             // Áp dụng bộ lọc toàn cục cho Category
@@ -86,7 +101,7 @@ namespace Infrastructures
                 .HasKey(x => new { x.ServiceId, x.ComboServiceId });
 
             modelBuilder.Entity<ComboServiceComboDetail>()
-                .HasKey(x => new {x.ComboServiceId, x.ComboDetailId});
+                .HasKey(x => new { x.ComboServiceId, x.ComboDetailId });
         }
 
     }

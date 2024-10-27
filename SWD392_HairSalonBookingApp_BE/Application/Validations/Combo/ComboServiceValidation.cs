@@ -15,10 +15,6 @@ namespace Application.Validations.Combo
             {
                 throw new ArgumentException("Price must be greater than zero");
             }
-            if (comboServiceDTO.SalonId == Guid.Empty)
-            {
-                throw new ArgumentException("SalonId is required");
-            }
         }
     }
 }

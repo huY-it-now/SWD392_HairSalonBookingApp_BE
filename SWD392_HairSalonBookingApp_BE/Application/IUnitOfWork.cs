@@ -14,5 +14,7 @@ namespace Application
         ISalonMemberRepository SalonMemberRepository { get; }
         IScheduleRepository ScheduleRepository { get; }
         IComboServiceComboDetailRepository ComboServiceComboDetailRepository { get; }
+        IAppointmentRepository AppointmentRepository { get; }
+        IServiceComboServiceRepository ServiceComboServiceRepository { get; }
     }
 }

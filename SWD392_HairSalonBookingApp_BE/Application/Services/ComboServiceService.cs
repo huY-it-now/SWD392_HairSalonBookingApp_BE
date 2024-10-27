@@ -42,9 +42,14 @@ namespace Application.Services
                     Id = cb.Id,
                     ComboServiceName = cb.ComboServiceName,
                     Price = cb.Price,
-                    SalonId = cb.SalonId,
                     Image = cb.ImageUrl,
-                    //ComboDetails = cb.ComboDetails
+                    ComboDetails = cb.ComboServiceComboDetails
+                        .Where(cd => cd.ComboDetail != null)
+                        .Select(cd => new ComboDetailDTO
+                        {
+                            Id = cd.ComboDetail.Id,
+                            Content = cd.ComboDetail.Content
+                        }).ToList()
                 };
 
                 cbsList.Add(cbDTO);
@@ -53,17 +58,15 @@ namespace Application.Services
             return new Result<object>
             {
                 Error = 0,
-                Message = "Print all combo services",
+                Message = "Print all combo services with details",
                 Data = cbsList
             };
         }
 
-
-        public async Task<Result<object>> GetComboServiceById(Guid id)
+        public async Task<Result<object>> GetAllComboDetailByComboServiceId(Guid id)
         {
-            var cbs = await _comboServiceRepository.GetComboServiceById(id);
-
-            if (cbs == null)
+            var comboService = await _comboServiceRepository.GetComboServiceById(id);
+            if (comboService == null)
             {
                 return new Result<object>
                 {
@@ -72,23 +75,55 @@ namespace Application.Services
                     Data = null
                 };
             }
-            var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(id);
-            var comboDetailDTOs = _mapper.Map<List<ComboDetailDTO>>(comboDetails);
 
-            var comboServiceDTO = _mapper.Map<ComboServiceDTO>(cbs);
-            
+            var comboDetails = await _comboServiceRepository.GetComboDetailByComboServiceId(id);
+
+            if (comboDetails == null || !comboDetails.Any())
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No combo details",
+                    Data = null
+                };
+            }
+
+            var comboDetailDTOs = comboDetails.Select(detail => new
+            {
+                ComboDetailId = detail.ComboDetailId,
+                Content = detail.ComboDetail?.Content ?? "No Content Available"
+            }).ToList();
+
+            var comboServiceDTO = new
+            {
+                ComboServiceId = comboService.Id,
+                ComboServiceName = comboService.ComboServiceName,
+                Image = comboService.ImageUrl,
+                ComboDetails = comboDetailDTOs
+            };
+
             return new Result<object>
             {
                 Error = 0,
-                Message = "Combo service details",
-                Data = comboServiceDTO
+                Message = "Combo service details retrieved successfully",
+                Data = new List<object> { comboServiceDTO }
             };
         }
-
 
         public async Task<Result<object>> AddComboService(AddComboServiceRequest createRequest)
         {
             ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(createRequest));
+
+            var comboDetail = await _unitOfWork.ComboDetailRepository.GetByIdAsync(createRequest.ComboDetailId);
+            if (comboDetail == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "The specified combo detail does not exist.",
+                    Data = null
+                };
+            }
 
             string fileExtension = Path.GetExtension(createRequest.ImageUrl.FileName);
             string newFileName = $"{Guid.NewGuid()}{fileExtension}";
@@ -107,15 +142,21 @@ namespace Application.Services
             var comboService = new ComboService
             {
                 ComboServiceName = createRequest.ComboServiceName,
-                SalonId = createRequest.SalonId,
+                Price = createRequest.Price,
                 ImageId = cloudinaryResult.PublicImageId,
                 ImageUrl = cloudinaryResult.ImageUrl,
+                IsDeleted = false,
+                ComboServiceComboDetails = new List<ComboServiceComboDetail>
+                 {
+                        new ComboServiceComboDetail
+                         {
+                                ComboDetailId = createRequest.ComboDetailId
+                         }
+                }
             };
 
             await _unitOfWork.ComboServiceRepository.AddAsync(comboService);
             await _unitOfWork.SaveChangeAsync();
-
-            var result = _mapper.Map<ComboServiceDTO>(comboService);
 
             return new Result<object>
             {
@@ -141,13 +182,27 @@ namespace Application.Services
 
         public async Task<Result<object>> DeleteComboService(Guid id)
         {
-            await _comboServiceRepository.DeleteComboService(id);
+            var cbs = await _unitOfWork.ComboServiceRepository.GetComboServiceById(id);
+
+            if (cbs == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found"
+                };
+            }
+
+            cbs.IsDeleted = true;
+
+            _unitOfWork.ComboServiceRepository.Update(cbs);
+
+            await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Combo service deleted successfully",
-                Data = null
+                Message = "delete successfully"
             };
         }
 
@@ -161,6 +216,40 @@ namespace Application.Services
                 Error = 0,
                 Message = "Combo details for the combo service",
                 Data = comboDetailDTOs
+            };
+        }
+
+        public async Task<Result<object>> AddComboDetailIntoComboService(Guid comboServiceId, Guid comboDetailId)
+        {
+            var comboService = await _unitOfWork.ComboServiceRepository.GetComboServiceById(comboServiceId);
+            var comboDetail = await _unitOfWork.ComboDetailRepository.GetComboDetailById(comboDetailId);
+
+            if (comboService == null || comboDetail == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Combo service or detail not found",
+                    Data = null
+                };
+            }
+
+            var comboServiceComboDetail = new ComboServiceComboDetail
+            {
+                ComboServiceId = comboServiceId,
+                ComboDetailId = comboDetailId,
+                ComboService = comboService,
+                ComboDetail = comboDetail
+            };
+
+            await _unitOfWork.ComboServiceComboDetailRepository.AddAsync(comboServiceComboDetail);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Combo detail added to combo service successfully",
+                Data = null
             };
         }
     }

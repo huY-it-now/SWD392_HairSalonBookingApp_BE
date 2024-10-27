@@ -20,19 +20,39 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
-        public async Task<Booking> GetBookingWithPayment(Guid id)
-        {
-            return await _dbContext.Bookings.Include(b => b.Payments).FirstOrDefaultAsync(booking => booking.Id == id);
-        }
-
-        public async Task<List<Booking>> GetFullBookingInformation()
+        public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
         {
             return await _dbContext.Bookings
-               .Where(b => b.Checked == false)
+               .Where(b => b.Id == id)
+               .Include(b => b.Payments)
+               .Include(b => b.ComboService)
+               .SingleOrDefaultAsync();
+        }
+
+        public async Task<Booking> GetBookingWithPayment(Guid id)
+        {
+            return await _dbContext.Bookings
+                .Include(b => b.Payments)
+                .FirstOrDefaultAsync(booking => booking.Id == id);
+        }
+
+        public async Task<List<Booking>> GetCheckedBookingInformation()
+        {
+            return await _dbContext.Bookings
+               .Where(b => b.Checked == true)
                .Include(b => b.User)
                .Include(b => b.Payments)
                .Include(b => b.SalonMember)
-               .Include(b => b.Service)
+               .Include(b => b.ComboService)
+               .ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetUncheckBookingInformation()
+        {
+            return await _dbContext.Bookings
+               .Where(b => b.Checked == false)
+               .Include(b => b.Payments)
+               .Include(b => b.ComboService)
                .ToListAsync();
         }
     }

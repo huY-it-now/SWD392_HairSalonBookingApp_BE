@@ -56,6 +56,11 @@ namespace WebApi.Services
             }
         }
 
+        public Task<bool> CreatePayment()
+        {
+            throw new NotImplementedException();
+        }
+
         public Task<Payments> GetPaymentsById(Guid Id)
         {
             throw new NotImplementedException();

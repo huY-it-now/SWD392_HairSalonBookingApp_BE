@@ -23,12 +23,12 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Category>> GetAllCategoryAsync()
         {
-            return await _dbContext.Categories.ToListAsync();
+            return await _dbContext.Categories.Where(d => d.IsDeleted == false).Include(c => c.Services).ToListAsync();
         }
 
         public async Task<Category> GetCategoryById(Guid id)
         {
-            return await _dbContext.Categories.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Categories.Where(d => d.IsDeleted == false).Include(c => c.Services).FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Category> CreateCategory(Category category)
@@ -59,14 +59,6 @@ namespace Infrastructures.Repositories
             await _dbContext.SaveChangesAsync();
 
             return existingCategory;
-        }
-
-        public async Task<bool> DeleteCategory(Category category)
-        {
-            _dbContext.Categories.Remove(category);
-            var result = await _dbContext.SaveChangesAsync();
-
-            return result > 0;
         }
     }
 }

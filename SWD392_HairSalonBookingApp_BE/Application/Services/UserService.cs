@@ -6,6 +6,7 @@ using AutoMapper;
 using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
+using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
@@ -55,7 +56,8 @@ namespace Application.Services
                 Id = user.Id,
                 FullName = user.FullName,
                 Email = user.Email,
-                Phone = user.PhoneNumber
+                Phone = user.PhoneNumber,
+                Address = user.Address,
             };
 
             return new Result<object>
@@ -309,81 +311,36 @@ namespace Application.Services
             };
         }
 
-
-        public async Task<Result<object>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
-        {
-            var stylist = await _unitOfWork.UserRepository.GetUserById(stylistId);
-
-            if (stylist == null || stylist.RoleId != 5)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Stylish not found!",
-                    Data = null
-                };
-            }
-
-            var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
-
-            if (schedules == null || schedules.Count == 0)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "No schedules found within the given date range.",
-                    Data = null
-                };
-            }
-
-            var scheduleDTOs = _mapper.Map<List<ScheduleDTO>>(schedules);
-
-            return new Result<object>
-            {
-                Error = 0,
-                Message = "Work and day-off schedule retrieved successfully!",
-                Data = scheduleDTOs
-            };
-        }
-
         public async Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request)
         {
-            var validation = new WorkDayValidation();
-            var validationResult = validation.Validate(request);
+            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
 
-            if (!validationResult.IsValid)
+            if (schedule != null && schedule.WorkShifts.Count + request.WorkShifts.Count > 3)
             {
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "Validation failed!",
-                    Data = validationResult.Errors.Select(x => x.ErrorMessage)
-                };
-            }
-
-            var existingSchedule = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(request.StylistId, request.ScheduleDate, request.ScheduleDate.AddDays(1));
-
-            if (existingSchedule.Count + request.WorkShifts.Count > 3)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Cannot register more than 3 shifts for one day.",
+                    Message = "You can only register up to shifts per day.",
                     Data = null
                 };
             }
 
-            foreach (var shift in request.WorkShifts)
+            if (schedule == null)
             {
-                var schedule = new SalonMemberSchedule
+                schedule = new SalonMemberSchedule
                 {
-                    StylistId = request.StylistId,
-                    Date = request.ScheduleDate,
-                    WorkShift = shift.ShiftName
+                    SalonMemberId = request.StylistId,
+                    ScheduleDate = request.ScheduleDate,
+                    WorkShifts = request.WorkShifts
                 };
 
                 await _unitOfWork.ScheduleRepository.AddAsync(schedule);
             }
+            else
+            {
+                schedule.WorkShifts.AddRange(request.WorkShifts);
+            }
+
 
             await _unitOfWork.SaveChangeAsync();
 
@@ -395,26 +352,39 @@ namespace Application.Services
             };
         }
 
-        public async Task<Result<object>> RegisterDayOff(RegisterDayOffDTO request)
+
+        public async Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime)
         {
-            var schedule = new SalonMemberSchedule
+            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime.TimeOfDay >= s.StartTime && bookingTime.TimeOfDay < s.EndTime);
+            if (shift == null)
             {
-                StylistId = request.StylistId,
-                Date = request.DayOffDate,
-                IsDayOff = true,
-            };
+                return new List<StylistDTO>();
+            }
 
-            await _unitOfWork.ScheduleRepository.AddAsync(schedule);
-            await _unitOfWork.SaveChangeAsync();
-
-            return new Result<object>
-            {
-                Error = 0,
-                Message = "Day off registered successfully!",
-                Data = null
-            };
-
+            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByShift(shift.Shift, bookingTime.Date);    
+            return availableStylists;
         }
+
+        public async Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
+        {
+            var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
+
+            List<WorkAndDayOffScheduleDTO> scheduleList = new List<WorkAndDayOffScheduleDTO>();
+
+            for (DateTime date = fromDate; date <= toDate; date = date.AddDays(1))
+            {
+                var schedule = schedules.FirstOrDefault(s => s.ScheduleDate.Date == date.Date);
+                scheduleList.Add(new WorkAndDayOffScheduleDTO
+                {
+                    Date = date,
+                    IsDayOff = schedule?.IsDayOff ?? true,
+                    WorkShifts = schedule?.WorkShifts ?? new List<string>()
+                });
+            }
+
+            return scheduleList;
+        }
+
 
         public async Task<Result<object>> UpdateProfile(UpdateProfileDTO request)
         {
@@ -512,6 +482,26 @@ namespace Application.Services
                 Error = 0,
                 Message = "Reset Password successfully"
             };
+        }
+
+        public async Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate)
+        {
+            var appointments = await _unitOfWork.AppointmentRepository.GetAppointmentsByStylistIdAndDateRange(stylistId, fromDate, toDate);
+            return _mapper.Map<List<AppointmentDTO>>(appointments);
+        }
+
+        public async Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request)
+        {
+            var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
+            if (appointment == null)
+            {
+                return new Result<object> { Error = 1, Message = "Appointment not found.", Data = null };
+            }
+
+            appointment.Status = request.Status;
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object> { Error = 0, Message = "Appointment status updated successfully.", Data = null };
         }
     }
 }

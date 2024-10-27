@@ -14,6 +14,7 @@ using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Category;
 using Domain.Contracts.DTO.Service;
 using Domain.Entities;
+using Domain.Contracts.DTO.Combo;
 
 namespace Application.Services
 {
@@ -33,13 +34,34 @@ namespace Application.Services
         public async Task<Result<object>> GetAllServices()
         {
             var services = await _unitOfWork.ServiceRepository.GetAllServicesAsync();
-            var servicesMapper = _mapper.Map<List<ServiceDTO>>(services);
+
+            var servicesDTOList = services.Select(service => new ServiceDTO
+            {
+                Id = service.Id,
+                ServiceName = service.ServiceName,
+                ComboServiceDTOs = service.ServiceComboServices?
+                    .Where(scs => scs.ComboService != null)
+                    .Select(scs => new ComboServiceDTO
+                    {
+                        Id = scs.ComboService.Id,
+                        ComboServiceName = scs.ComboService.ComboServiceName,
+                        Price = scs.ComboService.Price,
+                        Image = scs.ComboService.ImageUrl,
+                        ComboDetails = scs.ComboService.ComboServiceComboDetails?
+                            .Where(cd => cd.ComboDetail != null)
+                            .Select(cd => new ComboDetailDTO
+                            {
+                                Id = cd.ComboDetail.Id,
+                                Content = cd.ComboDetail.Content
+                            }).ToList() ?? new List<ComboDetailDTO>()
+                    }).ToList() ?? new List<ComboServiceDTO>()
+            }).ToList();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Print all service",
-                Data = servicesMapper
+                Message = "Print all services with their associated combo services and combo details",
+                Data = servicesDTOList
             };
         }
 
@@ -57,12 +79,32 @@ namespace Application.Services
                 };
             }
 
-            var serviceDTO = _mapper.Map<ServiceDTO>(service);
+            var serviceDTO = new ServiceDTO
+            {
+                Id = service.Id,
+                ServiceName = service.ServiceName,
+                ComboServiceDTOs = service.ServiceComboServices?
+                    .Where(scs => scs.ComboService != null)
+                    .Select(scs => new ComboServiceDTO
+                    {
+                        Id = scs.ComboService.Id,
+                        ComboServiceName = scs.ComboService.ComboServiceName,
+                        Price = scs.ComboService.Price,
+                        Image = scs.ComboService.ImageUrl,
+                        ComboDetails = scs.ComboService.ComboServiceComboDetails?
+                            .Where(cd => cd.ComboDetail != null)
+                            .Select(cd => new ComboDetailDTO
+                            {
+                                Id = cd.ComboDetail.Id,
+                                Content = cd.ComboDetail.Content
+                            }).ToList() ?? new List<ComboDetailDTO>()
+                    }).ToList() ?? new List<ComboServiceDTO>()
+            };
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Service details etrieved successfully!",
+                Message = "Service details retrieved successfully!",
                 Data = serviceDTO
             };
         }
@@ -190,6 +232,39 @@ namespace Application.Services
                 Data = null
             };
 
+        }
+
+        public async Task<Result<object>> AddComboIntoService(Guid serviceId, Guid comboServiceId)
+        {
+            var service = await _unitOfWork.ServiceRepository.GetServiceById(serviceId);
+            var comboService = await _unitOfWork.ComboServiceRepository.GetComboServiceById(comboServiceId);
+
+            if (service == null || comboService == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found",
+                };
+            }
+
+            var serviceComboService = new ServiceComboService
+            {
+                Service = service,
+                ServiceId = serviceId,
+                ComboService = comboService,
+                ComboServiceId = comboServiceId
+            };
+
+            await _unitOfWork.ServiceComboServiceRepository.AddAsync(serviceComboService);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Add combo service into service successfull",
+                Data = null
+            };
         }
     }
 }

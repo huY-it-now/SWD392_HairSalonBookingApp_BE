@@ -27,14 +27,24 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllCategory()
         {
-            var category = await _unitOfWork.CategoryRepository.GetAllCategoryAsync();
-            var categoryMapper = _mapper.Map<List<CategoryDTO>>(category);
+            var categories = await _unitOfWork.CategoryRepository.GetAllCategoryAsync();
+
+            var categoryDTOList = categories.Select(category => new CategoryDTO
+            {
+                Id = category.Id,
+                CategoryName = category.CategoryName,
+                Services = category.Services.Select(service => new ServiceDTO
+                {
+                    Id = service.Id,
+                    ServiceName = service.ServiceName
+                }).ToList()
+            }).ToList();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Print all category",
-                Data = categoryMapper
+                Message = "Print all categories with services",
+                Data = categoryDTOList
             };
         }
 
@@ -52,7 +62,16 @@ namespace Application.Services
                 };
             }
 
-            var categoryDTO = _mapper.Map<CategoryDTO>(category);
+            var categoryDTO = new CategoryDTO
+            {
+                Id = category.Id,
+                CategoryName = category.CategoryName,
+                Services = category.Services.Select(s => new ServiceDTO
+                {
+                    Id = s.Id,
+                    ServiceName = s.ServiceName
+                }).ToList()
+            };
 
             return new Result<object>
             {

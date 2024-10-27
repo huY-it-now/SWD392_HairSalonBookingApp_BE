@@ -3,13 +3,17 @@ using Application.Services;
 using Application.Utils;
 using AutoMapper;
 using AutoMapper.Internal;
+using Azure;
 using Domain.Contracts.Abstracts.Bank;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Bank;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi.Models;
 using MimeKit.Utils;
+using Net.payOS;
+using Net.payOS.Types;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Crmf;
 using WebApi.Services;
@@ -20,11 +24,15 @@ namespace WebApi.Controllers
     [ApiController]
     public class PaymentsController : ControllerBase
     {
+        private readonly IBookingService _bookingService;
+        private readonly PayOS _payOS;
         private readonly IPaymentService _paymentService;
         private readonly IMapper _mapper;
 
-        public PaymentsController(IPaymentService paymentService, IMapper mapper)
+        public PaymentsController(IPaymentService paymentService, IMapper mapper, PayOS payOS, IBookingService bookingService)
         {
+            _bookingService = bookingService;
+            _payOS = payOS;
             _paymentService = paymentService;
             _mapper = mapper;
         }
@@ -66,7 +74,7 @@ namespace WebApi.Controllers
         {
             var paymentCheck = await _paymentService.BookingPaymentCheck(BookingId);
 
-            if(!paymentCheck)
+            if (!paymentCheck)
             {
                 return BadRequest("The booking is not exist!");
             }
@@ -81,6 +89,150 @@ namespace WebApi.Controllers
             {
                 return Ok("This booking is paid");
             }
+        }
+
+        [HttpPost("create")]
+        public async Task<Result<object>> CreatePaymentLink(Guid bookingId)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            try
+            {
+                var booking = await _bookingService.GetBookingById(bookingId);
+                int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
+                ItemData item = new ItemData(booking.ComboService.ComboServiceName, 1, decimal.ToInt32(booking.ComboService.Price));
+                var cancelUrl = "https://localhost:7152/api/Payments/CancelPayment";
+                var returnUrl = "https://localhost:7152/swagger/index.html";
+                List<ItemData> items = new List<ItemData>();
+                items.Add(item);
+                PaymentData paymentData = new PaymentData(orderCode, decimal.ToInt32(booking.ComboService.Price), "Thanh toan doan hang", items, cancelUrl, returnUrl);
+
+                CreatePaymentResult createPayment = await _payOS.createPaymentLink(paymentData);
+
+                result.Message = "success";
+                result.Data = createPayment;
+                return result;
+            }
+            catch
+            {
+                result.Message = "Create fail";
+                result.Error = -1;
+                return result;
+            }
+        }
+
+        [HttpPut("CancelPayment")]
+        public async Task<Result<object>> CancelPayment([FromRoute] int orderId)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            try
+            {
+                PaymentLinkInformation paymentLinkInformation = await _payOS.cancelPaymentLink(orderId);
+
+                result.Message = "Cancel success";
+                result.Data = paymentLinkInformation;
+                return result;
+            }
+            catch
+            {
+                result.Message = "Cancel fail";
+                result.Error = -1;
+                return result;
+            }
+        }
+
+        [HttpGet("GetPayment")]
+        public async Task<Result<object>> GetPayment([FromRoute] int orderId)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            try
+            {
+                PaymentLinkInformation paymentLinkInformation = await _payOS.getPaymentLinkInformation(orderId);
+
+                result.Message = "Get success";
+                result.Data = paymentLinkInformation;
+                return result;
+            }
+            catch
+            {
+                result.Message = "Get fail";
+                result.Error = -1;
+                return result;
+            }
+        }
+
+        [HttpPost("confirm-webhook")]
+        public async Task<Result<object>> ConfirmWebhook(string webhook_url )
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            try
+            {
+                await _payOS.confirmWebhook(webhook_url);
+                result.Message = "success";
+                return result;
+            }
+            catch
+            {
+                result.Message = "fail";
+                result.Error = -1;
+                return result;
+            }
+
+        }
+
+        [HttpPost("payos_transfer_handler")]
+        //Webhook của cửa hàng dùng để nhận dữ liệu thanh toán từ payOS,
+        public Result<object> payOSTransferHandler(WebhookType body)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            try
+            {
+                WebhookData data = _payOS.verifyPaymentWebhookData(body);
+
+                if (data.description == "Ma giao dich thu nghiem" || data.description == "VQRIO123")
+                {
+                    result.Message = "Get success";
+                    return result;
+                }
+                result.Message = "Get success";
+                return result;
+            }
+            catch
+            {
+                result.Message = "Get fail";
+                result.Error = -1;
+                return result;
+            }
+
         }
     }
 }

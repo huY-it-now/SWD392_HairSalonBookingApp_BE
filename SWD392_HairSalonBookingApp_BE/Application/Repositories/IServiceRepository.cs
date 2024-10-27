@@ -14,6 +14,5 @@ namespace Application.Repositories
         Task<Service> GetServiceById(Guid id);
         Task<Service> CreateService(Service service);
         Task<Service> UpdateService(Service service);
-        Task<bool> DeleteService(Service service);
     }
 }

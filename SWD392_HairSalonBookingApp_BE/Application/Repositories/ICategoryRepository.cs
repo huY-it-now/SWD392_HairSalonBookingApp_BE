@@ -13,6 +13,5 @@ namespace Application.Repositories
         Task<Category> GetCategoryById(Guid id);
         Task<Category> CreateCategory(Category category);
         Task<Category> UpdateCategory(Category category);
-        Task<bool> DeleteCategory(Category category);
     }
 }
