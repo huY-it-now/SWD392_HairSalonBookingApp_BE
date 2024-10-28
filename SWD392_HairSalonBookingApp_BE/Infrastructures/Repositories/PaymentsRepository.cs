@@ -25,7 +25,7 @@ namespace Infrastructures.Repositories
 
         public bool CheckPayment(Payments payments)
         {
-            if (payments.PaymentSatus.StatusName.Equals("paid"))
+            if (payments.PaymentStatus.StatusName.Equals("paid"))
             {
                 return true;
             }

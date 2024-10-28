@@ -17,7 +17,7 @@ namespace Domain.Entities
         public Guid PaymentMethodId { get; set; }
         public PaymentMethods PaymentMethods { get; set; }
         public Guid PaymentStatusId { get; set; }
-        public PaymentSatus PaymentSatus { get; set; }
+        public PaymentStatus PaymentStatus { get; set; }
         public ICollection<PaymentLogs> PaymentLogs { get; set; }
     }
 }

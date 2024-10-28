@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Domain.Contracts.DTO.Stylish;
+using Domain.Contracts.DTO.Stylist;
 using FluentValidation;
 
-namespace Application.Validations.Stylish
+namespace Application.Validations.Stylist
 {
     public class ScheduleValidation : AbstractValidator<ScheduleDTO>
     {

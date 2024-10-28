@@ -24,7 +24,7 @@ namespace Infrastructures
         public DbSet<PaymentLogs> PaymentLogs { get; set; }
         public DbSet<PaymentMethods> PaymentMethods { get; set; }
         public DbSet<Payments> Payments { get; set; }
-        public DbSet<PaymentSatus> PaymentSatus { get; set; }
+        public DbSet<PaymentStatus> PaymentSatus { get; set; }
         public DbSet<Feedback> Feedbacks { get; set; }
         public DbSet<SalonMemberSchedule> SalonMemberSchedules { get; set; }
         public DbSet<ServiceComboService> ServiceComboServices { get; set; }

@@ -111,10 +111,20 @@ namespace WebApi.Controllers
             return result;
         }
 
-        [HttpDelete("CacelBooking")]
+        [HttpPost("AddFeekback")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> CacelBooking(Guid bookingId)
+        public async Task<Result<object>> AddFeekback(Guid bookingId, string feedback)
+        {
+            var result = await _bookingService.AddFeedBack(bookingId, feedback);
+
+            return result;
+        }
+
+        [HttpDelete("CancelBooking")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<Result<object>> CancelBooking(Guid bookingId)
         {
             var result = new Result<object>
             {
@@ -181,7 +191,7 @@ namespace WebApi.Controllers
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, int hour, int minute, Guid ComboServiceId)
+        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, TimeSpan hour_minutes, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
         {
             var result = new Result<object>
             {
@@ -190,12 +200,19 @@ namespace WebApi.Controllers
                 Data = null
             };
 
-            DateTime dateTime = new DateTime(cuttingDate.Year, cuttingDate.Month, cuttingDate.Day, hour, minute, 0);
+            if (string.IsNullOrEmpty(CustomerName) || string.IsNullOrEmpty(CustomerPhoneNumber))
+            {
+                result.Error = 1;
+                result.Message = "Please input customer name, customer phone number";
+                return result;
+            }
+
+            DateTime dateTime = new DateTime(cuttingDate.Year, cuttingDate.Month, cuttingDate.Day, hour_minutes.Hours, hour_minutes.Minutes, 0);
 
             if ((dateTime - DateTime.Now) < TimeSpan.FromHours(1))
             {
                 result.Error = 1;
-                result.Message = "Please booking at least 1 hour after now";
+                result.Message = "Please booking at least 1 hour after from now";
                 return result;
             }
 
@@ -206,7 +223,7 @@ namespace WebApi.Controllers
                 return result;
             }
 
-            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, dateTime, ComboServiceId);
+            result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, dateTime, ComboServiceId, CustomerName, CustomerPhoneNumber);
 
             return result;
         }

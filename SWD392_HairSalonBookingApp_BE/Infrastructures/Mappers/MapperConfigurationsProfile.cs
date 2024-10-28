@@ -12,7 +12,6 @@ using Domain.Contracts.Abstracts.Service;
 using Domain.Contracts.Abstracts.Salon;
 using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.Abstracts.Category;
-using Domain.Contracts.DTO.Stylish;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
