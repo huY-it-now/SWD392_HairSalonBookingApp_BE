@@ -10,5 +10,6 @@ public class SalonMemberSchedule : BaseEntity
     #region RelationShip
     public Guid SalonMemberId { get; set; }
     public SalonMember SalonMember { get; set; }
+    public ICollection<ScheduleWorkTime> WorkTime { get; set; }
     #endregion
 }

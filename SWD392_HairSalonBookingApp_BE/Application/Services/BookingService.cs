@@ -15,6 +15,7 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly IScheduleWorkTimeRepository _scheduleWorkTimeRepository;
         private readonly IPaymentLogRepository _paymentLogRepository;
         private readonly IPaymentMethodRepository _paymentMethodRepository;
         private readonly IPaymentStatusRepository _paymentStatusRepository;
@@ -25,8 +26,9 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository, ISalonMemberScheduleRepository salonMemberScheduleRepository, IPaymentLogRepository paymentLogRepository, IPaymentMethodRepository paymentMethodRepository, IPaymentStatusRepository paymentStatusRepository)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository, ISalonMemberScheduleRepository salonMemberScheduleRepository, IPaymentLogRepository paymentLogRepository, IPaymentMethodRepository paymentMethodRepository, IPaymentStatusRepository paymentStatusRepository, IScheduleWorkTimeRepository scheduleWorkTimeRepository)
         {
+            _scheduleWorkTimeRepository = scheduleWorkTimeRepository;
             _paymentLogRepository = paymentLogRepository;
             _paymentMethodRepository = paymentMethodRepository;
             _paymentStatusRepository = paymentStatusRepository;
