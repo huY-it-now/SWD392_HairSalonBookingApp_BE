@@ -10,5 +10,7 @@ namespace Domain.Entities
     {
         public DateTime ScheduleDate { get; set; }
         public string WorkShifts { get; set; }
+        public Guid SalonMemberScheduleId { get; set; }
+        public SalonMemberSchedule SalonMemberSchedule { get; set; }
     }
 }

@@ -8,7 +8,6 @@ using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Stylist;
-using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
 using Org.BouncyCastle.Asn1.Ocsp;

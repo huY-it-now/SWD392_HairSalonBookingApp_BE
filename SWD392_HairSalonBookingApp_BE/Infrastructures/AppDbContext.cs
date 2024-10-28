@@ -30,6 +30,7 @@ namespace Infrastructures
         public DbSet<ServiceComboService> ServiceComboServices { get; set; }
         public DbSet<ComboServiceComboDetail> ComboServiceComboDetails { get; set; }
         public DbSet<Appointment> Appointments { get; set; }
+        public DbSet<ScheduleWorkTime> ScheduleWorkTime { get; set; }
 
         #endregion
 
@@ -86,6 +87,11 @@ namespace Infrastructures
                 .HasOne(a => a.User)
                 .WithMany(c => c.Appointments)
                 .HasForeignKey(a => a.UserId);
+
+            modelBuilder.Entity<ScheduleWorkTime>()
+                .HasOne(swt => swt.SalonMemberSchedule)
+                .WithMany(sms => sms.WorkTime)
+                .HasForeignKey(swt => swt.SalonMemberScheduleId);
 
             modelBuilder.Entity<Appointment>()
                 .HasOne(a => a.ComboService).WithMany(c => c.Appointments).HasForeignKey(s => s.ComboServiceId);
