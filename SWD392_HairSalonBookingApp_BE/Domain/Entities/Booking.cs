@@ -5,6 +5,8 @@
         public string? Feedback { get; set; }
         public DateTime BookingDate { get; set; }
         public bool Checked { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerPhoneNumber { get; set; }
 
         #region Relationship
         public Guid PaymentId { get; set; }

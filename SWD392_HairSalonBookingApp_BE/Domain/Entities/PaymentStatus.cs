@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace Domain.Entities
 {
-    public class PaymentSatus : BaseEntity
+    public class PaymentStatus : BaseEntity
     {
         public string StatusName { get; set; } //Paid-Pending-Refunded
-        public string Discription {  get; set; } 
+        public string Description {  get; set; } 
         //Paid the amount
         //Waiting for pay
         //Have something wrong with booking so refund the money

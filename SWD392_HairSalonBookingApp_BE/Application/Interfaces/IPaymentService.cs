@@ -13,5 +13,7 @@ namespace Application.Interfaces
         Task<Payments> GetPaymentsById(Guid Id);
         Task<bool> ChangePaymentStatus(Guid bookingId, string status);
         Task<bool> CreatePayment();
+        Task<bool> CreatePaymentStatus(string StatusName, string Discription);
+        Task<bool> CreatePaymentMethod(string MethodName, string Discription);
     }
 }

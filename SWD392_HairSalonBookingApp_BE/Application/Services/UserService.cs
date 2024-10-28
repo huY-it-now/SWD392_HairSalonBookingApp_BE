@@ -7,7 +7,7 @@ using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
-using Domain.Contracts.DTO.Stylish;
+using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;

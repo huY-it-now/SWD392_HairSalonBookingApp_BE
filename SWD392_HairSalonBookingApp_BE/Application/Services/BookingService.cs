@@ -15,6 +15,9 @@ namespace Application.Services
 {
     public class BookingService : IBookingService
     {
+        private readonly IPaymentLogRepository _paymentLogRepository;
+        private readonly IPaymentMethodRepository _paymentMethodRepository;
+        private readonly IPaymentStatusRepository _paymentStatusRepository;
         private readonly ISalonMemberScheduleRepository _salonMemberScheduleRepository;
         private readonly IPaymentsRepository _paymentsRepository;
         private readonly IComboServiceRepository _comboService;
@@ -22,8 +25,11 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository, ISalonMemberScheduleRepository salonMemberScheduleRepository)
+        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository, ISalonMemberScheduleRepository salonMemberScheduleRepository, IPaymentLogRepository paymentLogRepository, IPaymentMethodRepository paymentMethodRepository, IPaymentStatusRepository paymentStatusRepository)
         {
+            _paymentLogRepository = paymentLogRepository;
+            _paymentMethodRepository = paymentMethodRepository;
+            _paymentStatusRepository = paymentStatusRepository;
             _salonMemberScheduleRepository = salonMemberScheduleRepository;
             _paymentsRepository = paymentsRepository;
             _comboService = comboService;
@@ -113,7 +119,7 @@ namespace Application.Services
             return salonMember;
         }
 
-        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId)
+        public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
         {
             Booking booking = new Booking();
 
@@ -129,6 +135,8 @@ namespace Application.Services
             booking.SalonMemberId = SalonMemberId;
             booking.UserId = CustomerId;
             booking.CreationDate = DateTime.Now;
+            booking.CustomerName = CustomerName;
+            booking.CustomerPhoneNumber = CustomerPhoneNumber;
 
             var salonMember = await _unitOfWork.SalonMemberRepository.GetByIdAsync(SalonMemberId);
 
@@ -256,19 +264,19 @@ namespace Application.Services
             }
 
             var payment = new Payments();
-            var paymentStatus = new PaymentSatus();
+            var paymentStatus = new PaymentStatus();
             var paymentMethod = new PaymentMethods();
 
             paymentMethod.MethodName = "Qr";
             paymentMethod.Description = "Pay through Qr";
 
             paymentStatus.StatusName = "Pending";
-            paymentStatus.Discription = "Waiting for pay";
+            paymentStatus.Description = "Waiting for pay";
 
             payment.PaymentAmount = comboService.Price;
             payment.BookingId = CustomerId;
             payment.Booking = booking;
-            payment.PaymentSatus = paymentStatus;
+            payment.PaymentStatus = paymentStatus;
             payment.PaymentMethods = paymentMethod;
 
             await _paymentsRepository.AddAsync(payment);
@@ -379,6 +387,20 @@ namespace Application.Services
             }
 
             return uncheckBooking;
+        }
+
+        public async Task<Result<object>> AddFeedBack(Guid bookingId, string FeedBack)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            var booking = await _bookingRepository.GetCheckedBookingInformation();
+
+            return result;
         }
     }
 }
