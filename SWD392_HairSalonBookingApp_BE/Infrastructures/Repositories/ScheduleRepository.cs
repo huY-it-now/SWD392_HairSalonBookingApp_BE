@@ -39,5 +39,11 @@ namespace Infrastructures.Repositories
 
             return schedules;
         }
+
+        public async Task DeleteWorkShiftAsync(SalonMemberSchedule schedule)
+        {
+            _dbContext.SalonMemberSchedules.Remove(schedule);
+            await _dbContext.SaveChangesAsync();
+        }
     }
 }
