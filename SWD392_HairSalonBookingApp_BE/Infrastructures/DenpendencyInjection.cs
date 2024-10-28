@@ -21,6 +21,11 @@ namespace Infrastructures
             services.AddScoped<ICloudinaryService, CloudinaryService>();
             services.AddScoped<ISalonService, SalonService>();
             services.AddScoped<ISalonRepository, SalonRepository>();
+            services.AddScoped<IPaymentStatusRepository, PaymentStatusRepository>();
+            services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
+            services.AddScoped<IPaymentLogRepository, PaymentLogRepository>();
+            services.AddScoped<IPaymentsRepository, PaymentsRepository>();
+            services.AddScoped<IScheduleWorkTimeRepository, ScheduleWorkTimeRepository>();
 
             services.AddScoped<ISalonMemberService, SalonMemberService>();
             services.AddScoped<ISalonMemberRepository, SalonMemberRepository>();
@@ -34,7 +39,6 @@ namespace Infrastructures
             services.AddScoped<IBookingRepository, BookingRepository>();
             services.AddScoped<IBookingService, BookingService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
-            services.AddScoped<IPaymentsRepository, PaymentsRepository>();
             services.AddSingleton<ICurrentTime, CurrentTime>();
             services.AddScoped<IScheduleRepository, ScheduleRepository>();
             services.AddScoped<IAppointmentRepository, AppointmentRepository>();
