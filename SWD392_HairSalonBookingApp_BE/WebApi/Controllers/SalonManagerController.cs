@@ -60,7 +60,7 @@ namespace SWD392_HairSalonBookingApp_BE.Controllers
             }
         }
 
-        [HttpGet("all-Stylists")]
+        [HttpGet("print-all-Stylists")]
         [ProducesResponseType(200, Type = typeof(List<StylistDTO>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         [ProducesResponseType(500, Type = typeof(Result<object>))]
@@ -72,8 +72,8 @@ namespace SWD392_HairSalonBookingApp_BE.Controllers
                 var stylistDTOList = stylists.Select(stylist => new StylistDTO
                 {
                     Id = stylist.Id,
-                    FullName = stylist.FullName,
-                    Email = stylist.Email,
+                    FullName = stylist.User.FullName,
+                    Email = stylist.User.Email,
                     Job = "Stylist",
                     Rating = stylist.Rating.ToString(),
                     Status = stylist.Status
@@ -88,7 +88,7 @@ namespace SWD392_HairSalonBookingApp_BE.Controllers
             }
         }
 
-        [HttpGet("all-SalonStaff")]
+        [HttpGet("print-all-SalonStaff")]
         [ProducesResponseType(200, Type = typeof(List<SalonStaffDTO>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         [ProducesResponseType(500, Type = typeof(Result<object>))]
@@ -100,8 +100,8 @@ namespace SWD392_HairSalonBookingApp_BE.Controllers
                 var salonStaffDTOList = salonStaff.Select(staff => new SalonStaffDTO
                 {
                     Id = staff.Id,
-                    FullName = staff.FullName,
-                    Email = staff.Email,
+                    FullName = staff.User.FullName,
+                    Email = staff.User.Email,
                     Job = "Salon Staff",
                     Status = staff.Status
                 }).ToList();
