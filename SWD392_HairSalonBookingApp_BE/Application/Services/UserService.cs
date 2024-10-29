@@ -8,6 +8,8 @@ using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
+using Domain.Contracts.DTO.Booking;
+using Domain.Contracts.DTO.Combo;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
@@ -602,6 +604,51 @@ namespace Application.Services
                 Error = 0,
                 Message = "Work shift deleted successfully!",
                 Data = null
+            };
+        }
+
+        public async Task<Result<object>> GetBookingsByUserId(Guid userId)
+        {
+            var bookings = await _unitOfWork.UserRepository.GetBookingsByUserId(userId);
+
+            if (bookings == null || bookings.Count == 0)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You don't have any orders",
+                    Data = null
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingDTO
+            {
+                Id = b.Id,
+                BookingDate = b.BookingDate,
+                Checked = b.Checked,
+                ComboServiceName = new List<ComboServiceForBookingDTO>
+                {
+                     new ComboServiceForBookingDTO
+                        {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                        }
+                },
+            }).ToList();
+
+            var bookingUserDTO = new BookingUserDTO
+            {
+                UserId = userId,
+                Bookings = bookingDTOs
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Orders",
+                Data = bookingUserDTO
             };
         }
     }
