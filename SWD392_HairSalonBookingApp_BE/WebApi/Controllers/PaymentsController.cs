@@ -106,8 +106,8 @@ namespace WebApi.Controllers
                 var booking = await _bookingService.GetBookingById(bookingId);
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
                 ItemData item = new ItemData(booking.ComboService.ComboServiceName, 1, decimal.ToInt32(booking.ComboService.Price));
-                var cancelUrl = "https://localhost:7152/api/Payments/CancelPayment";
-                var returnUrl = "https://localhost:7152/swagger/index.html";
+                var cancelUrl = "https://payos.vn/docs/api/#operation/payment-request";
+                var returnUrl = "http://localhost:5173/thank-you";
                 List<ItemData> items = new List<ItemData>();
                 items.Add(item);
                 PaymentData paymentData = new PaymentData(orderCode, decimal.ToInt32(booking.ComboService.Price), "Thanh toan doan hang", items, cancelUrl, returnUrl);
@@ -136,13 +136,15 @@ namespace WebApi.Controllers
                 Data = null
             };
 
+            PaymentLinkInformation paymentLinkInformation = await _payOS.cancelPaymentLink(orderId);
+
+            result.Message = "Cancel success";
+            result.Data = paymentLinkInformation;
+            return result;
+
             try
             {
-                PaymentLinkInformation paymentLinkInformation = await _payOS.cancelPaymentLink(orderId);
-
-                result.Message = "Cancel success";
-                result.Data = paymentLinkInformation;
-                return result;
+                
             }
             catch
             {
