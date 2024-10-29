@@ -402,7 +402,7 @@ namespace Application.Services
                 return new List<StylistDTO>();
             }
 
-            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByShift(shift.Shift, bookingTime.Date);
+            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByTime(shift.Shift, bookingTime.Date);
 
             var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
             {

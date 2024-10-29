@@ -28,7 +28,7 @@ namespace Infrastructures.Repositories
             return await _dbContext.SalonMemberSchedules.FirstOrDefaultAsync(s => s.SalonMemberId == stylistId && s.ScheduleDate == date);
         }
 
-        public async Task<List<StylistDTO>> GetAvailableStylistsByShift(string shift, DateTime date)
+        public async Task<List<StylistDTO>> GetAvailableStylistsByTime(string shift, DateTime date)
         {
             var schedules = await _dbContext.SalonMemberSchedules
                 .Include(s => s.SalonMember)
