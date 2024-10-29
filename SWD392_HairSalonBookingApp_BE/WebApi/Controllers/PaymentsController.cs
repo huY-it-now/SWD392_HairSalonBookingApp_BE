@@ -106,7 +106,7 @@ namespace WebApi.Controllers
                 var booking = await _bookingService.GetBookingById(bookingId);
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
                 ItemData item = new ItemData(booking.ComboService.ComboServiceName, 1, decimal.ToInt32(booking.ComboService.Price));
-                var cancelUrl = "https://payos.vn/docs/api/#operation/payment-request";
+                var cancelUrl = "http://localhost:5173/payment-cancelled";
                 var returnUrl = "http://localhost:5173/thank-you";
                 List<ItemData> items = new List<ItemData>();
                 items.Add(item);
@@ -126,8 +126,8 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpPut("CancelPayment")]
-        public async Task<Result<object>> CancelPayment([FromRoute] int orderId)
+        [HttpPost("cancel")]
+        public async Task<Result<object>> CancelPayment([FromRoute] System.Int64 orderId)
         {
             var result = new Result<object>
             {
@@ -138,15 +138,14 @@ namespace WebApi.Controllers
 
             PaymentLinkInformation paymentLinkInformation = await _payOS.cancelPaymentLink(orderId);
 
-            result.Message = "Cancel success";
-            result.Data = paymentLinkInformation;
-            return result;
-
             try
             {
-                
+                result.Message = "Cancel success";
+                result.Data = paymentLinkInformation;
+                return result;
+
             }
-            catch
+            catch 
             {
                 result.Message = "Cancel fail";
                 result.Error = -1;
@@ -155,7 +154,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("GetPayment")]
-        public async Task<Result<object>> GetPayment([FromRoute] int orderId)
+        public async Task<Result<object>> GetPayment([FromRoute] System.Int64 orderId)
         {
             var result = new Result<object>
             {
