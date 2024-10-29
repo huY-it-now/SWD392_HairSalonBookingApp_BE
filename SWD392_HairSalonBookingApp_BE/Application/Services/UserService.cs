@@ -1,5 +1,6 @@
 ﻿using Application.Commons;
 using Application.Interfaces;
+using Application.Repositories;
 using Application.Utils;
 using Application.Validations.Stylist;
 using AutoMapper;
@@ -312,19 +313,65 @@ namespace Application.Services
 
         public async Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request)
         {
-            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
-
-            if (schedule != null && schedule.WorkShifts.Count + request.WorkShifts.Count > 3)
+            var validShifts = new List<string> { "Morning", "Afternoon", "Evening" };
+            if (request.WorkShifts.Any(shift => !validShifts.Contains(shift)))
             {
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "You can only register up to shifts per day.",
+                    Message = "Invalid work shift. Only 'Morning', 'Afternoon', or 'Evening' are allowed.",
                     Data = null
                 };
             }
 
-            if (schedule == null)
+            if (request.WorkShifts.Count != request.WorkShifts.Distinct().Count())
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Duplicate work shifts are not allowed.",
+                    Data = null
+                };
+            }
+
+            if (request.WorkShifts.Count > 3)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You can register up to 3 shifts per day.",
+                    Data = null
+                };
+            }
+
+            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
+
+            if (schedule != null)
+            {
+                var duplicateShifts = request.WorkShifts.Intersect(schedule.WorkShifts).ToList();
+                if (duplicateShifts.Any())
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = $"The following shifts have already been registered for this date: {string.Join(", ", duplicateShifts)}.",
+                        Data = null
+                    };
+                }
+
+                if (schedule.WorkShifts.Count + request.WorkShifts.Count > 3)
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "You can register up to 3 shifts per day.",
+                        Data = null
+                    };
+                }
+
+                schedule.WorkShifts.AddRange(request.WorkShifts);
+            }
+            else
             {
                 schedule = new SalonMemberSchedule
                 {
@@ -335,11 +382,6 @@ namespace Application.Services
 
                 await _unitOfWork.ScheduleRepository.AddAsync(schedule);
             }
-            else
-            {
-                schedule.WorkShifts.AddRange(request.WorkShifts);
-            }
-
 
             await _unitOfWork.SaveChangeAsync();
 
@@ -360,7 +402,7 @@ namespace Application.Services
                 return new List<StylistDTO>();
             }
 
-            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByShift(shift.Shift, bookingTime.Date);    
+            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByShift(shift.Shift, bookingTime.Date);
             return availableStylists;
         }
 
@@ -485,8 +527,29 @@ namespace Application.Services
 
         public async Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
-            var appointments = await _unitOfWork.AppointmentRepository.GetAppointmentsByStylistIdAndDateRange(stylistId, fromDate, toDate);
-            return _mapper.Map<List<AppointmentDTO>>(appointments);
+            try
+            {
+                if (stylistId == Guid.Empty)
+                {
+                    throw new ArgumentException("Stylist ID cannot be empty.");
+                }
+
+                if (fromDate > toDate)
+                {
+                    throw new ArgumentException("From date cannot be greater than to date.");
+                }
+
+                // Lấy danh sách các lịch hẹn theo stylist và ngày
+                var appointments = await _unitOfWork.AppointmentRepository
+                    .GetAppointmentsByStylistIdAndDateRange(stylistId, fromDate, toDate);
+
+                return _mapper.Map<List<AppointmentDTO>>(appointments);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception tại đây
+                throw new ApplicationException("An error occurred while viewing appointments.", ex);
+            }
         }
 
         public async Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request)
@@ -501,6 +564,35 @@ namespace Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object> { Error = 0, Message = "Appointment status updated successfully.", Data = null };
+        }
+
+        public async Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift)
+        {
+            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(stylistId, scheduleDate);
+            if (schedule == null || !schedule.WorkShifts.Contains(workShift))
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "The specified work shift is not registered.",
+                    Data = null
+                };
+            }
+
+            schedule.WorkShifts.Remove(workShift);
+            if (schedule.WorkShifts.Count == 0)
+            {
+                await _unitOfWork.ScheduleRepository.DeleteWorkShiftAsync(schedule);
+            }
+
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Work shift deleted successfully!",
+                Data = null
+            };
         }
     }
 }

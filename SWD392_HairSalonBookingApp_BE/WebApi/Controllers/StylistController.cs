@@ -70,5 +70,34 @@ namespace WebApi.Controllers
             var result = await _userService.ViewAppointments(stylistId, fromDate, toDate);
             return Ok(result);
         }
+
+
+        [HttpPost("update-appointment-status")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> UpdateAppointmentStatus([FromBody] UpdateAppointmentStatusDTO request)
+        {
+            var result = await _userService.UpdateAppointmentStatus(request);
+            return Ok(result);
+        }
+
+        [HttpGet("get-available-stylists")]
+        [ProducesResponseType(200, Type = typeof(List<StylistDTO>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> GetAvailableStylist([FromQuery] DateTime bookingTime)
+        {
+            var result = await _userService.GetAvailableStylists(bookingTime);
+            return Ok(result);
+        }
+
+        [HttpPost("delete-work-shift")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> DeleteWorkShift([FromBody] Guid stylistId, DateTime scheduleDate, string workShift)
+        {
+            var result = await _userService.DeleteWorkShift(stylistId, scheduleDate, workShift);
+            return Ok(result);
+        }
     }
 }
+

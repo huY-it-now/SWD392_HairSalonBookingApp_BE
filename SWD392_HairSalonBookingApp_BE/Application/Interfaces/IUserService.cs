@@ -25,5 +25,6 @@ namespace Application.Interfaces
         Task<Result<object>> ResetPassword(ResetPasswordDTO request);
         Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate);
         Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request);
+        Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift);
     }
 }

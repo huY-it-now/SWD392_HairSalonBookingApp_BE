@@ -13,5 +13,8 @@ namespace Domain.Contracts.DTO.Appointment
         public string ServiceName { get; set; }
         public DateTime AppointmentDate { get; set; }
         public string Status { get; set; }
+
+        public string AppointmentTime => AppointmentDate.ToString("HH:mm");
+        public string AppointmentDay => AppointmentDate.ToString("dddd, dd MMMM yyyy");
     }
 }
