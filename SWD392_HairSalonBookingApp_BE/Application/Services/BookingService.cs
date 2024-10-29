@@ -144,13 +144,15 @@ namespace Application.Services
 
             if (salonMember == null)
             {
-                Result.Error = 1;
-                Result.Message = "Stylist is not found";
-                return Result;
-            }
+                var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(booking.BookingDate, booking.salon);
 
-            booking.SalonMember = salonMember;
-            booking.SalonMemberId = salonMember.Id;
+                booking.SalonMember = stylistListFree.ElementAt(new Random().Next(stylistListFree.Count));
+            }
+            else
+            {
+                booking.SalonMember = salonMember;
+                booking.SalonMemberId = salonMember.Id;
+            }           
 
             var comboService = await _comboService.GetComboServiceById(ComboServiceId);
 
