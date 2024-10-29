@@ -8,6 +8,7 @@ namespace Domain.Contracts.DTO.Booking
 {
     public class BookingDTO
     {
+        public Guid Id { get; set; }
         public DateTime BookingDate { get; set; }
         public bool Checked { get; set; }
     }
