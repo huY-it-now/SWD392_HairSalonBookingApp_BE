@@ -403,7 +403,17 @@ namespace Application.Services
             }
 
             var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByShift(shift.Shift, bookingTime.Date);
-            return availableStylists;
+
+            var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
+            {
+                Id = stylist.Id,
+                FullName = stylist.FullName,
+                Email = stylist.Email,
+                Job = stylist.Job,
+                Rating = stylist.Rating
+            }).ToList();
+
+            return stylistDTOs;
         }
 
         public async Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
