@@ -411,7 +411,7 @@ namespace Application.Services
                 Email = stylist.Email,
                 Job = stylist.Job,
                 Rating = stylist.Rating
-            }).Distinct().ToList();
+            }).ToList();
 
             return stylistDTOs;
         }
