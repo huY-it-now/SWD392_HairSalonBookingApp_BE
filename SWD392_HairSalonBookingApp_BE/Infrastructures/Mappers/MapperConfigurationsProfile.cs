@@ -40,6 +40,7 @@ namespace Infrastructures.Mappers
             CreateMap<AddComboServiceRequest, ComboServiceDTO>();
             CreateMap<ComboService, ComboServiceDTO>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.ImageUrl));
+            CreateMap<Booking, BookingDTO>();
 
             //cbs
             CreateMap<ComboService, ComboServiceDTO>();
