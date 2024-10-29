@@ -239,7 +239,7 @@ namespace Application.Services
 
             var salonMember = new SalonMember
             {
-                Id = Guid.NewGuid(),
+                Id = stylist.Id,
                 UserId = stylist.Id,
                 SalonId = salon.Id,
                 Job = request.Job,
