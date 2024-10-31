@@ -29,7 +29,7 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.ComboServiceComboDetails
                                  .Where(cscd => cscd.ComboServiceId == comboServiceId)
-                                 .Select(cscd => cscd.ComboDetail)
+                                 .Select(cscd => cscd.ComboDetail).Where(d => d.IsDeleted == false)
                                  .ToListAsync();
         }
 

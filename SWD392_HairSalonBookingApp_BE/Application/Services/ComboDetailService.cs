@@ -17,14 +17,16 @@ namespace Application.Services
         private readonly IComboDetailRepository _comboDetailRepository;
         private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
         private readonly IMapper _mapper;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ComboDetailService(IComboDetailRepository comboDetailRepository,
                                   IComboServiceComboDetailRepository comboServiceComboDetailRepository,
-                                  IMapper mapper)
+                                  IMapper mapper, IUnitOfWork unitOfWork)
         {
             _comboDetailRepository = comboDetailRepository;
             _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _mapper = mapper;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<Result<object>> GetAllComboDetails()
@@ -82,15 +84,29 @@ namespace Application.Services
 
         public async Task<Result<object>> AddComboDetail(AddComboDetailRequest createRequest)
         {
-            ComboDetailValidation.Validate(_mapper.Map<ComboDetailDTO>(createRequest));
-            var comboDetail = _mapper.Map<ComboDetail>(createRequest);
-            await _comboDetailRepository.AddComboDetail(comboDetail);
+            var exist = await _unitOfWork.ComboDetailRepository.CheckComboDetailExistByName(createRequest.Content);
+
+            if (exist != null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Combo detail is exist"
+                };
+            }
+
+            var newComboDetail = _mapper.Map<ComboDetail>(createRequest);
+
+            newComboDetail.Content = createRequest.Content;
+            newComboDetail.IsDeleted = false;
+
+            await _unitOfWork.ComboDetailRepository.AddAsync(newComboDetail);
+            await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Combo detail added successfully",
-                Data = null
+                Message = "Combo detail added successfully"
             };
         }
 
@@ -110,13 +126,26 @@ namespace Application.Services
 
         public async Task<Result<object>> DeleteComboDetail(Guid id)
         {
-            await _comboDetailRepository.DeleteComboDetail(id);
+            var cbd = await _unitOfWork.ComboDetailRepository.GetComboDetailById(id);
+
+            if (cbd == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found"
+                };
+            }
+
+            cbd.IsDeleted = true;
+
+            _unitOfWork.ComboDetailRepository.Update(cbd);
+            await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Combo detail deleted successfully",
-                Data = null
+                Message = "Delete successfully"
             };
         }
 
