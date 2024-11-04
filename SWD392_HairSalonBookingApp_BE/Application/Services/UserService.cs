@@ -659,5 +659,54 @@ namespace Application.Services
                 Data = bookingUserDTO
             };
         }
+
+        public async Task<Result<object>> GetAdminDashboard()
+        {
+            var bookings = await _unitOfWork.BookingRepository.GetAllAsync();
+
+            if (bookings == null || bookings.Count == 0)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No bookings found",
+                    Data = null
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingDTO
+            {
+                Id = b.Id,
+                BookingDate = b.BookingDate,
+                Checked = b.Checked,
+                CustomerName = b.CustomerName,
+                CustomerPhoneNumber = b.CustomerPhoneNumber,
+                ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
+        {
+            new ComboServiceForBookingDTO
+            {
+                Id = b.ComboService.Id,
+                ComboServiceName = b.ComboService.ComboServiceName,
+                Price = b.ComboService.Price,
+                Image = b.ComboService.ImageUrl
+            }
+        } : new List<ComboServiceForBookingDTO>(),
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue
+            }).ToList();
+
+            var dashboardDTO = new AdminDashboardDTO
+            {
+                TotalBookings = bookings.Count,
+                Bookings = bookingDTOs
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Admin dashboard",
+                Data = dashboardDTO
+            };
+        }
     }
 }
