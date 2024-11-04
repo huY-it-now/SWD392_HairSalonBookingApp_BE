@@ -18,7 +18,7 @@ namespace Application.Interfaces
         Task<Result<object>> PrintAllSalonMember();
         Task<Result<object>> GetSalonMemberWithRole(int roleId);
         Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request);
-        Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime);
+        Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingDate, TimeSpan bookingTime);
         Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate);
         Task<Result<object>> UpdateProfile(UpdateProfileDTO request);
         Task<Result<object>> ForgotPassword(string email);
