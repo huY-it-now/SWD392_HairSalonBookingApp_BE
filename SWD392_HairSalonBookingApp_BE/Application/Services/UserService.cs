@@ -400,15 +400,15 @@ namespace Application.Services
         }
 
 
-        public async Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime)
+        public async Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingDate, TimeSpan bookingTime)
         {
-            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime.TimeOfDay >= s.StartTime && bookingTime.TimeOfDay < s.EndTime);
+            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime >= s.StartTime && bookingTime < s.EndTime);
             if (shift == null)
             {
                 return new List<StylistDTO>();
             }
 
-            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByTime(shift.Shift, bookingTime.Date);
+            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByTime(shift.Shift, bookingDate);
 
             var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
             {
