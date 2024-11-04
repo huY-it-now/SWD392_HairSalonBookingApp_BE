@@ -4,6 +4,7 @@ using Domain.Contracts.Abstracts.Cloudinary;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Salon;
 using Domain.Entities;
+using Org.BouncyCastle.Ocsp;
 
 namespace Application.Services
 {
@@ -175,6 +176,33 @@ namespace Application.Services
             {
                 Error = 0,
                 Message = "These are all the salon members in this salon",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> ViewStylistBySalonId(Guid salonId)
+        {
+            var stylist = await _unitOfWork.SalonMemberRepository.GetStylistBySalonId(salonId);
+
+            if (stylist == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "There is no stylist"
+                };
+            }
+
+            var result = new ViewSalonDTO
+            {
+                SalonId = salonId,
+                SalonMembers = _mapper.Map<List<ViewSalonMemberDTO>>(stylist)
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Stylist in salon",
                 Data = result
             };
         }

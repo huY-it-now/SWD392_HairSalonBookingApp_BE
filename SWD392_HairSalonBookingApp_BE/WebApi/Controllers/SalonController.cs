@@ -85,5 +85,15 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> ViewStylistBySalonId(Guid salonId)
+        {
+            var result = await _salonService.ViewStylistBySalonId(salonId);
+
+            return Ok(result);
+        }
     }
 }
