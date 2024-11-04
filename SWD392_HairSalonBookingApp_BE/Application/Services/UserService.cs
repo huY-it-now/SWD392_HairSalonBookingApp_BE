@@ -662,9 +662,9 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAdminDashboard()
         {
-            var bookings = await _unitOfWork.BookingRepository.GetAllAsync();
+            var bookings = await _unitOfWork.BookingRepository.GetAllBookingsAsync();
 
-            if (bookings == null || !bookings.Any())
+            if (bookings == null || bookings.Count == 0)
             {
                 return new Result<object>
                 {
@@ -681,32 +681,32 @@ namespace Application.Services
                 Checked = b.Checked,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                ComboServiceName = b.ComboService != null
-        ? new List<ComboServiceForBookingDTO>
-        {
-            new ComboServiceForBookingDTO
+                ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
             {
-                Id = b.ComboService.Id,
-                ComboServiceName = b.ComboService.ComboServiceName,
-                Price = b.ComboService.Price,
-                Image = b.ComboService.ImageUrl
-            }
-        }
-        : new List<ComboServiceForBookingDTO>(),
-                PaymentAmount = b.Payments != null ? b.Payments.PaymentAmount : 0,
-                PaymentDate = b.Payments != null ? b.Payments.PaymentDate : DateTime.MinValue
+                new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                }
+            } : new List<ComboServiceForBookingDTO>(),
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus.StatusName
             }).ToList();
 
-            var dashboardDTO = new AdminDashboardDTO
+            var adminDashboardDTO = new AdminDashboardDTO
             {
-                Bookings = bookingDTOs,
+                TotalBookings = bookings.Count(),
+                Bookings = bookingDTOs
             };
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Admin dashboard data retrieved successfully",
-                Data = dashboardDTO
+                Message = "Admin dashboard data",
+                Data = adminDashboardDTO
             };
         }
     }
