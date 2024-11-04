@@ -27,5 +27,6 @@ namespace Application.Interfaces
         Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request);
         Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift);
         Task<Result<object>> GetBookingsByUserId(Guid userId);
+        Task<Result<object>> GetAdminDashboard();
     }
 }
