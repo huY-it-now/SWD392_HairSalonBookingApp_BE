@@ -664,7 +664,7 @@ namespace Application.Services
         {
             var bookings = await _unitOfWork.BookingRepository.GetAllAsync();
 
-            if (bookings == null || bookings.Count == 0)
+            if (bookings == null || !bookings.Any())
             {
                 return new Result<object>
                 {
@@ -681,7 +681,8 @@ namespace Application.Services
                 Checked = b.Checked,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
+                ComboServiceName = b.ComboService != null
+        ? new List<ComboServiceForBookingDTO>
         {
             new ComboServiceForBookingDTO
             {
@@ -690,21 +691,21 @@ namespace Application.Services
                 Price = b.ComboService.Price,
                 Image = b.ComboService.ImageUrl
             }
-        } : new List<ComboServiceForBookingDTO>(),
-                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
-                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue
+        }
+        : new List<ComboServiceForBookingDTO>(),
+                PaymentAmount = b.Payments != null ? b.Payments.PaymentAmount : 0,
+                PaymentDate = b.Payments != null ? b.Payments.PaymentDate : DateTime.MinValue
             }).ToList();
 
             var dashboardDTO = new AdminDashboardDTO
             {
-                TotalBookings = bookings.Count,
-                Bookings = bookingDTOs
+                Bookings = bookingDTOs,
             };
 
             return new Result<object>
             {
                 Error = 0,
-                Message = "Admin dashboard",
+                Message = "Admin dashboard data retrieved successfully",
                 Data = dashboardDTO
             };
         }
