@@ -28,16 +28,33 @@ namespace Infrastructures.Repositories
             return await _dbContext.SalonMemberSchedules.FirstOrDefaultAsync(s => s.SalonMemberId == stylistId && s.ScheduleDate == date);
         }
 
-        public async Task<List<StylistDTO>> GetAvailableStylistsByShift(string shift, DateTime date)
+        public async Task<List<StylistDTO>> GetAvailableStylistsByTime(string shift, DateTime date, Guid salonId)
         {
             var schedules = await _dbContext.SalonMemberSchedules
-                .Where(s => s.ScheduleDate.Date == date.Date && // So sánh chỉ phần ngày
-                            s.WorkShifts.Contains(shift) && // Kiểm tra ca làm việc
-                            !s.IsDayOff) // Kiểm tra không phải ngày nghỉ
-                .Select(s => new StylistDTO { Id = s.SalonMemberId })
-                .ToListAsync();
+        .Include(s => s.SalonMember)
+            .ThenInclude(sm => sm.User)
+        .Where(s => s.ScheduleDate.Date == date.Date &&
+                    s.WorkShifts.Contains(shift) &&
+                    !s.IsDayOff &&
+                    s.SalonMember.SalonId == salonId)
+        .Select(s => new StylistDTO
+        {
+            Id = s.SalonMember.Id,
+            FullName = s.SalonMember.User.FullName ?? string.Empty,
+            Email = s.SalonMember.User.Email ?? string.Empty,
+            Job = s.SalonMember.Job ?? string.Empty,
+            Rating = s.SalonMember.Rating ?? "No Rating",
+            Status = s.SalonMember.User.Status
+        })
+        .ToListAsync();
 
             return schedules;
+        }
+
+        public async Task DeleteWorkShiftAsync(SalonMemberSchedule schedule)
+        {
+            _dbContext.SalonMemberSchedules.Remove(schedule);
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

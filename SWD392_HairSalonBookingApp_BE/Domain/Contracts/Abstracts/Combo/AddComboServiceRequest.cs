@@ -12,6 +12,6 @@ namespace Domain.Contracts.Abstracts.Combo
         public string ComboServiceName { get; set; }
         public decimal Price { get; set; }
         public IFormFile? ImageUrl { get; set; }
-        public Guid ComboDetailId { get; set; }
+        public List<Guid> ComboDetailIds { get; set; }
     }
 }

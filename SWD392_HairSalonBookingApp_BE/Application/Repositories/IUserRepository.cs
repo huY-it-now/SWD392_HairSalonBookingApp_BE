@@ -10,5 +10,6 @@ namespace Application.Repositories
         Task<User> GetUserByEmail(string email);
         Task<User> Verify(string token);
         Task<User> GetUserById(Guid id);
+        Task<List<Booking>> GetBookingsByUserId(Guid userId);
     }
 }

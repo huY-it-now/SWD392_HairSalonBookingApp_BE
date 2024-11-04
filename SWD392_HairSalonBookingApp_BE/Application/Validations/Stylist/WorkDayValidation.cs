@@ -26,7 +26,8 @@ namespace Application.Validations.Stylist
                     shift == "Morning" ||
                     shift == "Afternoon" ||
                     shift == "Evening"))
-                .WithMessage("Work shift must be 'Morning', 'Afternoon', or 'Evening'.");
+                .WithMessage("Work shift must be 'Morning', 'Afternoon', or 'Evening'.")
+                .Must(shifts => shifts.Distinct().Count() == shifts.Count).WithMessage("Duplicate work shifts are not allowed.");
         }
     }
 }

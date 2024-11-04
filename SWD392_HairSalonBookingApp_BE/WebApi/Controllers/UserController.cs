@@ -159,12 +159,13 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("update-appointment-status")]
+        [HttpGet]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> UpdateAppointmentStatus([FromBody] UpdateAppointmentStatusDTO request)
+        public async Task<IActionResult> HistoryBookingForUser(Guid userId)
         {
-            var result = await _userService.UpdateAppointmentStatus(request);
+            var result = await _userService.GetBookingsByUserId(userId);
+
             return Ok(result);
         }
     }

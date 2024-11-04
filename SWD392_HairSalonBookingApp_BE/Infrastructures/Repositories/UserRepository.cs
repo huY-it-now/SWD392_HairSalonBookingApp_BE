@@ -24,6 +24,15 @@ namespace Infrastructures.Repositories
             return await _dbContext.Users.ToListAsync();
         }
 
+        public async Task<List<Booking>> GetBookingsByUserId(Guid userId)
+        {
+            return await _dbContext.Bookings
+                .Where(b => b.UserId == userId)
+                .Include(b => b.Payments)       // Include Payments entity
+                .Include(b => b.ComboService)   // Include ComboService entity
+                .ToListAsync();
+        }
+
         public async Task<User> GetUserByEmail(string email)
         {
             return await _dbContext.Users.Include(x => x.Role).FirstOrDefaultAsync(e => e.Email.ToLower() == email.ToLower());
