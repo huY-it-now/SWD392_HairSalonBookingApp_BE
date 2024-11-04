@@ -114,15 +114,18 @@ namespace Application.Services
         {
             ComboServiceValidation.Validate(_mapper.Map<ComboServiceDTO>(createRequest));
 
-            var comboDetail = await _unitOfWork.ComboDetailRepository.GetByIdAsync(createRequest.ComboDetailId);
-            if (comboDetail == null)
+            foreach (var comboDetailId in createRequest.ComboDetailIds)
             {
-                return new Result<object>
+                var comboDetail = await _unitOfWork.ComboDetailRepository.GetByIdAsync(comboDetailId);
+                if (comboDetail == null)
                 {
-                    Error = 1,
-                    Message = "The specified combo detail does not exist.",
-                    Data = null
-                };
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "One or more specified combo details do not exist.",
+                        Data = null
+                    };
+                }
             }
 
             string fileExtension = Path.GetExtension(createRequest.ImageUrl.FileName);
@@ -146,13 +149,10 @@ namespace Application.Services
                 ImageId = cloudinaryResult.PublicImageId,
                 ImageUrl = cloudinaryResult.ImageUrl,
                 IsDeleted = false,
-                ComboServiceComboDetails = new List<ComboServiceComboDetail>
-                 {
-                        new ComboServiceComboDetail
-                         {
-                                ComboDetailId = createRequest.ComboDetailId
-                         }
-                }
+                ComboServiceComboDetails = createRequest.ComboDetailIds.Select(id => new ComboServiceComboDetail
+                {
+                    ComboDetailId = id
+                }).ToList()
             };
 
             await _unitOfWork.ComboServiceRepository.AddAsync(comboService);
