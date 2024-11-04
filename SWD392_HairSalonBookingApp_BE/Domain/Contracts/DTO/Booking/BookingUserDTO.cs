@@ -1,6 +1,4 @@
-﻿using Domain.Contracts.DTO.Booking;
-
-namespace Domain.Contracts.DTO.User
+﻿namespace Domain.Contracts.DTO.Booking
 {
     public class BookingUserDTO
     {
