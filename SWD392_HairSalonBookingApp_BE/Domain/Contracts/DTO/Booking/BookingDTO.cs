@@ -12,7 +12,10 @@ namespace Domain.Contracts.DTO.Booking
         public Guid Id { get; set; }
         public DateTime BookingDate { get; set; }
         public bool Checked { get; set; }
+        public string CustomerName { get; set; }
+        public string CustomerPhoneNumber { get; set; }
         public List<ComboServiceForBookingDTO> ComboServiceName { get; set; }
-        public decimal Amount { get; set; }
+        public decimal PaymentAmount { get; set; }
+        public DateTime PaymentDate { get; set; }
     }
 }
