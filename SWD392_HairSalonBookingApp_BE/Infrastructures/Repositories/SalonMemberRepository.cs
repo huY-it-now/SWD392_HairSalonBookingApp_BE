@@ -28,4 +28,9 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
     {
         throw new NotImplementedException();
     }
+
+    public async Task<List<SalonMember>> GetStylistBySalonId(Guid salonId)
+    {
+        return await _dbContext.SalonMembers.Where(x => x.SalonId == salonId).Include(x => x.User).Where(x => x.User.RoleId == 5).ToListAsync();
+    }
 }

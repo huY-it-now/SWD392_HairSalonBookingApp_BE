@@ -227,6 +227,10 @@ namespace Application.Services
             {
                 stylist.RoleId = 4;
             }
+            else if (request.Job.StartsWith("admin"))
+            {
+                stylist.RoleId = 1;
+            }
             else
             {
                 return new Result<object>
