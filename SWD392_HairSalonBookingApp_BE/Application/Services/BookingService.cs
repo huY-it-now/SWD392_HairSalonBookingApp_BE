@@ -163,74 +163,79 @@ namespace Application.Services
                 return Result;
             }
 
-            var schedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
+            var schedule = await _scheduleWorkTimeRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
 
-            //if (schedule == null)
-            //{
-            //    SalonMemberSchedule salonMemberSchedule = new();
-            //    salonMemberSchedule.ScheduleDate = booking.BookingDate;
-            //    salonMemberSchedule.WorkShifts = booking.ComboService.ComboServiceName;
-            //    salonMemberSchedule.SalonMember = salonMember;
-            //    salonMemberSchedule.SalonMemberId = SalonMemberId;
-            //    await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
-
-            //    if (!(await _unitOfWork.SaveChangeAsync() > 0))
-            //    {
-            //        Result.Error = 1;
-            //        Result.Message = "Create stylist schedule fail";
-            //    }
-            //}
-
-            //TimeSpan comboTime = CheckComboSericeTime(comboService.ComboServiceName);
-
-            //TimeSpan timeEndPredict = new TimeSpan(booking.BookingDate.Hour + comboTime.Hours, booking.BookingDate.Minute + comboTime.Minutes, 0);
-
-            //foreach (var item in schedule) //check xem co trung lich ko
-            //{
-            //    if(item.ScheduleDate == booking.BookingDate)
-            //    {
-            //        Result.Error = 1;
-            //        Result.Message = "This time has been booked";
-            //    }
-                
-            //    TimeSpan timeOfWork = CheckComboSericeTime(item.WorkShifts);
-                
-            //    if ((timeEndPredict.Hours - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0)
-            //    {
-            //        Result.Error = 1;
-            //        Result.Message = $"Please choose another time before {timeEndPredict.Hours - item.ScheduleDate.Hour} hour";
-            //        return Result;
-            //    }else if ((timeEndPredict.Hours - item.ScheduleDate.Hour) == 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0 && (item.ScheduleDate.Minute - timeEndPredict.Minutes) < 0)
-            //    {
-            //        Result.Error = 1;
-            //        Result.Message = $"Please choose another time before 30 minutes";
-            //        return Result;
-            //    }
-            //    else if ((booking.BookingDate.Hour - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour + timeOfWork.Hours) < 0)
-            //    {
-            //        Result.Error = 1;
-            //        Result.Message = $"Please choose another time after {item.ScheduleDate.Hour + timeOfWork.Hours - booking.BookingDate.Hour} hour";
-            //        return Result;
-            //    }
-            //}
-
-            //SalonMemberSchedule salonMemberScheduleNew = new();
-            //salonMemberScheduleNew.ScheduleDate = booking.BookingDate;
-            //salonMemberScheduleNew.WorkShifts = booking.ComboService.ComboServiceName;
-            //salonMemberScheduleNew.SalonMember = salonMember;
-            //salonMemberScheduleNew.SalonMemberId = SalonMemberId;
-            //await _salonMemberScheduleRepository.AddAsync(salonMemberScheduleNew);
-
-            if (!(await _unitOfWork.SaveChangeAsync() > 0))
+            if (schedule == null)
             {
-                Result.Error = 1;
-                Result.Message = "Create stylist schedule fail";
+                var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
+                ScheduleWorkTime scheduleWorkTime = new();
+                scheduleWorkTime.ScheduleDate = booking.BookingDate;
+                scheduleWorkTime.WorkShifts = booking.ComboService.ComboServiceName;
+                scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
+                scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
+                await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
+
+                if (!(await _unitOfWork.SaveChangeAsync() > 0))
+                {
+                    Result.Error = 1;
+                    Result.Message = "Create stylist schedule fail";
+                }
+            }
+            else
+            {
+                TimeSpan comboTime = CheckComboSericeTime(comboService.ComboServiceName);
+
+                TimeSpan timeEndPredict = new TimeSpan(booking.BookingDate.Hour + comboTime.Hours, booking.BookingDate.Minute + comboTime.Minutes, 0);
+
+                foreach (var item in schedule) //check xem co trung lich ko
+                {
+                    if (item.ScheduleDate == booking.BookingDate)
+                    {
+                        Result.Error = 1;
+                        Result.Message = "This time has been booked";
+                    }
+
+                    TimeSpan timeOfWork = CheckComboSericeTime(item.ScheduleDate.ToString());
+
+                    if ((timeEndPredict.Hours - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0)
+                    {
+                        Result.Error = 1;
+                        Result.Message = $"Please choose another time before {timeEndPredict.Hours - item.ScheduleDate.Hour} hour";
+                        return Result;
+                    }
+                    else if ((timeEndPredict.Hours - item.ScheduleDate.Hour) == 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0 && (item.ScheduleDate.Minute - timeEndPredict.Minutes) < 0)
+                    {
+                        Result.Error = 1;
+                        Result.Message = $"Please choose another time before 30 minutes";
+                        return Result;
+                    }
+                    else if ((booking.BookingDate.Hour - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour + timeOfWork.Hours) < 0)
+                    {
+                        Result.Error = 1;
+                        Result.Message = $"Please choose another time after {item.ScheduleDate.Hour + timeOfWork.Hours - booking.BookingDate.Hour} hour";
+                        return Result;
+                    }
+                }
+
+                var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
+
+                ScheduleWorkTime scheduleWorkTime = new();
+                scheduleWorkTime.ScheduleDate = booking.BookingDate;
+                scheduleWorkTime.WorkShifts = booking.ComboService.ComboServiceName;
+                scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
+                scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
+                await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
+
+                if (!(await _unitOfWork.SaveChangeAsync() > 0))
+                {
+                    Result.Error = 1;
+                    Result.Message = "Create stylist schedule fail";
+                }
             }
 
             booking.ComboServiceId = comboService.Id;
             booking.ComboService = comboService;
             
-
             var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
 
             if (Salon != null)

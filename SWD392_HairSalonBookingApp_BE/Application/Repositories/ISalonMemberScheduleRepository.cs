@@ -8,6 +8,6 @@ namespace Application.Repositories
 {
     public interface ISalonMemberScheduleRepository : IGenericRepository<SalonMemberSchedule>
     {
-        Task<List<SalonMemberSchedule>> GetByTime(int year, int month, int day);
+        Task<SalonMemberSchedule> GetByTime(int year, int month, int day);
     }
 }

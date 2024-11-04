@@ -9,5 +9,6 @@ namespace Application.Repositories
 {
     public interface IScheduleWorkTimeRepository : IGenericRepository<ScheduleWorkTime>
     {
+        Task<List<ScheduleWorkTime>> GetByTime(int year, int month, int day);
     }
 }
