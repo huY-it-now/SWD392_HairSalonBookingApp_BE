@@ -20,6 +20,11 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<List<Booking>> GetAllBookingsAsync()
+        {
+            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+        }
+
         public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
         {
             return await _dbContext.Bookings
