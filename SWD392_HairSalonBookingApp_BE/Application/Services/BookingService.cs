@@ -413,5 +413,28 @@ namespace Application.Services
 
             return result;
         }
+
+        public async Task<Result<object>> GetBookingDetail(Guid bookingId)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingDetail(bookingId);
+
+            if (booking == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not have any booking"
+                };
+            }
+
+            var result = _mapper.Map<BookingDTO>(booking);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Booking Detail",
+                Data = result
+            };
+        }
     }
 }

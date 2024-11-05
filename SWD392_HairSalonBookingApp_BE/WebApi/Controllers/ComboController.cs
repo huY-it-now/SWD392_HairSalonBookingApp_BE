@@ -245,5 +245,13 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet("view-combo-detail-is-deleted")]
+        public async Task<IActionResult> ViewComboDetailIsDeleted()
+        {
+            var result = await _comboDetailService.GetComboDetailIsDeleted();
+
+            return Ok(result);
+        }
     }
 }

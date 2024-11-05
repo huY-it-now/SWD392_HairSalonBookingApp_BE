@@ -19,6 +19,16 @@ namespace Infrastructures.Repositories
             return await _dbContext.Users.AnyAsync(e => e.Email == email);
         }
 
+        public async Task<List<SalonMember>> GetAllManager()
+        {
+            return await _dbContext.SalonMembers.Include(x => x.User).Where(x => x.User.RoleId == 3).Include(x => x.Salon).ToListAsync();
+        }
+
+        public async Task<List<SalonMember>> GetAllStaff()
+        {
+            return await _dbContext.SalonMembers.Include(x => x.User).Where(x => x.User.RoleId == 4).Include(x => x.Salon).ToListAsync();
+        }
+
         public async Task<List<User>> GetAllUserAsync()
         {
             return await _dbContext.Users.ToListAsync();

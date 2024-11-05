@@ -227,5 +227,13 @@ namespace WebApi.Controllers
 
             return result;
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewBookingDetail(Guid bookingId)
+        {
+            var result = await _bookingService.GetBookingDetail(bookingId);
+
+            return Ok(result);
+        }
     }
 }

@@ -60,7 +60,12 @@ namespace Infrastructures.Repositories
 
         public async Task<ComboDetail> CheckComboDetailExistByName(string name)
         {
-            return await _dbContext.ComboDetails.FirstOrDefaultAsync(n => n.Content == name);
+            return await _dbContext.ComboDetails.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(n => n.Content == name);
+        }
+
+        public async Task<List<ComboDetail>> GetAllComboDetailIsDeleted()
+        {
+            return await _dbContext.ComboDetails.Where(x => x.IsDeleted == true).ToListAsync();
         }
 
         //public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)

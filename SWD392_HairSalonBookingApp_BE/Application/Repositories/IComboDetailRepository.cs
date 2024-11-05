@@ -14,5 +14,6 @@ namespace Application.Repositories
         Task<List<ComboService>> GetComboServicesByComboDetailId(Guid comboDetailId);
         Task<ComboDetail> CheckComboDetailExistByName(string name);
         //Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId);
+        Task<List<ComboDetail>> GetAllComboDetailIsDeleted();
     }
 }
