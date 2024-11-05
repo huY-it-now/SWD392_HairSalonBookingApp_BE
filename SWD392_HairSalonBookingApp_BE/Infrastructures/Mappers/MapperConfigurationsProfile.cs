@@ -33,8 +33,8 @@ namespace Infrastructures.Mappers
             CreateMap<CreateStylistDTO, CreateStylistRequest>();
             CreateMap<CreateStylistRequest, CreateStylistDTO>();
             CreateMap<SalonMember, StylistDTO>()
-           .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
-           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
             CreateMap<CreateStylistDTO, StylistDTO>();
             CreateMap<ResetPasswordRequest, ResetPasswordDTO>();
             CreateMap<AddComboServiceRequest, ComboServiceDTO>();
@@ -43,9 +43,9 @@ namespace Infrastructures.Mappers
             CreateMap<Booking, BookingDTO>();
             CreateMap<SalonMemberDTO, SalonMember>();
             CreateMap<SalonMember, SalonMemberDTO>()
-    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
-    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-    .ForMember(dest => dest.SalonName, opt => opt.MapFrom(src => src.Salon.salonName));
+                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.SalonName, opt => opt.MapFrom(src => src.Salon.salonName));
 
 
             //cbs

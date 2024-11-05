@@ -636,18 +636,20 @@ namespace Application.Services
                 Checked = b.Checked,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
+                Feedback = b.Feedback,
                 ComboServiceName = new List<ComboServiceForBookingDTO>
+    {
+        new ComboServiceForBookingDTO
         {
-            new ComboServiceForBookingDTO
-            {
-                Id = b.ComboService.Id,
-                ComboServiceName = b.ComboService.ComboServiceName,
-                Price = b.ComboService.Price,
-                Image = b.ComboService.ImageUrl
-            }
-        },
-                PaymentAmount = b.Payments.PaymentAmount,
-                PaymentDate = b.Payments.PaymentDate
+            Id = b.ComboService?.Id ?? Guid.Empty,
+            ComboServiceName = b.ComboService?.ComboServiceName ?? "Unknown",
+            Price = b.ComboService?.Price ?? 0,
+            Image = b.ComboService?.ImageUrl ?? string.Empty
+        }
+    },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
 
             var bookingUserDTO = new BookingUserDTO

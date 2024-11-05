@@ -38,8 +38,9 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Bookings
                 .Where(b => b.UserId == userId)
-                .Include(b => b.Payments)       // Include Payments entity
-                .Include(b => b.ComboService)   // Include ComboService entity
+                .Include(b => b.Payments)
+                .ThenInclude(x => x.PaymentStatus)
+                .Include(b => b.ComboService)
                 .ToListAsync();
         }
 

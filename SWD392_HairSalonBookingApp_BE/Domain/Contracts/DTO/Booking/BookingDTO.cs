@@ -18,5 +18,6 @@ namespace Domain.Contracts.DTO.Booking
         public decimal PaymentAmount { get; set; }
         public DateTime PaymentDate { get; set; }
         public string PaymentStatus { get; set; }
+        public string Feedback { get; set; }
     }
 }
