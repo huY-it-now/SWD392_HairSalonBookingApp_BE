@@ -167,21 +167,22 @@ namespace Application.Services
 
             var schedule = await _scheduleWorkTimeRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
 
+            var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
+
+            if (salonMemberSchedule == null)
+            {
+                salonMemberSchedule = new SalonMemberSchedule();
+                salonMemberSchedule.Id = new Guid();
+                salonMemberSchedule.IsDayOff = false;
+                salonMemberSchedule.SalonMember = booking.SalonMember;
+                salonMemberSchedule.SalonMemberId = booking.SalonMemberId;
+
+                await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
+                await _unitOfWork.SaveChangeAsync();
+            }
+
             if (schedule == null)
             {
-                var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
-
-                if (salonMemberSchedule == null)
-                {
-                    salonMemberSchedule = new SalonMemberSchedule();
-                    salonMemberSchedule.Id = new Guid();
-                    salonMemberSchedule.IsDayOff = false;
-                    salonMemberSchedule.SalonMember = booking.SalonMember;
-                    salonMemberSchedule.SalonMemberId = booking.SalonMemberId;
-
-                    await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
-                    await _unitOfWork.SaveChangeAsync();
-                }
                 ScheduleWorkTime scheduleWorkTime = new();
                 scheduleWorkTime.ScheduleDate = booking.BookingDate;
                 scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
@@ -230,8 +231,6 @@ namespace Application.Services
                         return Result;
                     }
                 }
-
-                var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
 
                 ScheduleWorkTime scheduleWorkTime = new();
                 scheduleWorkTime.ScheduleDate = booking.BookingDate;
