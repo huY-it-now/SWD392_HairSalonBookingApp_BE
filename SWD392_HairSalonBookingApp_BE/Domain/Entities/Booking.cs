@@ -19,8 +19,6 @@
         public SalonMember SalonMember { get; set; }
         public Guid ComboServiceId { get; set; }
         public ComboService ComboService { get; set; }
-        public Guid StylistId { get; set; }
-        public SalonMember Stylist { get; set;}
          #endregion
     }
 }

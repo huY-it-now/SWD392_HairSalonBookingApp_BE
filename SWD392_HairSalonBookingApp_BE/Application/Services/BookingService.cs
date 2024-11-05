@@ -324,6 +324,7 @@ namespace Application.Services
             payment.Booking = booking;
             payment.PaymentStatus = paymentStatus;
             payment.PaymentMethods = paymentMethod;
+            payment.PaymentDate = DateTime.Now;
 
             await _paymentsRepository.AddAsync(payment);
 
