@@ -65,5 +65,22 @@ namespace Infrastructures.Repositories
                .Include(b => b.ComboService)
                .ToListAsync();
         }
+
+        public async Task<List<Booking>> GetBookingsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
+        {
+            return await _dbContext.Bookings
+                .Where(b => b.StylistId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
+                .Include(b => b.User)
+                .Include(b => b.ComboService)
+                .ToListAsync();
+        }
+
+        public async Task<Booking> GetBookingByIdAsync(Guid bookingId)
+        {
+            return await _dbContext.Bookings
+                .Include(b => b.User)
+                .Include(b => b.ComboService)
+                .FirstOrDefaultAsync(b => b.Id == bookingId);
+        }
     }
 }

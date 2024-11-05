@@ -1,6 +1,8 @@
 ﻿using Application;
+using Application.Interfaces;
 using Application.Repositories;
 using Infrastructures.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructures
 {
@@ -19,6 +21,9 @@ namespace Infrastructures
         private IAppointmentRepository _appointmentRepository;
         private IServiceComboServiceRepository _serviceComboServiceRepository;
         private IBookingRepository _bookingRepository;
+        private readonly ICurrentTime _currentTime;
+        private readonly IClaimsService _claimsService;
+
 
         public UnitOfWork(AppDbContext dbContext,
                           IUserRepository userRepository,
@@ -32,7 +37,9 @@ namespace Infrastructures
                           IComboServiceComboDetailRepository comboServiceComboDetailRepository,
                           IAppointmentRepository appointmentRepository, 
                           IServiceComboServiceRepository serviceComboServiceRepository, 
-                          IBookingRepository bookingRepository)
+                          IBookingRepository bookingRepository,
+                          ICurrentTime currentTime, 
+                          IClaimsService claimsService)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -47,6 +54,8 @@ namespace Infrastructures
             _appointmentRepository = appointmentRepository;
             _serviceComboServiceRepository = serviceComboServiceRepository;
             _bookingRepository = bookingRepository;
+            _currentTime = currentTime;
+            _claimsService = claimsService;
         }
         
         public IUserRepository UserRepository => _userRepository;
@@ -67,6 +76,10 @@ namespace Infrastructures
         public async Task<int> SaveChangeAsync()
         {
             return await _dbContext.SaveChangesAsync();
+        }
+        public void Dispose()
+        {
+            _dbContext.Dispose();
         }
     }
 }

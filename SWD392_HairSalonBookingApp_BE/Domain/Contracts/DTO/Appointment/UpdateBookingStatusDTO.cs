@@ -9,7 +9,7 @@ namespace Domain.Contracts.DTO.Appointment
 {
     public class UpdateBookingStatusDTO
     {
-        public Guid AppointmentId { get; set; }
+        public Guid BookingId { get; set; }
         public string Status { get; set; }
     }
 }
