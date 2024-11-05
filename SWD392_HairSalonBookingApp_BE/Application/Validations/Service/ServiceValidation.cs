@@ -14,10 +14,12 @@ namespace Application.Validations.Service
         public ServiceValidation()
         {
             RuleFor(x => x.ServiceId)
-                .NotEqual(Guid.Empty).WithMessage("ServiceId is required");
+                .NotEqual(Guid.Empty)
+                .WithMessage("ServiceId is required");
 
             RuleFor(x => x.ServiceName)
-                .NotEmpty().WithMessage("ServiceName is required");
+                .NotEmpty()
+                .WithMessage("ServiceName is required");
         }
     }
 }

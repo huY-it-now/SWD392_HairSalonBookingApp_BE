@@ -30,7 +30,9 @@ namespace Infrastructures
                           ISalonMemberRepository salonMemberRepository,
                           IScheduleRepository scheduleRepository,
                           IComboServiceComboDetailRepository comboServiceComboDetailRepository,
-                          IAppointmentRepository appointmentRepository, IServiceComboServiceRepository serviceComboServiceRepository, IBookingRepository bookingRepository)
+                          IAppointmentRepository appointmentRepository, 
+                          IServiceComboServiceRepository serviceComboServiceRepository, 
+                          IBookingRepository bookingRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;

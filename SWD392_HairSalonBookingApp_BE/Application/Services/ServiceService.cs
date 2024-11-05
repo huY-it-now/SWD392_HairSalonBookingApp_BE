@@ -24,7 +24,9 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IServiceRepository _serviceRepository;
 
-        public ServiceService(IMapper mapper, IUnitOfWork unitOfWork, IServiceRepository serviceRepository)
+        public ServiceService(IMapper mapper, 
+                              IUnitOfWork unitOfWork, 
+                              IServiceRepository serviceRepository)
         {
             _serviceRepository = serviceRepository;
             _mapper = mapper;
@@ -33,7 +35,9 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllServices()
         {
-            var services = await _unitOfWork.ServiceRepository.GetAllServicesAsync();
+            var services = await _unitOfWork
+                                    .ServiceRepository
+                                    .GetAllServicesAsync();
 
             var servicesDTOList = services.Select(service => new ServiceDTO
             {
@@ -67,7 +71,9 @@ namespace Application.Services
 
         public async Task<Result<object>> GetServiceById(Guid id)
         {
-            var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
+            var service = await _unitOfWork
+                                    .ServiceRepository
+                                    .GetServiceById(id);
 
             if (service == null)
             {
@@ -111,7 +117,9 @@ namespace Application.Services
 
         public async Task<Result<object>> CreateService(CreateServiceDTO createRequest)
         {
-            var categoryExists = await _unitOfWork.CategoryRepository.GetCategoryById(createRequest.CategoryId);
+            var categoryExists = await _unitOfWork
+                                            .CategoryRepository
+                                            .GetCategoryById(createRequest.CategoryId);
             if (categoryExists == null)
             {
                 return new Result<object>
@@ -132,7 +140,9 @@ namespace Application.Services
 
             try
             {
-                await _unitOfWork.ServiceRepository.CreateService(service);
+                await _unitOfWork
+                        .ServiceRepository
+                        .CreateService(service);
                 await _unitOfWork.SaveChangeAsync();
             }
             catch (ArgumentException ex)
@@ -167,7 +177,9 @@ namespace Application.Services
 
         public async Task<Result<object>> UpdateService(Guid id, UpdateServiceDTO updateRequest)
         {
-            var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
+            var service = await _unitOfWork
+                                    .ServiceRepository
+                                    .GetServiceById(id);
 
             if (service == null || service.IsDeleted)
             {
@@ -184,7 +196,9 @@ namespace Application.Services
 
             try
             {
-                _unitOfWork.ServiceRepository.Update(service);
+                _unitOfWork
+                    .ServiceRepository
+                    .Update(service);
                 await _unitOfWork.SaveChangeAsync();
             }
             catch (Exception)
@@ -209,7 +223,9 @@ namespace Application.Services
 
         public async Task<Result<object>> DeleteService(Guid id)
         {
-            var service = await _unitOfWork.ServiceRepository.GetServiceById(id);
+            var service = await _unitOfWork
+                                    .ServiceRepository
+                                    .GetServiceById(id);
 
             if (service == null || service.IsDeleted)
             {
@@ -222,7 +238,9 @@ namespace Application.Services
             }
 
             service.IsDeleted = true;
-            _unitOfWork.ServiceRepository.Update(service);
+            _unitOfWork
+                .ServiceRepository
+                .Update(service);
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
@@ -236,8 +254,12 @@ namespace Application.Services
 
         public async Task<Result<object>> AddComboIntoService(Guid serviceId, Guid comboServiceId)
         {
-            var service = await _unitOfWork.ServiceRepository.GetServiceById(serviceId);
-            var comboService = await _unitOfWork.ComboServiceRepository.GetComboServiceById(comboServiceId);
+            var service = await _unitOfWork
+                                    .ServiceRepository
+                                    .GetServiceById(serviceId);
+            var comboService = await _unitOfWork
+                                        .ComboServiceRepository
+                                        .GetComboServiceById(comboServiceId);
 
             if (service == null || comboService == null)
             {
@@ -256,7 +278,9 @@ namespace Application.Services
                 ComboServiceId = comboServiceId
             };
 
-            await _unitOfWork.ServiceComboServiceRepository.AddAsync(serviceComboService);
+            await _unitOfWork
+                        .ServiceComboServiceRepository
+                        .AddAsync(serviceComboService);
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>

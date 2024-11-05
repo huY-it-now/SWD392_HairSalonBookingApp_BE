@@ -33,35 +33,44 @@ namespace Infrastructures.Mappers
             CreateMap<CreateStylistDTO, CreateStylistRequest>();
             CreateMap<CreateStylistRequest, CreateStylistDTO>();
             CreateMap<SalonMember, StylistDTO>()
-           .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
-           .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email));
+                .ForMember(dest => dest.FullName, opt => opt
+                .MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => opt
+                .MapFrom(src => src.User.Email));
             CreateMap<CreateStylistDTO, StylistDTO>();
             CreateMap<ResetPasswordRequest, ResetPasswordDTO>();
             CreateMap<AddComboServiceRequest, ComboServiceDTO>();
             CreateMap<ComboService, ComboServiceDTO>()
-                .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.ImageUrl));
+                .ForMember(dest => dest.Image, opt => opt
+                .MapFrom(src => src.ImageUrl));
             CreateMap<Booking, BookingDTO>();
             CreateMap<SalonMemberDTO, SalonMember>();
             CreateMap<SalonMember, SalonMemberDTO>()
-    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
-    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-    .ForMember(dest => dest.SalonName, opt => opt.MapFrom(src => src.Salon.salonName));
+                .ForMember(dest => dest.FullName, opt => opt
+                .MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => opt
+                .MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.SalonName, opt => opt
+                .MapFrom(src => src.Salon.salonName));
 
 
             //cbs
             CreateMap<ComboService, ComboServiceDTO>();
             CreateMap<AddComboServiceRequest, ComboService>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore()); // Ignore Id for creation
+                .ForMember(dest => dest.Id, opt => opt
+                .Ignore()); // Ignore Id for creation
             CreateMap<UpdateComboServiceRequest, ComboService>();
 
             //cbt
             CreateMap<ComboDetail, ComboDetailDTO>();
             CreateMap<AddComboDetailRequest, ComboDetail>()
-                .ForMember(dest => dest.Id, opt => opt.Ignore());
+                .ForMember(dest => dest.Id, opt => opt
+                .Ignore());
             CreateMap<UpdateComboDetailRequest, ComboDetail>();
             CreateMap<AddComboDetailRequest, ComboDetailDTO>();
             CreateMap<ComboServiceComboDetail, ComboDetailDTO>()
-            .ForMember(dest => dest.Id, opt => opt.MapFrom(src => src.ComboDetailId));
+                .ForMember(dest => dest.Id, opt => opt
+                .MapFrom(src => src.ComboDetailId));
 
             //cate
             CreateMap<Category, CategoryDTO>();
@@ -86,33 +95,47 @@ namespace Infrastructures.Mappers
 
             //Schedule
             CreateMap<SalonMemberSchedule, ScheduleDTO>()
-            .ForMember(dest => dest.WorkShift, opt => opt.MapFrom(src => src.WorkShifts))
-            .ForMember(dest => dest.IsDayOff, opt => opt.MapFrom(src => src.IsDayOff))
-            .ForMember(dest => dest.Date, opt => opt.MapFrom(src => src.ScheduleDate));
+                .ForMember(dest => dest.WorkShift, opt => opt
+                .MapFrom(src => src.WorkShifts))
+                .ForMember(dest => dest.IsDayOff, opt => opt
+                .MapFrom(src => src.IsDayOff))
+                .ForMember(dest => dest.Date, opt => opt
+                .MapFrom(src => src.ScheduleDate));
             CreateMap<RegisterWorkScheduleDTO, SalonMemberSchedule>()
-            .ForMember(dest => dest.WorkShifts, opt => opt.MapFrom(src => src.WorkShifts));
+                .ForMember(dest => dest.WorkShifts, opt => opt
+                .MapFrom(src => src.WorkShifts));
 
             CreateMap<ViewSalonDTO, ViewSalonRequest>();
             CreateMap<ViewSalonRequest, ViewSalonDTO>();
             CreateMap<SalonMember, ViewSalonMemberDTO>()
-            .ForMember(dest => dest.SalonMemberId, opt => opt.MapFrom(src => src.Id))
-            .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
-            .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
-            .ForMember(dest => dest.Job, opt => opt.MapFrom(src => src.Job));
+                .ForMember(dest => dest.SalonMemberId, opt => 
+                    opt.MapFrom(src => src.Id))
+                .ForMember(dest => dest.FullName, opt => 
+                    opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Email, opt => 
+                    opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.Job, opt => 
+                    opt.MapFrom(src => src.Job));
 
             //Appointment
             CreateMap<Appointment, AppointmentDTO>()
-            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.User.FullName))
-            .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ComboService.ComboServiceName))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.CustomerName, opt => 
+                    opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.ServiceName, opt => 
+                    opt.MapFrom(src => src.ComboService.ComboServiceName))
+                .ForMember(dest => dest.Status, opt => 
+                    opt.MapFrom(src => src.Status));
 
             CreateMap<UpdateAppointmentStatusDTO, Appointment>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+                .ForMember(dest => dest.Status, opt => 
+                    opt.MapFrom(src => src.Status));
 
             //Booking 
             CreateMap<Booking, BookingDTO>();
-            CreateMap<Booking, ViewCheckedBookingDTO>().ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
-            CreateMap<Booking, ViewPendingBookingDTO>().ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Booking, ViewCheckedBookingDTO>()
+                .ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Booking, ViewPendingBookingDTO>()
+                .ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }
