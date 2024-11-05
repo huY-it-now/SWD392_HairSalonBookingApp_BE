@@ -17,7 +17,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<ComboService>> GetAllComboServiceAsync()
         {
-            return await _dbContext.ComboServices.Where(d => d.IsDeleted == false)
+            return await _dbContext.ComboServices
         .Include(cs => cs.ComboServiceComboDetails)
             .ThenInclude(cs => cs.ComboDetail)
         .ToListAsync();

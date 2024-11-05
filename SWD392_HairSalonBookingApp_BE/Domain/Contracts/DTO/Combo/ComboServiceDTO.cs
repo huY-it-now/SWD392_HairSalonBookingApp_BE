@@ -11,6 +11,7 @@ namespace Domain.Contracts.DTO.Combo
         public string ComboServiceName { get; set; }
         public decimal Price { get; set; }
         public string? Image { get; set; }
-        public List<ComboDetailDTO> ComboDetails { get; set; } // Use ComboDetailDTO here
+        public List<ComboDetailDTO> ComboDetails { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }
