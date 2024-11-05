@@ -171,11 +171,14 @@ namespace Application.Services
 
             if (salonMemberSchedule == null)
             {
+                List<string> list = new List<string>();
+                list.Add("Check");
                 salonMemberSchedule = new SalonMemberSchedule();
                 salonMemberSchedule.Id = new Guid();
                 salonMemberSchedule.IsDayOff = false;
                 salonMemberSchedule.SalonMember = booking.SalonMember;
                 salonMemberSchedule.SalonMemberId = booking.SalonMemberId;
+                salonMemberSchedule.WorkShifts = list;
 
                 await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
                 await _unitOfWork.SaveChangeAsync();
@@ -195,6 +198,8 @@ namespace Application.Services
                     Result.Error = 1;
                     Result.Message = "Create stylist schedule fail";
                 }
+
+                salonMemberSchedule.WorkShifts.Add(scheduleWorkTime.WorkShifts);
             }
             else
             {
@@ -234,7 +239,7 @@ namespace Application.Services
 
                 ScheduleWorkTime scheduleWorkTime = new();
                 scheduleWorkTime.ScheduleDate = booking.BookingDate;
-                scheduleWorkTime.WorkShifts = booking.ComboService.ComboServiceName;
+                scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
                 scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
                 scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
                 await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
@@ -244,6 +249,8 @@ namespace Application.Services
                     Result.Error = 1;
                     Result.Message = "Create stylist schedule fail";
                 }
+
+                salonMemberSchedule.WorkShifts.Add(scheduleWorkTime.WorkShifts);
             }
 
             booking.ComboServiceId = comboService.Id;
