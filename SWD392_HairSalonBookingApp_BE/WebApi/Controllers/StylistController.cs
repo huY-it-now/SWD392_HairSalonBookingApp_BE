@@ -84,9 +84,11 @@ namespace WebApi.Controllers
         [HttpGet("get-available-stylists")]
         [ProducesResponseType(200, Type = typeof(List<StylistDTO>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> GetAvailableStylist([FromQuery] DateTime bookingTime)
+        public async Task<IActionResult> GetAvailableStylist([FromQuery]Guid salonId, [FromQuery] DateTime bookingDate, [FromQuery] int bookingHour, [FromQuery] int bookingMinute)
         {
-            var result = await _userService.GetAvailableStylists(bookingTime);
+            var bookingTime = new TimeSpan(bookingHour, bookingMinute, 0);
+
+            var result = await _userService.GetAvailableStylists(salonId, bookingDate, bookingTime);
             return Ok(result);
         }
 

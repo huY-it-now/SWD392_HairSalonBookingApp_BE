@@ -17,12 +17,12 @@ namespace Infrastructures.Repositories
 
         public async Task<List<ComboDetail>> GetAllComboDetailsAsync()
         {
-            return await _dbContext.ComboDetails.Where(x => !x.IsDeleted).ToListAsync();
+            return await _dbContext.ComboDetails.Where(x => x.IsDeleted == false).ToListAsync();
         }
 
         public async Task<ComboDetail> GetComboDetailById(Guid id)
         {
-            return await _dbContext.ComboDetails.FirstOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
+            return await _dbContext.ComboDetails.FirstOrDefaultAsync(x => x.Id == id && x.IsDeleted == false);
         }
 
         public async Task<ComboDetail> AddComboDetail(ComboDetail comboDetail)
@@ -56,6 +56,16 @@ namespace Infrastructures.Repositories
                                    .Where(cscd => cscd.ComboDetailId == comboDetailId)
                                    .Select(cscd => cscd.ComboService)
                                    .ToListAsync();
+        }
+
+        public async Task<ComboDetail> CheckComboDetailExistByName(string name)
+        {
+            return await _dbContext.ComboDetails.Where(x => x.IsDeleted == false).FirstOrDefaultAsync(n => n.Content == name);
+        }
+
+        public async Task<List<ComboDetail>> GetAllComboDetailIsDeleted()
+        {
+            return await _dbContext.ComboDetails.Where(x => x.IsDeleted == true).ToListAsync();
         }
 
         //public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)

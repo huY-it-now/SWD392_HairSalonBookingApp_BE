@@ -12,7 +12,9 @@ namespace Application.Validations.Category
     {
         public CategoryValidation()
         {
-            RuleFor(x => x.CategoryName).NotEmpty().WithMessage("Category Name is required");
+            RuleFor(x => x.CategoryName)
+                .NotEmpty()
+                .WithMessage("Category Name is required");
         }
     }
 }

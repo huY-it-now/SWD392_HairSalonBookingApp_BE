@@ -11,5 +11,6 @@ namespace Application.Interfaces
         Task<Result<object>> SearchSalonWithAddress(SalonDTO req);
         Task<Result<object>> SearchSalonById(SalonDTO req);
         Task<Result<object>> ViewSalonMemberBySalonId(ViewSalonDTO req);
+        Task<Result<object>> ViewStylistBySalonId(Guid salonId);
     }
 }

@@ -106,8 +106,8 @@ namespace WebApi.Controllers
                 var booking = await _bookingService.GetBookingById(bookingId);
                 int orderCode = int.Parse(DateTimeOffset.Now.ToString("ffffff"));
                 ItemData item = new ItemData(booking.ComboService.ComboServiceName, 1, decimal.ToInt32(booking.ComboService.Price));
-                var cancelUrl = "https://localhost:7152/api/Payments/CancelPayment";
-                var returnUrl = "https://localhost:7152/swagger/index.html";
+                var cancelUrl = "http://localhost:5173/payment-cancelled";
+                var returnUrl = "http://localhost:5173/thank-you";
                 List<ItemData> items = new List<ItemData>();
                 items.Add(item);
                 PaymentData paymentData = new PaymentData(orderCode, decimal.ToInt32(booking.ComboService.Price), "Thanh toan doan hang", items, cancelUrl, returnUrl);
@@ -126,8 +126,8 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpPut("CancelPayment")]
-        public async Task<Result<object>> CancelPayment([FromRoute] int orderId)
+        [HttpPost("cancel")]
+        public async Task<Result<object>> CancelPayment([FromRoute] System.Int64 orderId)
         {
             var result = new Result<object>
             {
@@ -136,15 +136,16 @@ namespace WebApi.Controllers
                 Data = null
             };
 
+            PaymentLinkInformation paymentLinkInformation = await _payOS.cancelPaymentLink(orderId);
+
             try
             {
-                PaymentLinkInformation paymentLinkInformation = await _payOS.cancelPaymentLink(orderId);
-
                 result.Message = "Cancel success";
                 result.Data = paymentLinkInformation;
                 return result;
+
             }
-            catch
+            catch 
             {
                 result.Message = "Cancel fail";
                 result.Error = -1;
@@ -153,7 +154,7 @@ namespace WebApi.Controllers
         }
 
         [HttpGet("GetPayment")]
-        public async Task<Result<object>> GetPayment([FromRoute] int orderId)
+        public async Task<Result<object>> GetPayment([FromRoute] System.Int64 orderId)
         {
             var result = new Result<object>
             {
@@ -194,9 +195,9 @@ namespace WebApi.Controllers
                 result.Message = "success";
                 return result;
             }
-            catch
+            catch (Exception e)
             {
-                result.Message = "fail";
+                result.Message = e.ToString();
                 result.Error = -1;
                 return result;
             }

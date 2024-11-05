@@ -51,35 +51,33 @@ namespace WebApi.Controllers
             return result;
         }
 
-        [HttpGet("ShowUncheckedBooking")]
+        [HttpGet("ShowPendingedBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> PrintAllUncheckedBooking()
+        public async Task<Result<object>> PrintAllPendingedBooking()
         {
-            var bookingList = await _bookingService.ShowAllUncheckedBooking();
+            var bookingList = await _bookingService.ShowAllPendingedBooking();
 
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Get uncheck booking success",
+                Message = "Get Pending booking success",
                 Data = bookingList
             };
 
             return result;
         }
 
-        [HttpPost("CheckBooking")]
+        [HttpPost("CheckBookingAsConfirmed")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> CheckBooking(Guid bookingId, bool Check) // true = ok, false = fake (delete)
+        public async Task<Result<object>> CheckBooking(Guid bookingId)
         {
-
-
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Checked",
-                Data = await _bookingService.CheckBooking(bookingId, Check)
+                Message = "Success",
+                Data = await _bookingService.CheckBooking(bookingId, "Confirmed")
             };
 
             return result;
@@ -129,9 +127,19 @@ namespace WebApi.Controllers
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Cancel completed",
-                Data = await _bookingService.CheckBooking(bookingId, false)
+                Message = "",
+                Data = null
             };
+
+            if (await _bookingService.CheckBooking(bookingId, "Cancel") == "Success")
+            {
+                result.Message = "Cancel completed";
+            }
+            else
+            {
+                result.Error = 1;
+                result.Message = "Cancel false";
+            }
 
             return result;
         }
@@ -179,7 +187,7 @@ namespace WebApi.Controllers
             BookingDTO bookingDTO = new BookingDTO()
             {
                 BookingDate = booking.BookingDate,
-                Checked = booking.Checked,
+                BookingStatus = booking.BookingStatus,
             };
 
             result.Message = "Add Stylist successfully";
@@ -191,7 +199,7 @@ namespace WebApi.Controllers
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> AddBooking([FromForm] Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, TimeOnly hour_minutes, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
+        public async Task<Result<object>> AddBooking(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, TimeOnly hour_minutes, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
         {
             var result = new Result<object>
             {
@@ -226,6 +234,14 @@ namespace WebApi.Controllers
             result = await _bookingService.CreateBookingWithRequest(CustomerId, salonId,  SalonMemberId, dateTime, ComboServiceId, CustomerName, CustomerPhoneNumber);
 
             return result;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewBookingDetail(Guid bookingId)
+        {
+            var result = await _bookingService.GetBookingDetail(bookingId);
+
+            return Ok(result);
         }
     }
 }

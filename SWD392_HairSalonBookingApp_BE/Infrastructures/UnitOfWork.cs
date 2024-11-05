@@ -18,6 +18,7 @@ namespace Infrastructures
         private readonly IComboServiceComboDetailRepository _comboServiceComboDetailRepository;
         private IAppointmentRepository _appointmentRepository;
         private IServiceComboServiceRepository _serviceComboServiceRepository;
+        private IBookingRepository _bookingRepository;
 
         public UnitOfWork(AppDbContext dbContext,
                           IUserRepository userRepository,
@@ -29,7 +30,9 @@ namespace Infrastructures
                           ISalonMemberRepository salonMemberRepository,
                           IScheduleRepository scheduleRepository,
                           IComboServiceComboDetailRepository comboServiceComboDetailRepository,
-                          IAppointmentRepository appointmentRepository, IServiceComboServiceRepository serviceComboServiceRepository)
+                          IAppointmentRepository appointmentRepository, 
+                          IServiceComboServiceRepository serviceComboServiceRepository, 
+                          IBookingRepository bookingRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -43,6 +46,7 @@ namespace Infrastructures
             _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
             _appointmentRepository = appointmentRepository;
             _serviceComboServiceRepository = serviceComboServiceRepository;
+            _bookingRepository = bookingRepository;
         }
         
         public IUserRepository UserRepository => _userRepository;
@@ -57,6 +61,8 @@ namespace Infrastructures
         public IAppointmentRepository AppointmentRepository => _appointmentRepository;
 
         public IServiceComboServiceRepository ServiceComboServiceRepository => _serviceComboServiceRepository;
+
+        public IBookingRepository BookingRepository => _bookingRepository;
 
         public async Task<int> SaveChangeAsync()
         {

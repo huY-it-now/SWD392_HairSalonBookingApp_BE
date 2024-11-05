@@ -19,7 +19,8 @@ namespace Application.Services
         private readonly IMapper _mapper;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryService(IMapper mapper, IUnitOfWork unitOfWork)
+        public CategoryService(IMapper mapper, 
+                               IUnitOfWork unitOfWork)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -27,7 +28,9 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllCategory()
         {
-            var categories = await _unitOfWork.CategoryRepository.GetAllCategoryAsync();
+            var categories = await _unitOfWork
+                                    .CategoryRepository
+                                    .GetAllCategoryAsync();
 
             var categoryDTOList = categories.Select(category => new CategoryDTO
             {
@@ -50,7 +53,9 @@ namespace Application.Services
 
         public async Task<Result<object>> GetCategoryById(Guid id)
         {
-            var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
+            var category = await _unitOfWork
+                                    .CategoryRepository
+                                    .GetCategoryById(id);
 
             if (category == null || category.IsDeleted)
             {
@@ -92,7 +97,9 @@ namespace Application.Services
                 IsDeleted = false
             };
 
-            var createdCategory = await _unitOfWork.CategoryRepository.CreateCategory(category);
+            var createdCategory = await _unitOfWork
+                                            .CategoryRepository
+                                            .CreateCategory(category);
 
             if (createdCategory == null)
             {
@@ -132,7 +139,9 @@ namespace Application.Services
 
         public async Task<Result<object>> UpdateCategory(Guid id, UpdateCategoryDTO updateRequest)
         {
-            var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
+            var category = await _unitOfWork
+                                    .CategoryRepository
+                                    .GetCategoryById(id);
 
             if (category == null || category.IsDeleted)
             {
@@ -172,7 +181,9 @@ namespace Application.Services
 
         public async Task<Result<object>> DeleteCategory(Guid id)
         {
-            var category = await _unitOfWork.CategoryRepository.GetCategoryById(id);
+            var category = await _unitOfWork
+                                    .CategoryRepository
+                                    .GetCategoryById(id);
 
             if (category == null || category.IsDeleted)
             {

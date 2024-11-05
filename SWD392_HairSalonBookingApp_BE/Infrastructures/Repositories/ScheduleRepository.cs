@@ -28,19 +28,25 @@ namespace Infrastructures.Repositories
             return await _dbContext.SalonMemberSchedules.FirstOrDefaultAsync(s => s.SalonMemberId == stylistId && s.ScheduleDate == date);
         }
 
-        public async Task<List<StylistDTO>> GetAvailableStylistsByTime(string shift, DateTime date)
+        public async Task<List<StylistDTO>> GetAvailableStylistsByTime(string shift, DateTime date, Guid salonId)
         {
-            var schedules = await _dbContext.SalonMemberSchedules.Include(s => s.SalonMember).ThenInclude(sm => sm.User).Where(s => s.ScheduleDate.Date == date.Date &&
+            var schedules = await _dbContext.SalonMemberSchedules
+        .Include(s => s.SalonMember)
+            .ThenInclude(sm => sm.User)
+        .Where(s => s.ScheduleDate.Date == date.Date &&
                     s.WorkShifts.Contains(shift) &&
-                    !s.IsDayOff).Select(s => new StylistDTO
-                {
-                Id = s.SalonMember.Id,
-                FullName = s.SalonMember.User.FullName ?? string.Empty,
-                Email = s.SalonMember.User.Email ?? string.Empty,
-                Job = s.SalonMember.Job ?? string.Empty,
-                Rating = s.SalonMember.Rating ?? "No Rating",
-                Status = s.SalonMember.User.Status
-                }).Distinct().ToListAsync();
+                    !s.IsDayOff &&
+                    s.SalonMember.SalonId == salonId)
+        .Select(s => new StylistDTO
+        {
+            Id = s.SalonMember.Id,
+            FullName = s.SalonMember.User.FullName ?? string.Empty,
+            Email = s.SalonMember.User.Email ?? string.Empty,
+            Job = s.SalonMember.Job ?? string.Empty,
+            Rating = s.SalonMember.Rating ?? "No Rating",
+            Status = s.SalonMember.User.Status
+        })
+        .ToListAsync();
 
             return schedules;
         }

@@ -20,6 +20,11 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
+        public async Task<List<Booking>> GetAllBookingsAsync()
+        {
+            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+        }
+
         public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
         {
             return await _dbContext.Bookings
@@ -27,6 +32,11 @@ namespace Infrastructures.Repositories
                .Include(b => b.Payments)
                .Include(b => b.ComboService)
                .SingleOrDefaultAsync();
+        }
+
+        public async Task<Booking> GetBookingDetail(Guid bookingId)
+        {
+            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).Where(x => x.Id == bookingId).FirstOrDefaultAsync();
         }
 
         public async Task<Booking> GetBookingWithPayment(Guid id)
@@ -39,7 +49,7 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetCheckedBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.Checked == true)
+               .Where(b => b.BookingStatus == "Checked")
                .Include(b => b.User)
                .Include(b => b.Payments)
                .Include(b => b.SalonMember)
@@ -47,10 +57,10 @@ namespace Infrastructures.Repositories
                .ToListAsync();
         }
 
-        public async Task<List<Booking>> GetUncheckBookingInformation()
+        public async Task<List<Booking>> GetPendingBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.Checked == false)
+               .Where(b => b.BookingStatus == "Pending")
                .Include(b => b.Payments)
                .Include(b => b.ComboService)
                .ToListAsync();

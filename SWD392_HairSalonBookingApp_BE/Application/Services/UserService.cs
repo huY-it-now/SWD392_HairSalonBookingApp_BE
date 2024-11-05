@@ -8,6 +8,9 @@ using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
+using Domain.Contracts.DTO.Booking;
+using Domain.Contracts.DTO.Combo;
+using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
@@ -225,6 +228,10 @@ namespace Application.Services
             {
                 stylist.RoleId = 4;
             }
+            else if (request.Job.StartsWith("admin"))
+            {
+                stylist.RoleId = 1;
+            }
             else
             {
                 return new Result<object>
@@ -237,7 +244,7 @@ namespace Application.Services
 
             var salonMember = new SalonMember
             {
-                Id = Guid.NewGuid(),
+                Id = stylist.Id,
                 UserId = stylist.Id,
                 SalonId = salon.Id,
                 Job = request.Job,
@@ -394,15 +401,15 @@ namespace Application.Services
         }
 
 
-        public async Task<List<StylistDTO>> GetAvailableStylists(DateTime bookingTime)
+        public async Task<List<StylistDTO>> GetAvailableStylists(Guid salonId, DateTime bookingDate, TimeSpan bookingTime)
         {
-            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime.TimeOfDay >= s.StartTime && bookingTime.TimeOfDay < s.EndTime);
+            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime >= s.StartTime && bookingTime < s.EndTime);
             if (shift == null)
             {
                 return new List<StylistDTO>();
             }
 
-            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByTime(shift.Shift, bookingTime.Date);
+            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
 
             var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
             {
@@ -410,8 +417,9 @@ namespace Application.Services
                 FullName = stylist.FullName,
                 Email = stylist.Email,
                 Job = stylist.Job,
-                Rating = stylist.Rating
-            }).Distinct().ToList();
+                Rating = stylist.Rating,
+                Status = stylist.Status
+            }).ToList();
 
             return stylistDTOs;
         }
@@ -602,6 +610,152 @@ namespace Application.Services
                 Error = 0,
                 Message = "Work shift deleted successfully!",
                 Data = null
+            };
+        }
+
+        public async Task<Result<object>> GetBookingsByUserId(Guid userId)
+        {
+            var bookings = await _unitOfWork.UserRepository.GetBookingsByUserId(userId);
+
+            if (bookings == null || bookings.Count == 0)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You don't have any orders",
+                    Data = null
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingDTO
+            {
+                Id = b.Id,
+                BookingDate = b.BookingDate,
+                BookingStatus = b.BookingStatus,
+                CustomerName = b.CustomerName,
+                CustomerPhoneNumber = b.CustomerPhoneNumber,
+                ComboServiceName = new List<ComboServiceForBookingDTO>
+        {
+            new ComboServiceForBookingDTO
+            {
+                Id = b.ComboService.Id,
+                ComboServiceName = b.ComboService.ComboServiceName,
+                Price = b.ComboService.Price,
+                Image = b.ComboService.ImageUrl
+            }
+        },
+                PaymentAmount = b.Payments.PaymentAmount,
+                PaymentDate = b.Payments.PaymentDate
+            }).ToList();
+
+            var bookingUserDTO = new BookingUserDTO
+            {
+                UserId = userId,
+                Bookings = bookingDTOs
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Orders",
+                Data = bookingUserDTO
+            };
+        }
+
+        public async Task<Result<object>> GetAdminDashboard()
+        {
+            var bookings = await _unitOfWork.BookingRepository.GetAllBookingsAsync();
+
+            if (bookings == null || bookings.Count == 0)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No bookings found",
+                    Data = null
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingDTO
+            {
+                Id = b.Id,
+                BookingDate = b.BookingDate,
+                BookingStatus = b.BookingStatus,
+                CustomerName = b.CustomerName,
+                CustomerPhoneNumber = b.CustomerPhoneNumber,
+                ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
+            {
+                new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                }
+            } : new List<ComboServiceForBookingDTO>(),
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus.StatusName
+            }).ToList();
+
+            var adminDashboardDTO = new AdminDashboardDTO
+            {
+                TotalBookings = bookings.Count(),
+                Bookings = bookingDTOs
+            };
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Admin dashboard data",
+                Data = adminDashboardDTO
+            };
+        }
+
+        public async Task<Result<object>> GetAllStaff()
+        {
+            var staff = await _unitOfWork.UserRepository.GetAllStaff();
+
+            if (staff == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not have any staff",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<List<SalonMemberDTO>>(staff);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All staff",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> GetAllManager()
+        {
+            var manager = await _unitOfWork.UserRepository.GetAllManager();
+
+            if (manager == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not have any manager"
+                };
+            }
+
+            var result = _mapper.Map<List<SalonMemberDTO>>(manager);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All manager",
+                Data = result
             };
         }
     }

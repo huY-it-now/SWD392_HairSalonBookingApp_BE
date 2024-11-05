@@ -10,9 +10,11 @@ namespace Application.Repositories
     public interface IBookingRepository : IGenericRepository<Booking>
     {
         Task<Booking> GetBookingWithPayment(Guid id); 
-        Task<List<Booking>> GetUncheckBookingInformation();
+        Task<List<Booking>> GetPendingBookingInformation();
         Task<List<Booking>> GetCheckedBookingInformation();
         Task<Booking> GetBookingByIdWithComboAndPayment(Guid id);
+        Task<List<Booking>> GetAllBookingsAsync();
+        Task<Booking> GetBookingDetail(Guid bookingId);
         Task<List<Booking>> GetBookingsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate);
         Task<Booking> GetBookingByIdAsync(Guid bookingId);
     }
