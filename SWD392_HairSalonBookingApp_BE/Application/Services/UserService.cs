@@ -543,48 +543,118 @@ namespace Application.Services
             };
         }
 
-        public async Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate)
+        public async Task<List<BookingDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
+            if (stylistId == Guid.Empty)
+            {
+                throw new ArgumentException("Stylist ID cannot be empty.");
+            }
+
+            if (fromDate > toDate)
+            {
+                throw new ArgumentException("From date cannot be greater than to date.");
+            }
+
             try
             {
-                if (stylistId == Guid.Empty)
-                {
-                    throw new ArgumentException("Stylist ID cannot be empty.");
-                }
+                // Lấy danh sách booking theo stylist và khoảng thời gian
+                var bookings = await _unitOfWork.BookingRepository
+                    .GetBookingsByStylistIdAndDateRange(stylistId, fromDate, toDate);
 
-                if (fromDate > toDate)
-                {
-                    throw new ArgumentException("From date cannot be greater than to date.");
-                }
-
-                // Lấy danh sách các lịch hẹn theo stylist và ngày
-                var appointments = await _unitOfWork.AppointmentRepository
-                    .GetAppointmentsByStylistIdAndDateRange(stylistId, fromDate, toDate);
-
-                return _mapper.Map<List<AppointmentDTO>>(appointments);
+                return _mapper.Map<List<BookingDTO>>(bookings);
             }
             catch (Exception ex)
             {
-                // Log the exception tại đây
+                // Log lỗi tại đây và ném ngoại lệ cho lớp gọi xử lý
                 throw new ApplicationException("An error occurred while viewing appointments.", ex);
             }
         }
 
-        public async Task<Result<object>> UpdateAppointmentStatus(UpdateBookingStatusDTO request)
+        public async Task<Result<object>> UpdateBookingStatus(UpdateBookingStatusDTO request)
         {
-            var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
-            if (appointment == null)
+            try
             {
-                return new Result<object> { Error = 1, Message = "Appointment not found.", Data = null };
+                var validator = new BookingValidation();
+                var validationResult = validator.Validate(request);
+
+                if (!validationResult.IsValid)
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "Validation errors occurred",
+                        Data = validationResult.Errors.Select(e => e.ErrorMessage).ToList()
+                    };
+                }
+
+                var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+
+                if (booking == null)
+                {
+                    return new Result<object>
+                    {
+                        Error = 1,
+                        Message = "Booking not found",
+                        Data = null
+                    };
+                }
+
+                // Only allow status change to "In Progress" or "Completed"
+                booking.BookingStatus = request.Status;
+                _unitOfWork.BookingRepository.Update(booking);
+                await _unitOfWork.SaveChangeAsync();
+
+                return new Result<object>
+                {
+                    Error = 0,
+                    Message = "Booking status updated successfully",
+                    Data = null
+                };
             }
-
-            appointment.Status = request.Status;
-            await _unitOfWork.SaveChangeAsync();
-
-            return new Result<object> { Error = 0, Message = "Appointment status updated successfully.", Data = null };
+            catch (Exception ex)
+            {
+                // Log exception
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "An error occurred while updating booking status",
+                    Data = null
+                };
+            }
         }
 
-        public async Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift)
+            //public async Task<List<BookingDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate)
+            //{
+            //    var bookings = await _unitOfWork.BookingRepository
+            //        .GetBookingsByStylistIdAndDateRange(stylistId, fromDate, toDate);
+
+            //    return _mapper.Map<List<BookingDTO>>(bookings);
+            //}
+
+            //public async Task<Result<object>> UpdateBookingStatus(UpdateBookingStatusDTO request)
+            //{
+            //    var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+
+            //    if (booking == null)
+            //    {
+            //        return new Result<object>.{
+            //            Error
+            //        };
+            //    }
+
+            //    if (request.Status == "In Progress" || request.Status == "Completed")
+            //    {
+            //        booking.BookingStatus = request.Status;
+            //        _unitOfWork.BookingRepository.Update(booking);
+            //        await _unitOfWork.SaveChangeAsync();
+            //        return Result<object>.Success(null, "Booking status updated successfully.");
+            //    }
+
+            //    return Result<object>.Fail("Invalid status update.");
+            //}
+
+
+            public async Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift)
         {
             var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(stylistId, scheduleDate);
             if (schedule == null || !schedule.WorkShifts.Contains(workShift))

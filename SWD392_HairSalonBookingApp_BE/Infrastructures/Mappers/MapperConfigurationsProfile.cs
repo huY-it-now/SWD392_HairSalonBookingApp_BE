@@ -126,8 +126,9 @@ namespace Infrastructures.Mappers
                 .ForMember(dest => dest.Status, opt => 
                     opt.MapFrom(src => src.Status));
 
-            CreateMap<UpdateBookingStatusDTO, Appointment>()
-                .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
+            CreateMap<UpdateBookingStatusDTO, Booking>()
+                .ForMember(dest => dest.BookingStatus, opt => 
+                    opt.MapFrom(src => src.Status));
 
             //Booking 
             CreateMap<Booking, BookingDTO>();
