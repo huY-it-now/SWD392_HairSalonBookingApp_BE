@@ -376,7 +376,7 @@ namespace Application.Services
                 for (int i = 0; i < booking.Count; i++)
                 {
                     item.Total = booking[i].ComboService.Price;
-                    //item.PaymentStatus = booking[i].Payments.PaymentSatus.StatusName;
+                    item.PaymentStatus = booking[i].Payments.PaymentStatus.StatusName;
                 }
             }
 
@@ -427,13 +427,34 @@ namespace Application.Services
                 };
             }
 
-            var result = _mapper.Map<BookingDTO>(booking);
+            var bookingDTO = new BookingDTO
+            {
+                Id = booking.Id,
+                BookingDate = booking.BookingDate,
+                Checked = booking.Checked,
+                CustomerName = booking.CustomerName,
+                CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                Feedback = booking.Feedback,
+                ComboServiceName = booking.ComboService != null ? new List<ComboServiceForBookingDTO>
+        {
+            new ComboServiceForBookingDTO
+            {
+                Id = booking.ComboService.Id,
+                ComboServiceName = booking.ComboService.ComboServiceName ?? "Unknown",
+                Price = booking.ComboService.Price,
+                Image = booking.ComboService.ImageUrl ?? string.Empty
+            }
+        } : new List<ComboServiceForBookingDTO>(),
+                PaymentAmount = booking.Payments?.PaymentAmount ?? 0,
+                PaymentDate = booking.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = booking.Payments?.PaymentStatus?.StatusName
+            };
 
             return new Result<object>
             {
                 Error = 0,
                 Message = "Booking Detail",
-                Data = result
+                Data = bookingDTO
             };
         }
     }

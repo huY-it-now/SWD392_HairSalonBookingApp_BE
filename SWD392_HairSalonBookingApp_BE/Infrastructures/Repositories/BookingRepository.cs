@@ -57,6 +57,7 @@ namespace Infrastructures.Repositories
                .Where(b => b.Checked == true)
                .Include(b => b.User)
                .Include(b => b.Payments)
+               .ThenInclude(x => x.PaymentStatus)
                .Include(b => b.SalonMember)
                .Include(b => b.ComboService)
                .ToListAsync();

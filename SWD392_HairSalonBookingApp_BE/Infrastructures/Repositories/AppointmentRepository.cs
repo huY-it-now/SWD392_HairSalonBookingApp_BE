@@ -22,7 +22,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Appointment>> GetAppointmentsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
-            return await _dbContext.Appointments.Where(a => a.StylistId == stylistId && a.AppointmentDate >= fromDate && a.AppointmentDate <= toDate).ToListAsync();
+            return await _dbContext.Appointments.Include(x => x.ComboService).Include(x => x.User).Where(a => a.StylistId == stylistId && a.AppointmentDate >= fromDate && a.AppointmentDate <= toDate).ToListAsync();
         }
 
         public async Task<Appointment> GetAppointmentByIdAsync(Guid appointmentId)

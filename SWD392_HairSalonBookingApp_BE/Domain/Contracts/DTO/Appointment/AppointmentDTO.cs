@@ -8,7 +8,6 @@ namespace Domain.Contracts.DTO.Appointment
 {
     public class AppointmentDTO
     {
-        public Guid AppointmentId { get; set; }
         public string CustomerName { get; set; }
         public string ServiceName { get; set; }
         public DateTime AppointmentDate { get; set; }
