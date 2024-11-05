@@ -570,7 +570,7 @@ namespace Application.Services
             }
         }
 
-        public async Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request)
+        public async Task<Result<object>> UpdateAppointmentStatus(UpdateBookingStatusDTO request)
         {
             var appointment = await _unitOfWork.AppointmentRepository.GetAppointmentByIdAsync(request.AppointmentId);
             if (appointment == null)

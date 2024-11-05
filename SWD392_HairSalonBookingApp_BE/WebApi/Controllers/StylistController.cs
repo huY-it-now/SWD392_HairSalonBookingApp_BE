@@ -75,7 +75,7 @@ namespace WebApi.Controllers
         [HttpPost("update-appointment-status")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> UpdateAppointmentStatus([FromBody] UpdateAppointmentStatusDTO request)
+        public async Task<IActionResult> UpdateAppointmentStatus([FromBody] UpdateBookingStatusDTO request)
         {
             var result = await _userService.UpdateAppointmentStatus(request);
             return Ok(result);

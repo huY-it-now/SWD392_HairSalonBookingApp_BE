@@ -2,6 +2,7 @@
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
+using Domain.Contracts.DTO.Booking;
 using Domain.Contracts.DTO.Stylist;
 using Microsoft.AspNetCore.Http.HttpResults;
 
@@ -23,8 +24,10 @@ namespace Application.Interfaces
         Task<Result<object>> UpdateProfile(UpdateProfileDTO request);
         Task<Result<object>> ForgotPassword(string email);
         Task<Result<object>> ResetPassword(ResetPasswordDTO request);
-        Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate);
-        Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request);
+        //Task<List<AppointmentDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate);
+        //Task<Result<object>> UpdateAppointmentStatus(UpdateAppointmentStatusDTO request);
+        Task<List<BookingDTO>> ViewAppointments(Guid stylistId, DateTime fromDate, DateTime toDate);
+        Task<Result<object>> UpdateBookingStatus(UpdateBookingStatusDTO request);
         Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift);
         Task<Result<object>> GetBookingsByUserId(Guid userId);
         Task<Result<object>> GetAdminDashboard();
