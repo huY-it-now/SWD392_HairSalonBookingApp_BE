@@ -14,7 +14,9 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public SalonService(IMapper mapper, IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
+        public SalonService(IMapper mapper, 
+                            IUnitOfWork unitOfWork, 
+                            ICloudinaryService cloudinaryService)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -35,6 +37,7 @@ namespace Application.Services
 
             string fileExtension = Path.GetExtension(req.Image.FileName);
             string newFileName = $"{Guid.NewGuid()}{fileExtension}";
+
             CloudinaryResponse cloudinaryResult = await _cloudinaryService.UploadImage(newFileName, req.Image);
 
             if (cloudinaryResult == null)
@@ -59,6 +62,7 @@ namespace Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             var salonMapper = _mapper.Map<SalonDTO>(salon);
+
             salonMapper.SalonName = salon.salonName;
             salonMapper.Image = salon.ImageUrl;
             salonMapper.SalonId = salon.Id;
@@ -113,6 +117,7 @@ namespace Application.Services
             }
 
             var result = _mapper.Map<SalonDTO>(salon);
+
             result.Image = salon.ImageUrl;
             result.SalonId = req.SalonId;
 
@@ -139,6 +144,7 @@ namespace Application.Services
             }
 
             var result = _mapper.Map<SalonDTO>(req);
+
             result.SalonName = salon.salonName;
             result.SalonId = salon.Id;
             result.Address = salon.Address;

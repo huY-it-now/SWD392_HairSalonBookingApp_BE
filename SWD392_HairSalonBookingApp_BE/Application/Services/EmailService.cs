@@ -20,17 +20,20 @@ namespace Application.Services
         public async Task SendEmail(MailRequest mailRequest)
         {
             var email = new MimeMessage();
+
             email.Sender = MailboxAddress.Parse(_emailSettings.Email);
             email.To.Add(MailboxAddress.Parse(mailRequest.Email));
             email.Subject = mailRequest.Subject;
 
             var builder = new BodyBuilder();
+
             builder.HtmlBody = mailRequest.EmailBody;
             email.Body = builder.ToMessageBody();
 
             try
             {
                 using var smtp = new SmtpClient();
+
                 await smtp.ConnectAsync(_emailSettings.Host, _emailSettings.Port, SecureSocketOptions.StartTls);
                 await smtp.AuthenticateAsync(_emailSettings.Email, _emailSettings.Password);
                 await smtp.SendAsync(email);
@@ -48,9 +51,11 @@ namespace Application.Services
         public async Task SendOtpMail(string name, string otpText, string email)
         {
             var mailRequest = new MailRequest();
+
             mailRequest.Email = email;
             mailRequest.Subject = "Thank for registering : OTP";
             mailRequest.EmailBody = GenerateEmailBody(name, otpText);
+
             await SendEmail(mailRequest);
         }
 
@@ -58,7 +63,9 @@ namespace Application.Services
         public string GenerateRandomNumber()
         {
             Random random = new Random();
+
             string randomo = random.Next(0, 1000000).ToString("D6");
+
             return randomo;
         }
 
@@ -66,6 +73,7 @@ namespace Application.Services
         private string GenerateEmailBody(string name, string otpText)
         {
             string email = string.Empty;
+
             email = "<div>";
             email += "<h1> Hi " + name + ", Thanks for registering</h1>";
             email += "<h2>This is your OTP: " + otpText + "</h2>";

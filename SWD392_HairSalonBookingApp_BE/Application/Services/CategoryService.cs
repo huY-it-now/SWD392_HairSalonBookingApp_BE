@@ -36,11 +36,13 @@ namespace Application.Services
             {
                 Id = category.Id,
                 CategoryName = category.CategoryName,
+
                 Services = category.Services.Select(service => new ServiceDTO
                 {
                     Id = service.Id,
                     ServiceName = service.ServiceName
                 }).ToList()
+
             }).ToList();
 
             return new Result<object>
@@ -71,6 +73,7 @@ namespace Application.Services
             {
                 Id = category.Id,
                 CategoryName = category.CategoryName,
+
                 Services = category.Services.Select(s => new ServiceDTO
                 {
                     Id = s.Id,
@@ -196,6 +199,7 @@ namespace Application.Services
             }
 
             category.IsDeleted = true;
+
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>

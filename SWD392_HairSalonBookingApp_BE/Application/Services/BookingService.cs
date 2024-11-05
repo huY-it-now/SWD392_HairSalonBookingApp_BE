@@ -28,7 +28,16 @@ namespace Application.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IBookingRepository _bookingRepository;
 
-        public BookingService(IBookingRepository bookingRepository, IUnitOfWork unitOfWork, IMapper mapper, IComboServiceRepository comboService, IPaymentsRepository paymentsRepository, ISalonMemberScheduleRepository salonMemberScheduleRepository, IPaymentLogRepository paymentLogRepository, IPaymentMethodRepository paymentMethodRepository, IPaymentStatusRepository paymentStatusRepository, IScheduleWorkTimeRepository scheduleWorkTimeRepository)
+        public BookingService(IBookingRepository bookingRepository, 
+                              IUnitOfWork unitOfWork, 
+                              IMapper mapper, 
+                              IComboServiceRepository comboService, 
+                              IPaymentsRepository paymentsRepository, 
+                              ISalonMemberScheduleRepository salonMemberScheduleRepository, 
+                              IPaymentLogRepository paymentLogRepository, 
+                              IPaymentMethodRepository paymentMethodRepository, 
+                              IPaymentStatusRepository paymentStatusRepository, 
+                              IScheduleWorkTimeRepository scheduleWorkTimeRepository)
         {
             _scheduleWorkTimeRepository = scheduleWorkTimeRepository;
             _paymentLogRepository = paymentLogRepository;
@@ -191,6 +200,7 @@ namespace Application.Services
                 scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
                 scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
                 scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
+
                 await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
 
                 if (!(await _unitOfWork.SaveChangeAsync() > 0))
@@ -205,7 +215,8 @@ namespace Application.Services
             {
                 TimeSpan comboTime = CheckComboSericeTime(comboService.ComboServiceName);
 
-                TimeSpan timeEndPredict = new TimeSpan(booking.BookingDate.Hour + comboTime.Hours, booking.BookingDate.Minute + comboTime.Minutes, 0);
+                TimeSpan timeEndPredict = new TimeSpan(booking.BookingDate.Hour + comboTime.Hours, 
+                                                       booking.BookingDate.Minute + comboTime.Minutes, 0);
 
                 foreach (var item in schedule) //check xem co trung lich ko
                 {
@@ -217,19 +228,23 @@ namespace Application.Services
 
                     TimeSpan timeOfWork = CheckComboSericeTime(item.ScheduleDate.ToString());
 
-                    if ((timeEndPredict.Hours - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0)
+                    if ((timeEndPredict.Hours - item.ScheduleDate.Hour) > 0 
+                        && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0)
                     {
                         Result.Error = 1;
                         Result.Message = $"Please choose another time before {timeEndPredict.Hours - item.ScheduleDate.Hour} hour";
                         return Result;
                     }
-                    else if ((timeEndPredict.Hours - item.ScheduleDate.Hour) == 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0 && (item.ScheduleDate.Minute - timeEndPredict.Minutes) < 0)
+                    else if ((timeEndPredict.Hours - item.ScheduleDate.Hour) == 0 
+                            && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0 
+                            && (item.ScheduleDate.Minute - timeEndPredict.Minutes) < 0)
                     {
                         Result.Error = 1;
                         Result.Message = $"Please choose another time before 30 minutes";
                         return Result;
                     }
-                    else if ((booking.BookingDate.Hour - item.ScheduleDate.Hour) > 0 && (booking.BookingDate.Hour - item.ScheduleDate.Hour + timeOfWork.Hours) < 0)
+                    else if ((booking.BookingDate.Hour - item.ScheduleDate.Hour) > 0 
+                        && (booking.BookingDate.Hour - item.ScheduleDate.Hour + timeOfWork.Hours) < 0)
                     {
                         Result.Error = 1;
                         Result.Message = $"Please choose another time after {item.ScheduleDate.Hour + timeOfWork.Hours - booking.BookingDate.Hour} hour";
@@ -242,6 +257,7 @@ namespace Application.Services
                 scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
                 scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
                 scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
+
                 await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
 
                 if (!(await _unitOfWork.SaveChangeAsync() > 0))
@@ -272,7 +288,8 @@ namespace Application.Services
 
             if (string.IsNullOrEmpty(SalonMemberId.ToString()))
             {
-                 var salonmember = await ChooseRandomStylist(cuttingDate, Salon);
+                var salonmember = await ChooseRandomStylist(cuttingDate, Salon);
+
                 booking.SalonMember = salonmember;
                 booking.SalonMemberId = salonmember.Id;
             }

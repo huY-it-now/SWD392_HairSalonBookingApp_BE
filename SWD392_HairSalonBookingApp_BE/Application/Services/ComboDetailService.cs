@@ -21,7 +21,8 @@ namespace Application.Services
 
         public ComboDetailService(IComboDetailRepository comboDetailRepository,
                                   IComboServiceComboDetailRepository comboServiceComboDetailRepository,
-                                  IMapper mapper, IUnitOfWork unitOfWork)
+                                  IMapper mapper, 
+                                  IUnitOfWork unitOfWork)
         {
             _comboDetailRepository = comboDetailRepository;
             _comboServiceComboDetailRepository = comboServiceComboDetailRepository;

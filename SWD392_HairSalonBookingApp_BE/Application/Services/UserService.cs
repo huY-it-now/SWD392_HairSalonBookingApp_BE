@@ -27,7 +27,12 @@ namespace Application.Services
         private readonly AppConfiguration _configuration;
         private readonly ICurrentTime _currentTime;
 
-        public UserService(IMapper mapper, IUnitOfWork unitOfWork, IPasswordHash passwordHash, IEmailService emailService, AppConfiguration configuration, ICurrentTime currentTime)
+        public UserService(IMapper mapper, 
+                           IUnitOfWork unitOfWork, 
+                           IPasswordHash passwordHash, 
+                           IEmailService emailService, 
+                           AppConfiguration configuration, 
+                           ICurrentTime currentTime)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -154,6 +159,7 @@ namespace Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             var result = _mapper.Map<UserDTO>(user);
+
             result.Phone = request.PhoneNumber;
 
             return new Result<object>
@@ -181,6 +187,7 @@ namespace Application.Services
             verify.VerifiedAt = DateTime.UtcNow;
             verify.VerificationToken = null;
             verify.Status = true;
+
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
@@ -255,7 +262,9 @@ namespace Application.Services
 
             await _unitOfWork.SalonMemberRepository.AddAsync(salonMember);
             await _unitOfWork.SaveChangeAsync();
+
             var result = _mapper.Map<StylistDTO>(request);
+
             result.FullName = stylist.FullName;
             result.Email = stylist.Email;
             result.Job = salonMember.Job;
@@ -296,7 +305,9 @@ namespace Application.Services
 
         public async Task<Result<object>> GetSalonMemberWithRole(int roleId)
         {
-            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberWithRole(roleId);
+            var salonMember = await _unitOfWork
+                                        .SalonMemberRepository
+                                        .GetSalonMemberWithRole(roleId);
 
             if (salonMember == null)
             {
@@ -321,6 +332,7 @@ namespace Application.Services
         public async Task<Result<object>> RegisterWorkSchedule(RegisterWorkScheduleDTO request)
         {
             var validShifts = new List<string> { "Morning", "Afternoon", "Evening" };
+
             if (request.WorkShifts.Any(shift => !validShifts.Contains(shift)))
             {
                 return new Result<object>
@@ -351,11 +363,17 @@ namespace Application.Services
                 };
             }
 
-            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
+            var schedule = await _unitOfWork
+                                    .ScheduleRepository
+                                    .GetScheduleByDateAsync(request.StylistId, request.ScheduleDate);
 
             if (schedule != null)
             {
-                var duplicateShifts = request.WorkShifts.Intersect(schedule.WorkShifts).ToList();
+                var duplicateShifts = request
+                                        .WorkShifts
+                                        .Intersect(schedule.WorkShifts)
+                                        .ToList();
+
                 if (duplicateShifts.Any())
                 {
                     return new Result<object>
@@ -387,7 +405,9 @@ namespace Application.Services
                     WorkShifts = request.WorkShifts
                 };
 
-                await _unitOfWork.ScheduleRepository.AddAsync(schedule);
+                await _unitOfWork
+                            .ScheduleRepository
+                            .AddAsync(schedule);
             }
 
             await _unitOfWork.SaveChangeAsync();
@@ -403,13 +423,19 @@ namespace Application.Services
 
         public async Task<List<StylistDTO>> GetAvailableStylists(Guid salonId, DateTime bookingDate, TimeSpan bookingTime)
         {
-            var shift = WorkShiftDTO.GetAvailableShifts().FirstOrDefault(s => bookingTime >= s.StartTime && bookingTime < s.EndTime);
+            var shift = WorkShiftDTO
+                            .GetAvailableShifts()
+                            .FirstOrDefault(s => bookingTime >= s.StartTime 
+                                            && bookingTime < s.EndTime);
+
             if (shift == null)
             {
                 return new List<StylistDTO>();
             }
 
-            var availableStylists = await _unitOfWork.ScheduleRepository.GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
+            var availableStylists = await _unitOfWork
+                                                .ScheduleRepository
+                                                .GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
 
             var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
             {
@@ -426,13 +452,16 @@ namespace Application.Services
 
         public async Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
-            var schedules = await _unitOfWork.ScheduleRepository.GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
+            var schedules = await _unitOfWork
+                                        .ScheduleRepository
+                                        .GetSchedulesByUserIdAndDateRange(stylistId, fromDate, toDate);
 
             List<WorkAndDayOffScheduleDTO> scheduleList = new List<WorkAndDayOffScheduleDTO>();
 
             for (DateTime date = fromDate; date <= toDate; date = date.AddDays(1))
             {
                 var schedule = schedules.FirstOrDefault(s => s.ScheduleDate.Date == date.Date);
+
                 scheduleList.Add(new WorkAndDayOffScheduleDTO
                 {
                     Date = date,
@@ -466,13 +495,16 @@ namespace Application.Services
             if (request.Email != userExist.Email)
             {
                 var token = _emailService.GenerateRandomNumber();
+
                 await _emailService.SendOtpMail(request.FullName, token, request.Email);
+
                 userExist.VerifiedAt = null;
                 userExist.VerificationToken = token;
                 userExist.Email = request.Email;
             }
 
             _unitOfWork.UserRepository.Update(userExist);
+
             await _unitOfWork.SaveChangeAsync();
 
             var result = _mapper.Map<UpdateProfileDTO>(userExist);
@@ -499,12 +531,14 @@ namespace Application.Services
             }
 
             var token = _emailService.GenerateRandomNumber();
+
             await _emailService.SendOtpMail(user.FullName, token, user.Email);
 
             user.VerificationToken = token;
             user.VerifiedAt = null;
 
             _unitOfWork.UserRepository.Update(user);
+
             await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
@@ -558,8 +592,9 @@ namespace Application.Services
             try
             {
                 // Lấy danh sách booking theo stylist và khoảng thời gian
-                var bookings = await _unitOfWork.BookingRepository
-                    .GetBookingsByStylistIdAndDateRange(stylistId, fromDate, toDate);
+                var bookings = await _unitOfWork
+                                        .BookingRepository
+                                        .GetBookingsByStylistIdAndDateRange(stylistId, fromDate, toDate);
 
                 return _mapper.Map<List<BookingDTO>>(bookings);
             }
@@ -587,7 +622,9 @@ namespace Application.Services
                     };
                 }
 
-                var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+                var booking = await _unitOfWork
+                                        .BookingRepository
+                                        .GetBookingByIdAsync(request.BookingId);
 
                 if (booking == null)
                 {
@@ -600,8 +637,12 @@ namespace Application.Services
                 }
 
                 // Only allow status change to "In Progress" or "Completed"
+
                 booking.BookingStatus = request.Status;
-                _unitOfWork.BookingRepository.Update(booking);
+                _unitOfWork
+                    .BookingRepository
+                    .Update(booking);
+
                 await _unitOfWork.SaveChangeAsync();
 
                 return new Result<object>
@@ -656,7 +697,10 @@ namespace Application.Services
 
             public async Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift)
         {
-            var schedule = await _unitOfWork.ScheduleRepository.GetScheduleByDateAsync(stylistId, scheduleDate);
+            var schedule = await _unitOfWork
+                                    .ScheduleRepository
+                                    .GetScheduleByDateAsync(stylistId, scheduleDate);
+
             if (schedule == null || !schedule.WorkShifts.Contains(workShift))
             {
                 return new Result<object>
@@ -668,6 +712,8 @@ namespace Application.Services
             }
 
             schedule.WorkShifts.Remove(workShift);
+
+
             if (schedule.WorkShifts.Count == 0)
             {
                 await _unitOfWork.ScheduleRepository.DeleteWorkShiftAsync(schedule);
