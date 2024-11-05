@@ -67,5 +67,20 @@ namespace WebApi.Controllers
              var result = await _userService.GetAdminDashboard();
              return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewAllStaff()
+        {
+            var result = await _userService.GetAllStaff();
+
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewAllManager()
+        {
+            var result = await _userService.GetAllManager();
+            return Ok(result);
+        }
     }
 }

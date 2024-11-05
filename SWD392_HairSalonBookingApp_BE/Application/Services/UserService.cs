@@ -10,6 +10,7 @@ using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
 using Domain.Contracts.DTO.Combo;
+using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
@@ -708,6 +709,53 @@ namespace Application.Services
                 Error = 0,
                 Message = "Admin dashboard data",
                 Data = adminDashboardDTO
+            };
+        }
+
+        public async Task<Result<object>> GetAllStaff()
+        {
+            var staff = await _unitOfWork.UserRepository.GetAllStaff();
+
+            if (staff == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not have any staff",
+                    Data = null
+                };
+            }
+
+            var result = _mapper.Map<List<SalonMemberDTO>>(staff);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All staff",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> GetAllManager()
+        {
+            var manager = await _unitOfWork.UserRepository.GetAllManager();
+
+            if (manager == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not have any manager"
+                };
+            }
+
+            var result = _mapper.Map<List<SalonMemberDTO>>(manager);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All manager",
+                Data = result
             };
         }
     }

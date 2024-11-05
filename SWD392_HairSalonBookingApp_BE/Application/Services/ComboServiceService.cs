@@ -37,6 +37,16 @@ namespace Application.Services
 
             foreach (var cb in cbs)
             {
+                if (cb.ComboServiceComboDetails.Any(cd => cd.ComboDetail.IsDeleted))
+                {
+                    cb.IsDeleted = true;
+                }
+
+                if (cb.IsDeleted)
+                {
+                    continue;
+                }
+
                 var cbDTO = new ComboServiceDTO
                 {
                     Id = cb.Id,
@@ -125,6 +135,11 @@ namespace Application.Services
                         Message = "One or more specified combo details do not exist.",
                         Data = null
                     };
+                }
+
+                if (comboDetail.IsDeleted == true)
+                {
+                    comboDetail.IsDeleted = false;
                 }
             }
 
