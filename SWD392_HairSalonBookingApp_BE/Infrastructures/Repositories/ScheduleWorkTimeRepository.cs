@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,6 +18,10 @@ namespace Infrastructures.Repositories
         {
             _dbContext = dbContext;
         }
-    
+
+        public Task<List<ScheduleWorkTime>> GetByTime(int year, int month, int day)
+        {
+            return _dbContext.ScheduleWorkTime.Where(sms => sms.ScheduleDate.Day == day && sms.ScheduleDate.Year == year && sms.ScheduleDate.Month == month).OrderBy(sms => sms.ScheduleDate).ToListAsync();
+        }
     }
 }
