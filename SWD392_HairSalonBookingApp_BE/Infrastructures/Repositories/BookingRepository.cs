@@ -34,6 +34,11 @@ namespace Infrastructures.Repositories
                .SingleOrDefaultAsync();
         }
 
+        public async Task<Booking> GetBookingDetail(Guid bookingId)
+        {
+            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).Where(x => x.Id == bookingId).FirstOrDefaultAsync();
+        }
+
         public async Task<Booking> GetBookingWithPayment(Guid id)
         {
             return await _dbContext.Bookings

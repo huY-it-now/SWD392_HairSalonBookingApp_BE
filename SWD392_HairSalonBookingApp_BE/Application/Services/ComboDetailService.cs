@@ -149,6 +149,29 @@ namespace Application.Services
             };
         }
 
+        public async Task<Result<object>> GetComboDetailIsDeleted()
+        {
+            var comboDetail = await _unitOfWork.ComboDetailRepository.GetAllComboDetailIsDeleted();
+
+            if (comboDetail == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not any combo detail is deleted"
+                };
+            }
+
+            var result = _mapper.Map<List<ComboDetailDTO>>(comboDetail);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All combo detail is deleted",
+                Data = result
+            };
+        }
+
         //public async Task<Result<object>> GetComboDetailsByComboServiceId(Guid comboServiceId)
         //{
         //    var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(comboServiceId);

@@ -22,5 +22,6 @@ namespace Application.Interfaces
         Task<Booking> GetBookingById(Guid Id);
         Task<BookingDTO> AddRandomStylist(Guid Id);
         Task<Result<object>> AddFeedBack(Guid bookingId, string FeedBack);
+        Task<Result<object>> GetBookingDetail(Guid bookingId);
     }
 }

@@ -28,5 +28,7 @@ namespace Application.Interfaces
         Task<Result<object>> DeleteWorkShift(Guid stylistId, DateTime scheduleDate, string workShift);
         Task<Result<object>> GetBookingsByUserId(Guid userId);
         Task<Result<object>> GetAdminDashboard();
+        Task<Result<object>> GetAllStaff();
+        Task<Result<object>> GetAllManager();
     }
 }

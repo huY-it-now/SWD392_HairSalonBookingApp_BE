@@ -14,5 +14,6 @@ namespace Application.Repositories
         Task<List<Booking>> GetCheckedBookingInformation();
         Task<Booking> GetBookingByIdWithComboAndPayment(Guid id);
         Task<List<Booking>> GetAllBookingsAsync();
+        Task<Booking> GetBookingDetail(Guid bookingId);
     }
 }

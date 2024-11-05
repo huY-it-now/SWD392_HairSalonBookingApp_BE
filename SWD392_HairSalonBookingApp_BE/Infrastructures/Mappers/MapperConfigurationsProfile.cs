@@ -41,6 +41,12 @@ namespace Infrastructures.Mappers
             CreateMap<ComboService, ComboServiceDTO>()
                 .ForMember(dest => dest.Image, opt => opt.MapFrom(src => src.ImageUrl));
             CreateMap<Booking, BookingDTO>();
+            CreateMap<SalonMemberDTO, SalonMember>();
+            CreateMap<SalonMember, SalonMemberDTO>()
+    .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.User.FullName))
+    .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+    .ForMember(dest => dest.SalonName, opt => opt.MapFrom(src => src.Salon.salonName));
+
 
             //cbs
             CreateMap<ComboService, ComboServiceDTO>();
