@@ -99,7 +99,7 @@ namespace Infrastructures.Mappers
             .ForMember(dest => dest.ServiceName, opt => opt.MapFrom(src => src.ComboService.ComboServiceName))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
-            CreateMap<UpdateAppointmentStatusDTO, Appointment>()
+            CreateMap<UpdateBookingStatusDTO, Appointment>()
                 .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status));
 
             //Booking 

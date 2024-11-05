@@ -8,7 +8,7 @@ using FluentValidation;
 
 namespace Application.Validations.Stylist
 {
-    public class AppointmentValidation : AbstractValidator<UpdateAppointmentStatusDTO>
+    public class AppointmentValidation : AbstractValidator<UpdateBookingStatusDTO>
     {
         public AppointmentValidation()
         {

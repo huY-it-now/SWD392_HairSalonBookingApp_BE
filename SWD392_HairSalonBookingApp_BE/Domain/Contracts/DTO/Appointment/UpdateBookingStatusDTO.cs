@@ -7,7 +7,7 @@ using Domain.Contracts.DTO.Appointment;
 
 namespace Domain.Contracts.DTO.Appointment
 {
-    public class UpdateAppointmentStatusDTO
+    public class UpdateBookingStatusDTO
     {
         public Guid AppointmentId { get; set; }
         public string Status { get; set; }
