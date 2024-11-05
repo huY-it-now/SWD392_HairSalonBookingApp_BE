@@ -15,7 +15,8 @@ namespace WebApi.Controllers
         private readonly ICategoryService _categoryService;
         private readonly IMapper _mapper;
 
-        public CategoryController(ICategoryService categoryService, IMapper mapper)
+        public CategoryController(ICategoryService categoryService, 
+                                  IMapper mapper)
         {
             _categoryService = categoryService;
             _mapper = mapper;

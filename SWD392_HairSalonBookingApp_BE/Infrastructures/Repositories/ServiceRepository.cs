@@ -16,44 +16,60 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public ServiceRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public ServiceRepository(AppDbContext dbContext, 
+                                 ICurrentTime timeService, 
+                                 IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
 
         public async Task<List<Service>> GetAllServicesAsync()
         {
-            return await _dbContext.Services.Where(d => d.IsDeleted == false).Include(s => s.ServiceComboServices)
-            .ThenInclude(scs => scs.ComboService)
-                .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
-                    .ThenInclude(csDetails => csDetails.ComboDetail).ToListAsync();
+            return await _dbContext
+                            .Services
+                            .Where(d => d.IsDeleted == false)
+                            .Include(s => s.ServiceComboServices)
+                            .ThenInclude(scs => scs.ComboService)
+                            .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
+                            .ThenInclude(csDetails => csDetails.ComboDetail)
+                            .ToListAsync();
         }
 
         public async Task<Service> GetServiceById(Guid id)
         {
-            return await _dbContext.Services.Where(d => d.IsDeleted == false).Include(s => s.ServiceComboServices)
-            .ThenInclude(scs => scs.ComboService)
-                .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
-                    .ThenInclude(csDetails => csDetails.ComboDetail).FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext
+                            .Services
+                            .Where(d => d.IsDeleted == false)
+                            .Include(s => s.ServiceComboServices)
+                            .ThenInclude(scs => scs.ComboService)
+                            .ThenInclude(cs => cs.ComboServiceComboDetails) // Include ComboServiceComboDetails
+                            .ThenInclude(csDetails => csDetails.ComboDetail)
+                            .FirstOrDefaultAsync(x => x.Id == id);
         }
 
         public async Task<Service> CreateService(Service service)
         {
-            var existingService = await _dbContext.Services.FirstOrDefaultAsync(s => s.ServiceName == service.ServiceName && s.CategoryId == service.CategoryId);
+            var existingService = await _dbContext
+                                            .Services
+                                            .FirstOrDefaultAsync(s => s.ServiceName == service.ServiceName && s.CategoryId == service.CategoryId);
 
             if (existingService != null)
             {
                 throw new ArgumentException("A service with the same name already exists in this category!");
             }
 
-            await _dbContext.Services.AddAsync(service);
+            await _dbContext
+                        .Services
+                        .AddAsync(service);
             await _dbContext.SaveChangesAsync();
             return service;
         }
 
         public async Task<Service> UpdateService(Service service)
         {
-            var existingService= await _dbContext.Services.FirstOrDefaultAsync(c => c.Id == service.Id);
+            var existingService= await _dbContext
+                                            .Services
+                                            .FirstOrDefaultAsync(c => c.Id == service.Id);
 
             if (existingService == null)
             {
@@ -61,7 +77,9 @@ namespace Infrastructures.Repositories
             }
 
             existingService.ServiceName = service.ServiceName;
-            _dbContext.Services.Update(existingService);
+            _dbContext
+                .Services
+                .Update(existingService);
             await _dbContext.SaveChangesAsync();
 
             return existingService;

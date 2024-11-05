@@ -17,7 +17,8 @@ namespace WebApi.Controllers
         private readonly IServiceService _serviceService;
         private readonly IMapper _mapper;
 
-        public ServiceController(IServiceService serviceService, IMapper mapper)
+        public ServiceController(IServiceService serviceService, 
+                                 IMapper mapper)
         {
             _serviceService = serviceService;
             _mapper = mapper;
