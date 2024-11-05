@@ -69,7 +69,7 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetBookingsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
             return await _dbContext.Bookings
-                .Where(b => b.StylistId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
+                .Where(b => b.SalonMemberId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
                 .Include(b => b.User)
                 .Include(b => b.ComboService)
                 .ToListAsync();

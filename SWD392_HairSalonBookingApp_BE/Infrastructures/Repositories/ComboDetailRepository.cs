@@ -17,7 +17,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<ComboDetail>> GetAllComboDetailsAsync()
         {
-            return await _dbContext.ComboDetails.Where(x => x.IsDeleted == false).ToListAsync();
+            return await _dbContext.ComboDetails.ToListAsync();
         }
 
         public async Task<ComboDetail> GetComboDetailById(Guid id)
