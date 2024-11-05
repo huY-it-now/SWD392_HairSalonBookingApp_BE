@@ -26,8 +26,9 @@ namespace Application.Services
         private readonly IEmailService _emailService;
         private readonly AppConfiguration _configuration;
         private readonly ICurrentTime _currentTime;
+        private readonly IBookingRepository _bookingRepository;
 
-        public UserService(IMapper mapper, IUnitOfWork unitOfWork, IPasswordHash passwordHash, IEmailService emailService, AppConfiguration configuration, ICurrentTime currentTime)
+        public UserService(IMapper mapper, IUnitOfWork unitOfWork, IPasswordHash passwordHash, IEmailService emailService, AppConfiguration configuration, ICurrentTime currentTime, IBookingRepository bookingRepository)
         {
             _mapper = mapper;
             _unitOfWork = unitOfWork;
@@ -35,6 +36,7 @@ namespace Application.Services
             _emailService = emailService;
             _configuration = configuration;
             _currentTime = currentTime;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<Result<object>> GetAllUser()
@@ -756,6 +758,31 @@ namespace Application.Services
                 Error = 0,
                 Message = "All manager",
                 Data = result
+            };
+        }
+
+        public async Task<Result<object>> UserFeedback(Guid bookingId, string feedback)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingById(bookingId);
+
+            if (booking == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not have booking"
+                };
+            }
+
+            booking.Feedback = feedback;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Feedback successfully"
             };
         }
     }

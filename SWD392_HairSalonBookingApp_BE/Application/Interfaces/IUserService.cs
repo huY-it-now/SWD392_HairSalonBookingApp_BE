@@ -30,5 +30,6 @@ namespace Application.Interfaces
         Task<Result<object>> GetAdminDashboard();
         Task<Result<object>> GetAllStaff();
         Task<Result<object>> GetAllManager();
+        Task<Result<object>> UserFeedback(Guid bookingId, string feedback);
     }
 }
