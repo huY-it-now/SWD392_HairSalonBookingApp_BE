@@ -57,10 +57,10 @@ namespace Infrastructures.Repositories
                .ToListAsync();
         }
 
-        public async Task<List<Booking>> GetUncheckBookingInformation()
+        public async Task<List<Booking>> GetPendingBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.BookingStatus == "UnCheck")
+               .Where(b => b.BookingStatus == "Pending")
                .Include(b => b.Payments)
                .Include(b => b.ComboService)
                .ToListAsync();

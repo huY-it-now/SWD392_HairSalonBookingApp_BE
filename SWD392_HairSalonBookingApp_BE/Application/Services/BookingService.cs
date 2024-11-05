@@ -62,7 +62,7 @@ namespace Application.Services
                 return "Booking is not found";
             }
 
-            if (Check == "Checked")
+            if (Check != "Pending")
             {
                 booking.BookingStatus = "Checked";
 
@@ -97,7 +97,7 @@ namespace Application.Services
                 return "Save change fail";
             }
 
-            return "Check success";
+            return "Success";
         }
 
         public async Task<bool> CreateBooking(Booking booking)
@@ -134,7 +134,7 @@ namespace Application.Services
                 Data = null
             };
 
-            booking.BookingStatus = "Uncheck";
+            booking.BookingStatus = "Pending";
             booking.BookingDate = cuttingDate;
             booking.SalonMemberId = SalonMemberId;
             booking.UserId = CustomerId;
@@ -170,9 +170,21 @@ namespace Application.Services
             if (schedule == null)
             {
                 var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
+
+                if (salonMemberSchedule == null)
+                {
+                    salonMemberSchedule = new SalonMemberSchedule();
+                    salonMemberSchedule.Id = new Guid();
+                    salonMemberSchedule.IsDayOff = false;
+                    salonMemberSchedule.SalonMember = booking.SalonMember;
+                    salonMemberSchedule.SalonMemberId = booking.SalonMemberId;
+
+                    await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
+                    await _unitOfWork.SaveChangeAsync();
+                }
                 ScheduleWorkTime scheduleWorkTime = new();
                 scheduleWorkTime.ScheduleDate = booking.BookingDate;
-                scheduleWorkTime.WorkShifts = booking.ComboService.ComboServiceName;
+                scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
                 scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
                 scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
                 await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
@@ -376,20 +388,20 @@ namespace Application.Services
                 for (int i = 0; i < booking.Count; i++)
                 {
                     item.Total = booking[i].ComboService.Price;
-                    //item.PaymentStatus = booking[i].Payments.PaymentSatus.StatusName;
+                    item.PaymentStatus = booking[i].Payments.PaymentStatus.StatusName;
                 }
             }
 
             return checkedBooking;
         }
 
-        public async Task<List<ViewUncheckBookingDTO>> ShowAllUncheckedBooking()
+        public async Task<List<ViewPendingBookingDTO>> ShowAllPendingedBooking()
         {
-            var booking = await _bookingRepository.GetUncheckBookingInformation();
+            var booking = await _bookingRepository.GetPendingBookingInformation();
 
-            var uncheckBooking = _mapper.Map<List<ViewUncheckBookingDTO>>(booking);
+            var PendingBooking = _mapper.Map<List<ViewPendingBookingDTO>>(booking);
 
-            foreach (var item in uncheckBooking)
+            foreach (var item in PendingBooking)
             {
                 for(int i = 0; i < booking.Count; i++)
                 {
@@ -397,7 +409,7 @@ namespace Application.Services
                 }
             }
 
-            return uncheckBooking;
+            return PendingBooking;
         }
 
         public async Task<Result<object>> AddFeedBack(Guid bookingId, string FeedBack)
