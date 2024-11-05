@@ -10,6 +10,8 @@ namespace Application.Repositories
     public interface IAppointmentRepository : IGenericRepository<Appointment>
     {
         Task<List<Appointment>> GetAppointmentsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate);
+
         Task<Appointment> GetAppointmentByIdAsync(Guid appointmentId);
+
     }
 }

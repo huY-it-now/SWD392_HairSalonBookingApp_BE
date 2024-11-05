@@ -34,6 +34,7 @@ namespace Application.Services
         public async Task<DeletionResult> DeleteFileAsync(string publicId)
         {
             var deletionParams = new DeletionParams(publicId);
+
             return await _cloudinary.DestroyAsync(deletionParams);
         }
 

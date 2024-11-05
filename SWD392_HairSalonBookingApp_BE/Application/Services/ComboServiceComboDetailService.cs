@@ -22,6 +22,7 @@ namespace Application.Services
         {
             //lấy danh sách ComboDetails theo comboServiceId
             var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(comboServiceId);
+
             return comboDetails.ToList();
         }
 
@@ -29,6 +30,7 @@ namespace Application.Services
         {
             //lấy danh sách ComboServices theo comboDetailId
             var comboServices = await _comboServiceComboDetailRepository.GetComboServicesByComboDetailId(comboDetailId);
+
             return comboServices.ToList();
         }
     }

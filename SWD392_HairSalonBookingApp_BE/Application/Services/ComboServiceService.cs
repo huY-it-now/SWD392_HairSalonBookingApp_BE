@@ -21,7 +21,8 @@ namespace Application.Services
         public ComboServiceService(IComboServiceRepository comboServiceRepository,
                                    IComboServiceComboDetailRepository comboServiceComboDetailRepository,
                                    IMapper mapper,
-                                   IUnitOfWork unitOfWork, ICloudinaryService cloudinaryService)
+                                   IUnitOfWork unitOfWork, 
+                                   ICloudinaryService cloudinaryService)
         {
             _comboServiceRepository = comboServiceRepository;
             _comboServiceComboDetailRepository = comboServiceComboDetailRepository;
