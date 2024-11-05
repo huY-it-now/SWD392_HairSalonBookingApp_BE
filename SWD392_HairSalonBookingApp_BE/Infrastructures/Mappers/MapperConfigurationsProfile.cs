@@ -112,7 +112,7 @@ namespace Infrastructures.Mappers
             //Booking 
             CreateMap<Booking, BookingDTO>();
             CreateMap<Booking, ViewCheckedBookingDTO>().ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
-            CreateMap<Booking, ViewUncheckBookingDTO>().ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Booking, ViewPendingBookingDTO>().ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
         }
     }
 }

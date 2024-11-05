@@ -51,35 +51,33 @@ namespace WebApi.Controllers
             return result;
         }
 
-        [HttpGet("ShowUncheckedBooking")]
+        [HttpGet("ShowPendingedBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> PrintAllUncheckedBooking()
+        public async Task<Result<object>> PrintAllPendingedBooking()
         {
-            var bookingList = await _bookingService.ShowAllUncheckedBooking();
+            var bookingList = await _bookingService.ShowAllPendingedBooking();
 
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Get uncheck booking success",
+                Message = "Get Pending booking success",
                 Data = bookingList
             };
 
             return result;
         }
 
-        [HttpPost("CheckBooking")]
+        [HttpPost("CheckBookingAsConfirmed")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> CheckBooking(Guid bookingId, string Check) // true = ok, false = fake (delete)
+        public async Task<Result<object>> CheckBooking(Guid bookingId)
         {
-
-
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Checked",
-                Data = await _bookingService.CheckBooking(bookingId, Check)
+                Message = "Success",
+                Data = await _bookingService.CheckBooking(bookingId, "Confirmed")
             };
 
             return result;
@@ -129,9 +127,19 @@ namespace WebApi.Controllers
             var result = new Result<object>
             {
                 Error = 0,
-                Message = "Cancel completed",
-                Data = await _bookingService.CheckBooking(bookingId, "Uncheck")
+                Message = "",
+                Data = null
             };
+
+            if (await _bookingService.CheckBooking(bookingId, "Cancel") == "Success")
+            {
+                result.Message = "Cancel completed";
+            }
+            else
+            {
+                result.Error = 1;
+                result.Message = "Cancel false";
+            }
 
             return result;
         }

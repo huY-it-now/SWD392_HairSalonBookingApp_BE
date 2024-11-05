@@ -26,20 +26,20 @@ namespace SWD392_HairSalonBookingApp_BE.Controllers
             _logger = logger;
         }
 
-        [HttpGet("bookings/unchecked")]
+        [HttpGet("bookings/Pendinged")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<IActionResult> GetUncheckBookings()
+        public async Task<IActionResult> GetPendingBookings()
         {
             try
             {
-                var bookings = await _bookingService.ShowAllUncheckedBooking();
+                var bookings = await _bookingService.ShowAllPendingedBooking();
                 return Ok(bookings);
             }
             catch (System.Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving unchecked bookings.");
-                return StatusCode(500, new { message = "An error occurred while retrieving unchecked bookings.", details = ex.Message });
+                _logger.LogError(ex, "An error occurred while retrieving Pendinged bookings.");
+                return StatusCode(500, new { message = "An error occurred while retrieving Pendinged bookings.", details = ex.Message });
             }
         }
 

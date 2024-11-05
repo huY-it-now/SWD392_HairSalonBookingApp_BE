@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Domain.Contracts.DTO.Booking
 {
-    public class ViewUncheckBookingDTO
+    public class ViewPendingBookingDTO
     {
         public Guid BookingId { get; set; }
         public DateTime BookingDate { get; set; }
