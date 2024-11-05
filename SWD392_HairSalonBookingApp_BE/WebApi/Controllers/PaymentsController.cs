@@ -195,9 +195,9 @@ namespace WebApi.Controllers
                 result.Message = "success";
                 return result;
             }
-            catch
+            catch (Exception e)
             {
-                result.Message = "fail";
+                result.Message = e.ToString();
                 result.Error = -1;
                 return result;
             }

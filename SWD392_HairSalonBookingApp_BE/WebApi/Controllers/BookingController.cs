@@ -71,7 +71,7 @@ namespace WebApi.Controllers
         [HttpPost("CheckBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> CheckBooking(Guid bookingId, bool Check) // true = ok, false = fake (delete)
+        public async Task<Result<object>> CheckBooking(Guid bookingId, string Check) // true = ok, false = fake (delete)
         {
 
 
@@ -130,7 +130,7 @@ namespace WebApi.Controllers
             {
                 Error = 0,
                 Message = "Cancel completed",
-                Data = await _bookingService.CheckBooking(bookingId, false)
+                Data = await _bookingService.CheckBooking(bookingId, "Uncheck")
             };
 
             return result;
@@ -179,7 +179,7 @@ namespace WebApi.Controllers
             BookingDTO bookingDTO = new BookingDTO()
             {
                 BookingDate = booking.BookingDate,
-                Checked = booking.Checked,
+                BookingStatus = booking.BookingStatus,
             };
 
             result.Message = "Add Stylist successfully";

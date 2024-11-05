@@ -53,7 +53,7 @@ namespace Application.Services
             return _mapper.Map<BookingDTO>(booking);
         }
 
-        public async Task<string> CheckBooking(Guid bookingId, bool Check)
+        public async Task<string> CheckBooking(Guid bookingId, string Check)
         {
             var booking = await _bookingRepository.GetByIdAsync(bookingId);
 
@@ -62,9 +62,9 @@ namespace Application.Services
                 return "Booking is not found";
             }
 
-            if (Check)
+            if (Check == "Checked")
             {
-                booking.Checked = true;
+                booking.BookingStatus = "Checked";
 
                 _bookingRepository.Update(booking);
 
@@ -134,7 +134,7 @@ namespace Application.Services
                 Data = null
             };
 
-            booking.Checked = false;
+            booking.BookingStatus = "Uncheck";
             booking.BookingDate = cuttingDate;
             booking.SalonMemberId = SalonMemberId;
             booking.UserId = CustomerId;
