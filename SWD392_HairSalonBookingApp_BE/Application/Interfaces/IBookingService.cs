@@ -16,7 +16,7 @@ namespace Application.Interfaces
         Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber);
         Task<List<ViewUncheckBookingDTO>> ShowAllUncheckedBooking();
         Task<List<ViewCheckedBookingDTO>> ShowAllCheckedBooking();
-        Task<string> CheckBooking(Guid bookingId, bool Check);
+        Task<string> CheckBooking(Guid bookingId, string Check);
         Task<bool> CreateBooking(Booking booking);
         Task<bool> UpdateBooking(Booking booking);
         Task<Booking> GetBookingById(Guid Id);

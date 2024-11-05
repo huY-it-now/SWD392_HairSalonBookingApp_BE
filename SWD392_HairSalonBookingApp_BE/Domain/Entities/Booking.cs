@@ -4,7 +4,7 @@
     {
         public string? Feedback { get; set; }
         public DateTime BookingDate { get; set; }
-        public bool Checked { get; set; }
+        public string BookingStatus { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhoneNumber { get; set; }
 

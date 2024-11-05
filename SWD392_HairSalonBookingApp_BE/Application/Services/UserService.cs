@@ -631,7 +631,7 @@ namespace Application.Services
             {
                 Id = b.Id,
                 BookingDate = b.BookingDate,
-                Checked = b.Checked,
+                BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 ComboServiceName = new List<ComboServiceForBookingDTO>
@@ -680,7 +680,7 @@ namespace Application.Services
             {
                 Id = b.Id,
                 BookingDate = b.BookingDate,
-                Checked = b.Checked,
+                BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>

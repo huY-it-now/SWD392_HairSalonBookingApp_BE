@@ -49,7 +49,7 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetCheckedBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.Checked == true)
+               .Where(b => b.BookingStatus == "Checked")
                .Include(b => b.User)
                .Include(b => b.Payments)
                .Include(b => b.SalonMember)
@@ -60,7 +60,7 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetUncheckBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.Checked == false)
+               .Where(b => b.BookingStatus == "UnCheck")
                .Include(b => b.Payments)
                .Include(b => b.ComboService)
                .ToListAsync();
