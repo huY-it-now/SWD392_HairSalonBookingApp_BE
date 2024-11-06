@@ -877,5 +877,30 @@ namespace Application.Services
                 Data = result
             };
         }
+
+        public async Task<Result<object>> AddFeedbackForUser(Guid bookingId, string feedback)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(bookingId);
+
+            if (booking == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not found booking"
+                };
+            }
+
+            booking.Feedback = feedback;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Thank you your feedback!"
+            };
+        }
     }
 }
