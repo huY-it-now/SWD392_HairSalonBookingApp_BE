@@ -22,7 +22,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetAllBookingsAsync()
         {
-            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+            return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
         }
 
         public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
@@ -81,6 +81,11 @@ namespace Infrastructures.Repositories
                 .Include(b => b.User)
                 .Include(b => b.ComboService)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
+        }
+
+        public async Task<List<Booking>> GetAllBookingWithAllStatus()
+        {
+            return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
         }
     }
 }
