@@ -87,5 +87,13 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
         }
+
+        public async Task<List<Booking>> GetBookingForStylist(Guid stylistId)
+        {
+            return await _dbContext.Bookings
+                    .Where(x => x.SalonMemberId == stylistId)
+                    .Include(x => x.ComboService)
+                    .ToListAsync();
+        }
     }
 }
