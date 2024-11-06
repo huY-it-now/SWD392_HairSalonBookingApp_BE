@@ -13,11 +13,13 @@ namespace WebApi.Controllers
     {
         private readonly IUserService _userService;
         private readonly IMapper _mapper;
+        private readonly ISalonMemberService _salonMemberService;
 
-        public StylistController(IUserService userService, IMapper mapper)
+        public StylistController(IUserService userService, IMapper mapper, ISalonMemberService salonMemberService)
         {
             _userService = userService;
             _mapper = mapper;
+            _salonMemberService = salonMemberService;
         }
 
         [HttpPost("create-stylist")]
@@ -98,6 +100,14 @@ namespace WebApi.Controllers
         public async Task<IActionResult> DeleteWorkShift([FromBody] Guid stylistId, DateTime scheduleDate, string workShift)
         {
             var result = await _userService.DeleteWorkShift(stylistId, scheduleDate, workShift);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewListBookingForStylist(Guid stylistId)
+        {
+            var result = await _salonMemberService.GetAllBookingForStylist(stylistId);
+
             return Ok(result);
         }
     }
