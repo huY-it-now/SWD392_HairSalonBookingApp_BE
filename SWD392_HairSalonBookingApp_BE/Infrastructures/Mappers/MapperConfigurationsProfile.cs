@@ -136,6 +136,11 @@ namespace Infrastructures.Mappers
                 .ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
             CreateMap<Booking, ViewPendingBookingDTO>()
                 .ForMember(dest => dest.BookingId, opt => opt.MapFrom(src => src.Id));
+            CreateMap<Booking, BookingStatusDTO>()
+                .ForMember(dest => dest.StylistName, opt => opt.MapFrom(src => src.SalonMember.Id))
+                .ForMember(dest => dest.StylistName, opt => opt.MapFrom(src => src.SalonMember.User.FullName))
+                .ForMember(dest => dest.PaymentStatus, opt => opt.MapFrom(src => src.Payments.PaymentStatus.StatusName));
+            CreateMap<BookingStatusDTO, Booking>();
         }
     }
 }

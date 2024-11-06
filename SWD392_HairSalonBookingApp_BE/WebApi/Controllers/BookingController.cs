@@ -243,5 +243,13 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewAllBookingWithAllStatus()
+        {
+            var result = await _bookingService.GetAllBookingWithAllStatus();
+
+            return Ok(result);
+        }
     }
 }

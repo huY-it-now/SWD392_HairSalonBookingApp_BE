@@ -264,7 +264,7 @@ namespace Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             var result = _mapper.Map<StylistDTO>(request);
-
+            result.Id = stylist.Id;
             result.FullName = stylist.FullName;
             result.Email = stylist.Email;
             result.Job = salonMember.Job;
@@ -799,6 +799,9 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
+                Feedback = b.Feedback,
+                StylistId = b.SalonMember.Id,
+                StylistName = b.SalonMember.User.FullName,
                 ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
             {
                 new ComboServiceForBookingDTO
