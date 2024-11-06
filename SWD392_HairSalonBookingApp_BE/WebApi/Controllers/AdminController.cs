@@ -82,5 +82,12 @@ namespace WebApi.Controllers
             var result = await _userService.GetAllManager();
             return Ok(result);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> BanUser(Guid userId)
+        {
+            var result = await _userService.BanUser(userId);
+            return Ok(result);
+        }
     }
 }

@@ -168,5 +168,13 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> AddFeedbackForUser(Guid bookingId, string feedback)
+        {
+            var result = await _userService.AddFeedbackForUser(bookingId, feedback);
+
+            return Ok(result);
+        }
     }
 }

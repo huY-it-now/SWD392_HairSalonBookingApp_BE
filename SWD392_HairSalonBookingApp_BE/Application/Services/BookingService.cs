@@ -500,5 +500,47 @@ namespace Application.Services
                 Data = result
             };
         }
+
+        public async Task<Result<object>> GetAllBookingWithAllStatus()
+        {
+            var bookings = await _unitOfWork.BookingRepository.GetAllBookingWithAllStatus();
+
+            if (bookings == null || !bookings.Any())
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not found any booking"
+                };
+            }
+
+            var result = bookings.Select(booking => new BookingStatusDTO
+            {
+                BookingId = booking.Id,
+                BookingDate = booking.BookingDate,
+                BookingStatus = booking.BookingStatus,
+                CustomerName = booking.CustomerName,
+                CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                StylistId = booking.SalonMemberId,
+                StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = booking.ComboServiceId,
+                    ComboServiceName = booking.ComboService.ComboServiceName ?? "Unknown Service",
+                    Price = booking.ComboService.Price,
+                    Image = booking.ComboService.ImageUrl
+                },
+                PaymentAmount = booking.Payments?.PaymentAmount ?? 0,
+                PaymentDate = booking.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = booking.Payments?.PaymentStatus?.StatusName
+            }).ToList();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All booking with all status",
+                Data = result
+            };
+        }
     }
 }

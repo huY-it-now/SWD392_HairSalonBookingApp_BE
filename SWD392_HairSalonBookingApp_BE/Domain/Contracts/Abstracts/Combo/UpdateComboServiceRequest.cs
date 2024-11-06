@@ -11,6 +11,7 @@ namespace Domain.Contracts.Abstracts.Combo
         public Guid Id { get; set; }
         public string ComboServiceName { get; set; }
         public decimal Price { get; set; }
-        public Guid SalonId { get; set; }
+        public bool IsDeleted { get; set; }
+        public string Image { get; set; }
     }
 }

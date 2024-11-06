@@ -7,5 +7,6 @@ namespace Domain.Contracts.DTO.Combo
     {
         public Guid Id { get; set; }
         public string Content { get; set; }
+        public bool IsDeleted { get; set; }
     }
 }

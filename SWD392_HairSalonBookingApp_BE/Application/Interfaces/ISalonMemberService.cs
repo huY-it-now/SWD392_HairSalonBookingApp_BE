@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Domain.Contracts.Abstracts.Shared;
+using Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,5 +13,6 @@ namespace Application.Interfaces
         public Task<SalonMember> GetSalonMemberById(Guid id);
         Task<List<SalonMember>> GetAllStylists();
         Task<List<SalonMember>> GetAllSalonStaff();
+        Task<Result<object>> GetAllBookingForStylist(Guid stylistId);
     }
 }

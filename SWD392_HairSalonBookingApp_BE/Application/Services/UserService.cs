@@ -85,7 +85,17 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "User not found.",
+                    Message = "User not found",
+                    Data = null
+                };
+            }
+
+            if (user.IsDeleted == true)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You was banned by Admin",
                     Data = null
                 };
             }
@@ -264,7 +274,7 @@ namespace Application.Services
             await _unitOfWork.SaveChangeAsync();
 
             var result = _mapper.Map<StylistDTO>(request);
-
+            result.Id = stylist.Id;
             result.FullName = stylist.FullName;
             result.Email = stylist.Email;
             result.Job = salonMember.Job;
@@ -799,6 +809,9 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
+                Feedback = b.Feedback,
+                StylistId = b.SalonMember.Id,
+                StylistName = b.SalonMember.User.FullName,
                 ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
             {
                 new ComboServiceForBookingDTO
@@ -872,6 +885,56 @@ namespace Application.Services
                 Error = 0,
                 Message = "All manager",
                 Data = result
+            };
+        }
+
+        public async Task<Result<object>> AddFeedbackForUser(Guid bookingId, string feedback)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(bookingId);
+
+            if (booking == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Do not found booking"
+                };
+            }
+
+            booking.Feedback = feedback;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Thank you your feedback!"
+            };
+        }
+
+        public async Task<Result<object>> BanUser(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserById(userId);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            user.IsDeleted = true;
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Ban user successfully"
             };
         }
     }

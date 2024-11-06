@@ -22,7 +22,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetAllBookingsAsync()
         {
-            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+            return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
         }
 
         public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
@@ -70,6 +70,7 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Bookings
                 .Where(b => b.BookingDate >= fromDate && b.BookingDate <= toDate)
+                .Where(b => b.SalonMemberId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
                 .Include(b => b.User)
                 .Include(b => b.ComboService)
                 .ToListAsync();
@@ -82,6 +83,19 @@ namespace Infrastructures.Repositories
                 .Include(b => b.ComboService)
                 .Include(b => b.salon)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
+        }
+
+        public async Task<List<Booking>> GetAllBookingWithAllStatus()
+        {
+            return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+        }
+
+        public async Task<List<Booking>> GetBookingForStylist(Guid stylistId)
+        {
+            return await _dbContext.Bookings
+                    .Where(x => x.SalonMemberId == stylistId)
+                    .Include(x => x.ComboService)
+                    .ToListAsync();
         }
     }
 }
