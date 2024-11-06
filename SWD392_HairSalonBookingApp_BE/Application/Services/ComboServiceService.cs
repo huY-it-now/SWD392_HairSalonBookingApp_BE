@@ -144,26 +144,11 @@ namespace Application.Services
                 }
             }
 
-            string fileExtension = Path.GetExtension(createRequest.ImageUrl.FileName);
-            string newFileName = $"{Guid.NewGuid()}{fileExtension}";
-            CloudinaryResponse cloudinaryResult = await _cloudinaryService.UploadImage(newFileName, createRequest.ImageUrl);
-
-            if (cloudinaryResult == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Error uploading image. Please try again.",
-                    Data = null
-                };
-            }
-
             var comboService = new ComboService
             {
                 ComboServiceName = createRequest.ComboServiceName,
                 Price = createRequest.Price,
-                ImageId = cloudinaryResult.PublicImageId,
-                ImageUrl = cloudinaryResult.ImageUrl,
+                ImageUrl = createRequest.ImageUrl,
                 IsDeleted = false,
                 ComboServiceComboDetails = createRequest.ComboDetailIds.Select(id => new ComboServiceComboDetail
                 {

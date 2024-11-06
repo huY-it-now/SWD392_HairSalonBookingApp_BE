@@ -43,7 +43,8 @@ namespace Infrastructures.Mappers
             CreateMap<ComboService, ComboServiceDTO>()
                 .ForMember(dest => dest.Image, opt => opt
                 .MapFrom(src => src.ImageUrl));
-            CreateMap<Booking, BookingDTO>();
+            CreateMap<Booking, BookingDTO>().ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.SalonMember.User != null ? src.SalonMember.User.FullName : "N/A"))
+    .ForMember(dest => dest.StylistName, opt => opt.MapFrom(src => src.SalonMember != null ? src.SalonMember.User.FullName : "Unknown"));
             CreateMap<SalonMemberDTO, SalonMember>();
             CreateMap<SalonMember, SalonMemberDTO>()
                 .ForMember(dest => dest.FullName, opt => opt

@@ -36,7 +36,14 @@ namespace Infrastructures.Repositories
 
         public async Task<Booking> GetBookingDetail(Guid bookingId)
         {
-            return await _dbContext.Bookings.Include(x => x.ComboService).Include(x => x.Payments).Where(x => x.Id == bookingId).FirstOrDefaultAsync();
+            return await _dbContext.Bookings
+    .Include(x => x.SalonMember)
+        .ThenInclude(x => x.User)
+    .Include(x => x.ComboService)
+    .Include(x => x.Payments)
+        .ThenInclude(x => x.PaymentStatus)
+    .Where(x => x.Id == bookingId)
+    .FirstOrDefaultAsync();
         }
 
         public async Task<Booking> GetBookingWithPayment(Guid id)
