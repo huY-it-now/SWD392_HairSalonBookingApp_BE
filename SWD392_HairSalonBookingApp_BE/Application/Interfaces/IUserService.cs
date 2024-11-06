@@ -33,5 +33,6 @@ namespace Application.Interfaces
         Task<Result<object>> GetAllManager();
         Task<Result<object>> AddFeedbackForUser(Guid bookingId, string feedback);
         Task<Result<object>> BanUser(Guid userId);
+        Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId);
     }
 }

@@ -21,5 +21,6 @@ namespace Application.Repositories
         Task<Booking> GetBookingByIdAsync(Guid bookingId);
         Task<List<Booking>> GetAllBookingWithAllStatus();
         Task<List<Booking>> GetBookingForStylist(Guid stylistId);
+        Task<Booking> GetBookingUncompletedNow(Guid userId);
     }
 }

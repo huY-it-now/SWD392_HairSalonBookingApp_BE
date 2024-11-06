@@ -809,7 +809,7 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                Feedback = b.Feedback,
+                Feedback = b.Feedback.Title,
                 StylistId = b.SalonMember.Id,
                 StylistName = b.SalonMember.User.FullName,
                 ComboServiceName = b.ComboService != null ? new ComboServiceForBookingDTO
@@ -907,7 +907,7 @@ namespace Application.Services
                 };
             }
 
-            booking.Feedback = feedback;
+            /*booking.Feedback = ;*/
 
             _unitOfWork.BookingRepository.Update(booking);
             await _unitOfWork.SaveChangeAsync();
@@ -942,6 +942,11 @@ namespace Application.Services
                 Error = 0,
                 Message = "Ban user successfully"
             };
+        }
+
+        public Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
+        {
+            throw new NotImplementedException();
         }
     }
 }

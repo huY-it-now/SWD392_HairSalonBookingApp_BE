@@ -102,5 +102,10 @@ namespace Infrastructures.Repositories
                     .Include(x => x.ComboService)
                     .ToListAsync();
         }
+
+        public Task<Booking> GetBookingUncompletedNow(Guid userId)
+        {
+            return _dbContext.Bookings.Where(x => x.BookingStatus != "Completed").Include(x => x.salon).Include(x => x.SalonMember).Include(x => x.ComboService).FirstOrDefaultAsync();
+        }
     }
 }
