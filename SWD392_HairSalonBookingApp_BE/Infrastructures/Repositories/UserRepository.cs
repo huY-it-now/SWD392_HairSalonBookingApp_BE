@@ -37,9 +37,9 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetBookingsByUserId(Guid userId)
         {
             return await _dbContext.Bookings
-                .Where(b => b.UserId == userId)
-                .Include(b => b.Payments)       // Include Payments entity
-                .Include(b => b.ComboService)   // Include ComboService entity
+                .Where(b => b.UserId == userId).Where(s => s.BookingStatus == "Completed")
+                .Include(b => b.Payments)
+                .Include(b => b.ComboService)
                 .ToListAsync();
         }
 

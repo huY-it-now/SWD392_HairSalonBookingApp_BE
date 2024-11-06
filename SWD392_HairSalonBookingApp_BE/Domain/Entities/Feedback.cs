@@ -11,7 +11,7 @@ namespace Domain.Entities
         public string RatingContent { get; set; }
         public Guid UserId { get; set; }
         public User User { get; set; }
-        public Guid SalonId { get; set; }
-        public Salon Salon { get; set;}
+        public Guid BookingId { get; set; }
+        public Booking Booking { get; set; }
     }
 }

@@ -459,11 +459,30 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "Do not have any booking"
+                    Message = "Do not found any booking"
                 };
             }
 
-            var result = _mapper.Map<BookingDTO>(booking);
+            var result = new BookingDTO
+            {
+                Id = booking.Id,
+                BookingDate = booking.BookingDate,
+                BookingStatus = booking.BookingStatus,
+                CustomerName = booking.CustomerName,
+                CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                StylistId = booking.SalonMemberId,
+                StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = booking.ComboServiceId,
+                    ComboServiceName = booking.ComboService.ComboServiceName ?? "Unknown Service",
+                    Price = booking.ComboService.Price,
+                    Image = booking.ComboService.ImageUrl
+                },
+                PaymentAmount = booking.Payments?.PaymentAmount ?? 0,
+                PaymentDate = booking.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = booking.Payments?.PaymentStatus?.StatusName
+            };
 
             return new Result<object>
             {
@@ -493,6 +512,7 @@ namespace Application.Services
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,
                 CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                Feedback = booking.Feedback,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO

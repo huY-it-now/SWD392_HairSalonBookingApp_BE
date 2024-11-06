@@ -748,7 +748,7 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "You don't have any orders",
+                    Message = "No bookings found",
                     Data = null
                 };
             }
@@ -760,18 +760,18 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                ComboServiceName = new List<ComboServiceForBookingDTO>
-        {
-            new ComboServiceForBookingDTO
-            {
-                Id = b.ComboService.Id,
-                ComboServiceName = b.ComboService.ComboServiceName,
-                Price = b.ComboService.Price,
-                Image = b.ComboService.ImageUrl
-            }
-        },
-                PaymentAmount = b.Payments.PaymentAmount,
-                PaymentDate = b.Payments.PaymentDate
+                StylistId = b.SalonMemberId,
+                StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
 
             var bookingUserDTO = new BookingUserDTO
@@ -812,24 +812,21 @@ namespace Application.Services
                 Feedback = b.Feedback,
                 StylistId = b.SalonMember.Id,
                 StylistName = b.SalonMember.User.FullName,
-                ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
-            {
-                new ComboServiceForBookingDTO
+                ComboServiceName = b.ComboService != null ? new ComboServiceForBookingDTO
                 {
                     Id = b.ComboService.Id,
                     ComboServiceName = b.ComboService.ComboServiceName,
                     Price = b.ComboService.Price,
                     Image = b.ComboService.ImageUrl
-                }
-            } : new List<ComboServiceForBookingDTO>(),
+                } : null,
                 PaymentAmount = b.Payments?.PaymentAmount ?? 0,
                 PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
-                PaymentStatus = b.Payments?.PaymentStatus.StatusName
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
 
             var adminDashboardDTO = new AdminDashboardDTO
             {
-                TotalBookings = bookings.Count(),
+                TotalBookings = bookings.Count,
                 Bookings = bookingDTOs
             };
 
@@ -898,6 +895,15 @@ namespace Application.Services
                 {
                     Error = 1,
                     Message = "Do not found booking"
+                };
+            }
+
+            if (booking.Feedback != null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You have already feedback"
                 };
             }
 

@@ -17,7 +17,7 @@ namespace Domain.Contracts.DTO.Booking
         public string Feedback { get; set; }
         public Guid StylistId { get; set; }
         public string StylistName { get; set; }
-        public List<ComboServiceForBookingDTO> ComboServiceName { get; set; }
+        public ComboServiceForBookingDTO ComboServiceName { get; set; }
         public decimal PaymentAmount { get; set; }
         public DateTime PaymentDate { get; set; }
         public string PaymentStatus { get; set; }
