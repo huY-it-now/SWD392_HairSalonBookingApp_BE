@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -37,13 +38,13 @@ namespace Infrastructures.Repositories
         public async Task<Booking> GetBookingDetail(Guid bookingId)
         {
             return await _dbContext.Bookings
-    .Include(x => x.SalonMember)
-        .ThenInclude(x => x.User)
-    .Include(x => x.ComboService)
-    .Include(x => x.Payments)
-        .ThenInclude(x => x.PaymentStatus)
-    .Where(x => x.Id == bookingId)
-    .FirstOrDefaultAsync();
+                            .Include(x => x.SalonMember)
+                            .ThenInclude(x => x.User)
+                            .Include(x => x.ComboService)
+                            .Include(x => x.Payments)
+                            .ThenInclude(x => x.PaymentStatus)
+                            .Where(x => x.Id == bookingId)
+                            .FirstOrDefaultAsync();
         }
 
         public async Task<Booking> GetBookingWithPayment(Guid id)
@@ -103,6 +104,11 @@ namespace Infrastructures.Repositories
                     .Where(x => x.SalonMemberId == stylistId)
                     .Include(x => x.ComboService)
                     .ToListAsync();
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate)
+        {
+            return await _dbContext.Bookings.AnyAsync(predicate);
         }
     }
 }
