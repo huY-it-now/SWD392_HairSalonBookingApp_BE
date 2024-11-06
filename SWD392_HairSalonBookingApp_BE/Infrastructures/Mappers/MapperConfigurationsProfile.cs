@@ -206,9 +206,12 @@ namespace Infrastructures.Mappers
 
             //Feedback
             CreateMap<Booking, ListFeedbackDTO>()
-                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Feedback.Title))
-                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
-                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Feedback.Description)); ;
+                .ForMember(dest => dest.Title, opt => 
+                    opt.MapFrom(src => src.Feedback.Title))
+                .ForMember(dest => dest.UserName, opt => 
+                    opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Description, opt => 
+                    opt.MapFrom(src => src.Feedback.Description)); ;
         }
     }
 }

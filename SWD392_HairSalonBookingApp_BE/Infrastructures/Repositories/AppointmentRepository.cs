@@ -14,7 +14,9 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public AppointmentRepository(AppDbContext context, ICurrentTime timeService, IClaimsService claimsService)
+        public AppointmentRepository(AppDbContext context, 
+                                     ICurrentTime timeService, 
+                                     IClaimsService claimsService)
             : base(context, timeService, claimsService)
         {
             _dbContext = context;
@@ -22,12 +24,17 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Appointment>> GetAppointmentsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
-            return await _dbContext.Appointments.Where(a => a.StylistId == stylistId && a.AppointmentDate >= fromDate && a.AppointmentDate <= toDate).ToListAsync();
+            return await _dbContext
+                            .Appointments
+                            .Where(a => a.StylistId == stylistId && a.AppointmentDate >= fromDate && a.AppointmentDate <= toDate)
+                            .ToListAsync();
         }
 
         public async Task<Appointment> GetAppointmentByIdAsync(Guid appointmentId)
         {
-            return await _dbContext.Appointments.FirstOrDefaultAsync(a => a.Id == appointmentId);
+            return await _dbContext
+                            .Appointments
+                            .FirstOrDefaultAsync(a => a.Id == appointmentId);
         }
     }
 }

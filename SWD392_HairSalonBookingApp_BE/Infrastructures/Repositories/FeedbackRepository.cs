@@ -9,19 +9,26 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public FeedbackRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public FeedbackRepository(AppDbContext dbContext, 
+                                  ICurrentTime timeService, 
+                                  IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
 
         public async Task<Feedback> GetFeedbackById(Guid id)
         {
-            return await _dbContext.Feedbacks.Where(x => x.Id == id).FirstOrDefaultAsync();
+            return await _dbContext.Feedbacks
+                                        .Where(x => x.Id == id)
+                                        .FirstOrDefaultAsync();
         }
 
         public async Task<List<Booking>> GetListFeedback()
         {
-            return await _dbContext.Bookings.Include(x => x.Feedback).Include(x => x.User).ToListAsync();
+            return await _dbContext.Bookings
+                                        .Include(x => x.Feedback)
+                                        .Include(x => x.User)
+                                        .ToListAsync();
         }
     }
 }

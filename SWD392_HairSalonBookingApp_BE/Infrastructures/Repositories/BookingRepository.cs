@@ -16,35 +16,44 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public BookingRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public BookingRepository(AppDbContext dbContext, 
+                                 ICurrentTime timeService, 
+                                 IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
 
         public async Task<List<Booking>> GetAllBookingsAsync()
         {
-            return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+            return await _dbContext.Bookings
+                                        .Include(x => x.SalonMember)
+                                        .ThenInclude(x => x.User)
+                                        .Include(x => x.ComboService)   
+                                        .Include(x => x.Payments)
+                                        .ThenInclude(x => x.PaymentStatus)
+                                        .ToListAsync();
         }
 
         public async Task<Booking> GetBookingByIdWithComboAndPayment(Guid id)
         {
             return await _dbContext.Bookings
-               .Where(b => b.Id == id)
-               .Include(b => b.Payments)
-               .Include(b => b.ComboService)
-               .SingleOrDefaultAsync();
+                                        .Where(b => b.Id == id)
+                                        .Include(b => b.Payments)
+                                        .Include(b => b.ComboService)
+                                        .SingleOrDefaultAsync();
         }
 
         public async Task<Booking> GetBookingDetail(Guid bookingId)
         {
-            return await _dbContext.Bookings.Include(x => x.Feedback)
-    .Include(x => x.SalonMember)
-        .ThenInclude(x => x.User)
-    .Include(x => x.ComboService)
-    .Include(x => x.Payments)
-        .ThenInclude(x => x.PaymentStatus)
-    .Where(x => x.Id == bookingId)
-    .FirstOrDefaultAsync();
+            return await _dbContext.Bookings
+                                        .Include(x => x.Feedback)
+                                        .Include(x => x.SalonMember)
+                                        .ThenInclude(x => x.User)
+                                        .Include(x => x.ComboService)
+                                        .Include(x => x.Payments)
+                                        .ThenInclude(x => x.PaymentStatus)
+                                        .Where(x => x.Id == bookingId)
+                                        .FirstOrDefaultAsync();
         }
 
         public async Task<Booking> GetBookingWithPayment(Guid id)
@@ -57,40 +66,40 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetCheckedBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.BookingStatus == "Checked")
-               .Include(b => b.User)
-               .Include(b => b.Payments)
-               .Include(b => b.SalonMember)
-               .Include(b => b.ComboService)
-               .ToListAsync();
+                                       .Where(b => b.BookingStatus == "Checked")
+                                       .Include(b => b.User)
+                                       .Include(b => b.Payments)
+                                       .Include(b => b.SalonMember)
+                                       .Include(b => b.ComboService)
+                                       .ToListAsync();
         }
 
         public async Task<List<Booking>> GetPendingBookingInformation()
         {
             return await _dbContext.Bookings
-               .Where(b => b.BookingStatus == "Pending")
-               .Include(b => b.Payments)
-               .Include(b => b.ComboService)
-               .ToListAsync();
+                                       .Where(b => b.BookingStatus == "Pending")
+                                       .Include(b => b.Payments)
+                                       .Include(b => b.ComboService)
+                                       .ToListAsync();
         }
 
         public async Task<List<Booking>> GetBookingsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
             return await _dbContext.Bookings
-                .Where(b => b.BookingDate >= fromDate && b.BookingDate <= toDate)
-                .Where(b => b.SalonMemberId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
-                .Include(b => b.User)
-                .Include(b => b.ComboService)
-                .ToListAsync();
+                                        .Where(b => b.BookingDate >= fromDate && b.BookingDate <= toDate)
+                                        .Where(b => b.SalonMemberId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
+                                        .Include(b => b.User)
+                                        .Include(b => b.ComboService)
+                                        .ToListAsync();
         }
 
         public async Task<Booking> GetBookingByIdAsync(Guid bookingId)
         {
             return await _dbContext.Bookings
-                .Include(b => b.User)
-                .Include(b => b.ComboService)
-                .Include(b => b.salon)
-                .FirstOrDefaultAsync(b => b.Id == bookingId);
+                                        .Include(b => b.User)
+                                        .Include(b => b.ComboService)
+                                        .Include(b => b.salon)
+                                        .FirstOrDefaultAsync(b => b.Id == bookingId);
         }
 
         public async Task<List<Booking>> GetAllBookingWithAllStatus()
@@ -108,19 +117,25 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetBookingForStylist(Guid stylistId)
         {
             return await _dbContext.Bookings
-                    .Where(x => x.SalonMemberId == stylistId)
-                    .Include(x => x.ComboService)
-                    .ToListAsync();
+                                        .Where(x => x.SalonMemberId == stylistId)
+                                        .Include(x => x.ComboService)
+                                        .ToListAsync();
         }
 
         public Task<Booking> GetBookingUncompletedNow(Guid userId)
         {
-            return _dbContext.Bookings.Where(x => x.BookingStatus != "Completed").Include(x => x.salon).Include(x => x.SalonMember).Include(x => x.ComboService).FirstOrDefaultAsync();
+            return _dbContext.Bookings
+                                .Where(x => x.BookingStatus != "Completed")
+                                .Include(x => x.salon)
+                                .Include(x => x.SalonMember)
+                                .Include(x => x.ComboService)
+                                .FirstOrDefaultAsync();
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate)
         {
-            return await _dbContext.Bookings.AnyAsync(predicate);
+            return await _dbContext.Bookings
+                                        .AnyAsync(predicate);
         }
     }
 }

@@ -8,7 +8,9 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public ServiceComboRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService)
+        public ServiceComboRepository(AppDbContext dbContext, 
+                                      ICurrentTime timeService, 
+                                      IClaimsService claimsService)
         {
             _dbContext = dbContext;
         }

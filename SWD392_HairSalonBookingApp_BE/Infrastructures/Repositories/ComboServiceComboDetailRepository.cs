@@ -28,17 +28,18 @@ namespace Infrastructures.Repositories
         public async Task<List<ComboDetail>> GetComboDetailsByComboServiceId(Guid comboServiceId)
         {
             return await _dbContext.ComboServiceComboDetails
-                                 .Where(cscd => cscd.ComboServiceId == comboServiceId)
-                                 .Select(cscd => cscd.ComboDetail).Where(d => d.IsDeleted == false)
-                                 .ToListAsync();
+                                         .Where(cscd => cscd.ComboServiceId == comboServiceId)
+                                         .Select(cscd => cscd.ComboDetail)
+                                         .Where(d => d.IsDeleted == false)
+                                         .ToListAsync();
         }
 
         public async Task<List<ComboService>> GetComboServicesByComboDetailId(Guid comboDetailId)
         {
             return await _dbContext.ComboServiceComboDetails
-                                 .Where(cscd => cscd.ComboDetailId == comboDetailId)
-                                 .Select(cscd => cscd.ComboService)
-                                 .ToListAsync();
+                                         .Where(cscd => cscd.ComboDetailId == comboDetailId)
+                                         .Select(cscd => cscd.ComboService)
+                                         .ToListAsync();
         }
     }
 

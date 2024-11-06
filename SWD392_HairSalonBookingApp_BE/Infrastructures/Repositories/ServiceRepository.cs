@@ -51,7 +51,8 @@ namespace Infrastructures.Repositories
         {
             var existingService = await _dbContext
                                             .Services
-                                            .FirstOrDefaultAsync(s => s.ServiceName == service.ServiceName && s.CategoryId == service.CategoryId);
+                                            .FirstOrDefaultAsync(s => s.ServiceName == service.ServiceName && 
+                                                                 s.CategoryId == service.CategoryId);
 
             if (existingService != null)
             {
@@ -62,6 +63,7 @@ namespace Infrastructures.Repositories
                         .Services
                         .AddAsync(service);
             await _dbContext.SaveChangesAsync();
+
             return service;
         }
 
@@ -77,9 +79,11 @@ namespace Infrastructures.Repositories
             }
 
             existingService.ServiceName = service.ServiceName;
+
             _dbContext
                 .Services
                 .Update(existingService);
+
             await _dbContext.SaveChangesAsync();
 
             return existingService;
