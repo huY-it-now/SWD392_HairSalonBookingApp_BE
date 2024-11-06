@@ -5,6 +5,8 @@ using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
 using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Stylist;
+using Domain.Contracts.DTO.User;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
@@ -37,5 +39,9 @@ namespace Application.Interfaces
         Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId);
         Task<string> UserFeedback(FeedbackDTO request);
         Task<Result<object>> GetListFeedback();
+
+        Task<Result<object>> GetUserByEmailAsync(string email);
+        Task<Result<object>> CreateUserAsync(UserDTO userDto);
+
     }
 }

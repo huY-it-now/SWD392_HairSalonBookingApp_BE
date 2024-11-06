@@ -17,6 +17,7 @@ using Domain.Contracts.DTO.User;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Application.Services
@@ -954,6 +955,44 @@ namespace Application.Services
                 Error = 0,
                 Message = "All feedback",
                 Data = result
+            };
+        }
+
+        public async Task<Result<object>> GetUserByEmailAsync(string email)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByEmail(email);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "User not found",
+                    Data = null
+                };
+            }
+
+            var userDto = _mapper.Map<UserDTO>(user);
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "User retrieved successfully",
+                Data = userDto
+            };
+        }
+
+        public async Task<Result<object>> CreateUserAsync(UserDTO userDto)
+        {
+            var user = _mapper.Map<User>(userDto);
+
+            await _unitOfWork.UserRepository.AddAsync(user);
+            await _unitOfWork.SaveChangeAsync(); // Lưu thay đổi với UnitOfWork
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "User created successfully",
+                Data = _mapper.Map<UserDTO>(user)
             };
         }
     }

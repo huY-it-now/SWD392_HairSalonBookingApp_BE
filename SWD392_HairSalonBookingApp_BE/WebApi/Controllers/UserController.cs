@@ -11,6 +11,7 @@ using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Stylist;
+using Domain.Contracts.DTO.User;
 using Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
@@ -30,9 +31,10 @@ namespace WebApi.Controllers
         private readonly IEmailService _emailService;
         private readonly AppConfiguration _configuration;
         private readonly ICurrentTime _currentTime;
+        private readonly IGoogleAuthService _googleAuthService;
 
         public UserController(IUserService userService, IMapper mapper, IUnitOfWork unitOfWork, IPasswordHash passwordHash, IEmailService emailService, AppConfiguration configuration,
-                           ICurrentTime currentTime)
+                           ICurrentTime currentTime, IGoogleAuthService googleAuthService)
         {
             _userService = userService;
             _mapper = mapper;
@@ -41,6 +43,7 @@ namespace WebApi.Controllers
             _emailService = emailService;
             _configuration = configuration;
             _currentTime = currentTime;
+            _googleAuthService = googleAuthService;
         }
 
         [HttpPost("register")]
@@ -237,5 +240,25 @@ namespace WebApi.Controllers
 
             return Ok("Thank you for your feedback");
         }
+
+        [HttpPost("google-login")]
+        public async Task<IActionResult> GoogleLogin([FromBody] string firebaseToken)
+        {
+            var userId = await _googleAuthService.VerifyFirebaseTokenAsync(firebaseToken);
+
+            var userGuid = Guid.Parse(userId);
+
+            var user = await _userService.GetUserById(userGuid);
+
+            if (user == null)
+            {
+                // Nếu user chưa tồn tại trong database, tạo mới user
+                await _userService.CreateUserAsync(new UserDTO { Id = userGuid });
+            }
+
+            var systemToken = await _googleAuthService.GenerateSystemTokenAsync(userGuid.ToString());
+            return Ok(new { Token = systemToken });
+        }
     }
 }
+
