@@ -7,7 +7,9 @@ namespace Application.Validations.Account
     {
         public VerifyTokenValidator()
         {
-            RuleFor(x => x.Token).NotEmpty().WithMessage("Token is required!");
+            RuleFor(x => x.Token)
+                .NotEmpty()
+                .WithMessage("Token is required!");
         }
     }
 }
