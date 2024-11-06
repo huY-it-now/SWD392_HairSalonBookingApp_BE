@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
@@ -108,6 +109,11 @@ namespace Infrastructures.Repositories
         public Task<Booking> GetBookingUncompletedNow(Guid userId)
         {
             return _dbContext.Bookings.Where(x => x.BookingStatus != "Completed").Include(x => x.salon).Include(x => x.SalonMember).Include(x => x.ComboService).FirstOrDefaultAsync();
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate)
+        {
+            return await _dbContext.Bookings.AnyAsync(predicate);
         }
     }
 }
