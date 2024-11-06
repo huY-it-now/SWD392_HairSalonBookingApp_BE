@@ -36,5 +36,6 @@ namespace Application.Interfaces
         Task<Result<object>> BanUser(Guid userId);
         Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId);
         Task<string> UserFeedback(FeedbackDTO request);
+        Task<Result<object>> GetListFeedback();
     }
 }

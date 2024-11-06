@@ -18,5 +18,10 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Feedbacks.Where(x => x.Id == id).FirstOrDefaultAsync();
         }
+
+        public async Task<List<Booking>> GetListFeedback()
+        {
+            return await _dbContext.Bookings.Include(x => x.Feedback).Include(x => x.User).ToListAsync();
+        }
     }
 }

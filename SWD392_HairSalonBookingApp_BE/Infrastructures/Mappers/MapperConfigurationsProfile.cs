@@ -15,6 +15,7 @@ using Domain.Contracts.Abstracts.Category;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
+using Domain.Contracts.DTO.Feedback;
 
 namespace Infrastructures.Mappers
 {
@@ -202,6 +203,12 @@ namespace Infrastructures.Mappers
             CreateMap<BookingForStylist, Booking>();
 
             CreateMap<Booking, BookingForStylist>();
+
+            //Feedback
+            CreateMap<Booking, ListFeedbackDTO>()
+                .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Feedback.Title))
+                .ForMember(dest => dest.UserName, opt => opt.MapFrom(src => src.User.FullName))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Feedback.Description)); ;
         }
     }
 }
