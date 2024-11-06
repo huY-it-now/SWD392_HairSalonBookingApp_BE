@@ -10,10 +10,13 @@ using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
 using Domain.Contracts.DTO.Combo;
+using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Application.Services
@@ -75,63 +78,6 @@ namespace Application.Services
                 Data = userDTO
             };
         }
-
-        public async Task<Result<object>> Login(LoginUserDTO request)
-        {
-            var user = await _unitOfWork.UserRepository.GetUserByEmail(request.Email);
-
-            if (user == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "User not found",
-                    Data = null
-                };
-            }
-
-            if (user.IsDeleted == true)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "You was banned by Admin",
-                    Data = null
-                };
-            }
-
-            var isPasswordValid = _passwordHash.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
-
-            if (!isPasswordValid)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Incorrect password.",
-                    Data = null
-                };
-            }
-
-            if (user.VerifiedAt == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Please verify your email.",
-                    Data = null
-                };
-            }
-
-            var token = user.GenerateJsonWebToken(_configuration.JWTSecretKey, _currentTime.GetCurrentTime());
-
-            return new Result<object>
-            {
-                Error = 0,
-                Message = $"Welcome back, {user.FullName}!",
-                Data = token
-            };
-        }
-
 
         public async Task<Result<object>> Register(RegisterUserDTO request)
         {
@@ -947,6 +893,37 @@ namespace Application.Services
         public Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<string> UserFeedback(FeedbackDTO request)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+
+            if (booking == null)
+            {
+                throw new Exception("Not found booking");
+            }
+
+            if (booking.FeedbackId != null)
+            {
+                return "no";
+            }
+
+            var feedback = new Feedback
+            {
+                Id = Guid.NewGuid(),
+                Title = request.Title,
+                Description = request.Description,
+            };
+
+            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+            
+            booking.FeedbackId = feedback.Id;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return "Thank you for your feedback";
         }
     }
 }

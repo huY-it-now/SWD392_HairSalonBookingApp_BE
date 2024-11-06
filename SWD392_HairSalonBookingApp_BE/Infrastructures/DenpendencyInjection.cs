@@ -49,6 +49,7 @@ namespace Infrastructures
             services.AddScoped<ComboDetailService>();
             services.AddScoped<IComboService, ComboServiceService>();
             services.AddScoped<ISalonMemberScheduleRepository, SalonMemberScheduleRepository>();
+            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
 
             // ATTENTION: if you do migration please check file README.md
             services.AddDbContext<AppDbContext>(option => option.UseSqlServer(databaseConnection));

@@ -53,11 +53,20 @@ namespace Application.Services
 
         public async Task<BookingDTO> AddRandomStylist(Guid Id)
         {
-            var booking = await _bookingRepository.GetByIdAsync(Id);
+            var booking = await _bookingRepository.GetBookingByIdAsync(Id);
 
-            var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(booking.BookingDate, booking.salon);
+            var stylist = await ChooseRandomStylist(booking.BookingDate, booking.salon, booking.ComboService.ComboServiceName, booking.SalonMember);
 
-            booking.SalonMember = stylistListFree.ElementAt(new Random().Next(stylistListFree.Count));
+            if (stylist == null)
+            {
+                return null;
+            }
+
+            booking.SalonMember = stylist;
+
+            _bookingRepository.Update(booking);
+
+            await _unitOfWork.SaveChangeAsync();
 
             return _mapper.Map<BookingDTO>(booking);
         }
@@ -123,13 +132,20 @@ namespace Application.Services
             return await  _unitOfWork.SaveChangeAsync() > 0;
         }
 
-        public async Task<SalonMember> ChooseRandomStylist(DateTime dateTime, Salon salon)
+        public async Task<SalonMember> ChooseRandomStylist(DateTime dateTime, Salon salon, string comboServiceName, SalonMember salonMember)
         {
-            var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(dateTime, salon);
+            int EndHour = dateTime.Hour + CheckComboSericeTime(comboServiceName).Hours;
 
-            var salonMember = stylistListFree.ElementAt(new Random().Next(stylistListFree.Count));
+            var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(dateTime, salon, dateTime.Hour, EndHour, 0, 0, salonMember);
 
-            return salonMember;
+            if (stylistListFree == null)
+            {
+                return null;
+            }
+
+            var salonMemberAdd = stylistListFree.ElementAt(new Random().Next(stylistListFree.Count));
+
+            return salonMemberAdd;
         }
 
         public async Task<Result<object>> CreateBookingWithRequest(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
@@ -149,21 +165,7 @@ namespace Application.Services
             booking.UserId = CustomerId;
             booking.CreationDate = DateTime.Now;
             booking.CustomerName = CustomerName;
-            booking.CustomerPhoneNumber = CustomerPhoneNumber;
-
-            var salonMember = await _unitOfWork.SalonMemberRepository.GetByIdAsync(SalonMemberId);
-
-            if (salonMember == null)
-            {
-                var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(booking.BookingDate, booking.salon);
-
-                booking.SalonMember = stylistListFree.ElementAt(new Random().Next(stylistListFree.Count));
-            }
-            else
-            {
-                booking.SalonMember = salonMember;
-                booking.SalonMemberId = salonMember.Id;
-            }           
+            booking.CustomerPhoneNumber = CustomerPhoneNumber;    
 
             var comboService = await _comboService.GetComboServiceById(ComboServiceId);
 
@@ -172,6 +174,39 @@ namespace Application.Services
                 Result.Error = 1;
                 Result.Message = "Combo service is not found";
                 return Result;
+            }
+
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetByIdAsync(SalonMemberId);
+
+            var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
+
+            if (Salon != null)
+            {
+                booking.salon = Salon;
+                booking.SalonId = salonId;
+            }
+            else
+            {
+                Result.Error = 1;
+                Result.Message = "Salon not found";
+                return Result;
+            }
+
+            if (salonMember == null)
+            {
+                booking.SalonMember = await ChooseRandomStylist(cuttingDate, Salon, comboService.ComboServiceName, salonMember);
+
+                if (booking.SalonMember == null)
+                {
+                    Result.Error = 1;
+                    Result.Message = "There is no free stylist now.";
+                    return Result;
+                }
+            }
+            else
+            {
+                booking.SalonMember = salonMember;
+                booking.SalonMemberId = salonMember.Id;
             }
 
             var schedule = await _scheduleWorkTimeRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
@@ -271,24 +306,17 @@ namespace Application.Services
 
             booking.ComboServiceId = comboService.Id;
             booking.ComboService = comboService;
-            
-            var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
-
-            if (Salon != null)
-            {
-                booking.salon = Salon;
-                booking.SalonId = salonId;
-            }
-            else
-            {
-                Result.Error = 1;
-                Result.Message = "Salon not found";
-                return Result;
-            }
 
             if (string.IsNullOrEmpty(SalonMemberId.ToString()))
             {
-                var salonmember = await ChooseRandomStylist(cuttingDate, Salon);
+                var salonmember = await ChooseRandomStylist(cuttingDate, Salon, comboService.ComboServiceName, salonMember);
+
+                if (salonmember == null)
+                {
+                    Result.Error = 1;
+                    Result.Message = "There is no free stylist now.";
+                    return Result;
+                }
 
                 booking.SalonMember = salonmember;
                 booking.SalonMemberId = salonmember.Id;
@@ -470,6 +498,7 @@ namespace Application.Services
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,
                 CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                Feedback = booking.Feedback.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO

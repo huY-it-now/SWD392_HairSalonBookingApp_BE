@@ -36,7 +36,7 @@ namespace Infrastructures.Repositories
 
         public async Task<Booking> GetBookingDetail(Guid bookingId)
         {
-            return await _dbContext.Bookings
+            return await _dbContext.Bookings.Include(x => x.Feedback)
     .Include(x => x.SalonMember)
         .ThenInclude(x => x.User)
     .Include(x => x.ComboService)
@@ -76,6 +76,7 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetBookingsByStylistIdAndDateRange(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
             return await _dbContext.Bookings
+                .Where(b => b.BookingDate >= fromDate && b.BookingDate <= toDate)
                 .Where(b => b.SalonMemberId == stylistId && b.BookingDate >= fromDate && b.BookingDate <= toDate)
                 .Include(b => b.User)
                 .Include(b => b.ComboService)
@@ -87,12 +88,13 @@ namespace Infrastructures.Repositories
             return await _dbContext.Bookings
                 .Include(b => b.User)
                 .Include(b => b.ComboService)
+                .Include(b => b.salon)
                 .FirstOrDefaultAsync(b => b.Id == bookingId);
         }
 
         public async Task<List<Booking>> GetAllBookingWithAllStatus()
         {
-            return await _dbContext.Bookings.Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
+            return await _dbContext.Bookings.Include(x => x.Feedback).Include(x => x.SalonMember).ThenInclude(x => x.User).Include(x => x.ComboService).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).ToListAsync();
         }
 
         public async Task<List<Booking>> GetBookingForStylist(Guid stylistId)
