@@ -14,14 +14,21 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public SalonMemberScheduleRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public SalonMemberScheduleRepository(AppDbContext dbContext, 
+                                             ICurrentTime timeService, 
+                                             IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
 
         public Task<SalonMemberSchedule> GetByTime(int year, int month, int day)
         {
-            return _dbContext.SalonMemberSchedules.Where(sms => sms.ScheduleDate.Day == day && sms.ScheduleDate.Year == year && sms.ScheduleDate.Month == month).OrderBy(sms => sms.ScheduleDate).SingleOrDefaultAsync();
+            return _dbContext.SalonMemberSchedules
+                                    .Where(sms => sms.ScheduleDate.Day == day && 
+                                           sms.ScheduleDate.Year == year && 
+                                           sms.ScheduleDate.Month == month)
+                                    .OrderBy(sms => sms.ScheduleDate)
+                                    .SingleOrDefaultAsync();
         }
     }
 }
