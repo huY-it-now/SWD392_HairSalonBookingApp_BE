@@ -24,9 +24,54 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
             .Include(x => x.User).Include(x => x.Salon).ToListAsync();
     }
 
-    public Task<List<SalonMember>> GetSalonMembersFree(DateTime dateTime, Salon salon)
+    public async Task<List<SalonMember>> GetSalonMembersFree(DateTime dateTime, Salon salon, int HourStart, int HourEnd, int minuteStart, int minutEnd, SalonMember salonMember)
     {
-        throw new NotImplementedException();
+        var listStylist = await _dbContext.SalonMembers.Include(st => st.SalonMemberSchedules).Where(st => st.Salon == salon).ToListAsync();
+
+        if (listStylist.Count == 0)
+        {
+            return null;
+        }
+
+        if (salonMember != null)
+        {
+            listStylist.Remove(salonMember);
+        }
+
+        List<SalonMemberSchedule> listschedules = new();
+
+        foreach (var item in listStylist)
+        {
+            if (item.SalonMemberSchedules != null)
+            {
+                foreach (var schedule in item.SalonMemberSchedules)
+                {
+                    if (schedule.ScheduleDate.Day == dateTime.Day && schedule.ScheduleDate.Month == dateTime.Month && schedule.ScheduleDate.Year == dateTime.Year)
+                    {
+                        listschedules.Add(schedule);
+                    }
+                }
+            }
+        }
+
+        foreach (var item in listschedules)
+        {
+            foreach (var workTime in item.WorkTime)
+            {
+                if (workTime.ScheduleDate.Hour > HourStart && workTime.ScheduleDate.Hour < HourEnd)
+                {
+                    foreach (var sty in listStylist)
+                    {
+                        if(sty.SalonMemberSchedules == item)
+                        {
+                            listStylist.Remove(sty);
+                        }
+                    }
+                }
+            }
+        }
+
+        return listStylist;
     }
 
     public async Task<List<SalonMember>> GetStylistBySalonId(Guid salonId)
