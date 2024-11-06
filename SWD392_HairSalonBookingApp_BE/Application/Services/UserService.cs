@@ -85,7 +85,17 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "User not found.",
+                    Message = "User not found",
+                    Data = null
+                };
+            }
+
+            if (user.IsDeleted == true)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You was banned by Admin",
                     Data = null
                 };
             }
@@ -900,6 +910,31 @@ namespace Application.Services
             {
                 Error = 0,
                 Message = "Thank you your feedback!"
+            };
+        }
+
+        public async Task<Result<object>> BanUser(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserById(userId);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            user.IsDeleted = true;
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Ban user successfully"
             };
         }
     }

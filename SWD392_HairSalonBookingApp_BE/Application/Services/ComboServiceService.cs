@@ -38,7 +38,7 @@ namespace Application.Services
 
             foreach (var cb in cbs)
             {
-                if (cb.ComboServiceComboDetails.Any(cd => cd.ComboDetail.IsDeleted))
+                if (cb.ComboServiceComboDetails.All(cd => cd.ComboDetail.IsDeleted))
                 {
                     cb.IsDeleted = true;
                 }

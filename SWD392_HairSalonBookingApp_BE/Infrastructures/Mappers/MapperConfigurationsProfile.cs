@@ -60,6 +60,7 @@ namespace Infrastructures.Mappers
                 .ForMember(dest => dest.Id, opt => opt
                 .Ignore()); // Ignore Id for creation
             CreateMap<UpdateComboServiceRequest, ComboService>();
+            CreateMap<UpdateComboServiceRequest, ComboServiceDTO>();
 
             //cbt
             CreateMap<ComboDetail, ComboDetailDTO>();
@@ -71,6 +72,7 @@ namespace Infrastructures.Mappers
             CreateMap<ComboServiceComboDetail, ComboDetailDTO>()
                 .ForMember(dest => dest.Id, opt => opt
                 .MapFrom(src => src.ComboDetailId));
+            CreateMap<UpdateComboDetailRequest, ComboDetailDTO>();
 
             //cate
             CreateMap<Category, CategoryDTO>();
