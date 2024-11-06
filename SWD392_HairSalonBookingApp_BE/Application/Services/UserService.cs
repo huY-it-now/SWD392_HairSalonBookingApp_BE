@@ -933,5 +933,28 @@ namespace Application.Services
 
             return "Thank you for your feedback";
         }
+
+        public async Task<Result<object>> GetListFeedback()
+        {
+            var feedback = await _unitOfWork.FeedbackRepository.GetListFeedback();
+
+            if (feedback == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No one feedback"
+                };
+            }
+
+            var result = _mapper.Map<List<ListFeedbackDTO>>(feedback);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All feedback",
+                Data = result
+            };
+        }
     }
 }
