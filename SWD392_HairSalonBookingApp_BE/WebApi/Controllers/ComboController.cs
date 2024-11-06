@@ -72,32 +72,14 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpPut("update-comboDetails/{id}")]
+        [HttpPut("update-comboDetails")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         [ProducesResponseType(404, Type = typeof(Result<object>))]
-        public async Task<IActionResult> UpdateComboDetail(Guid id, [FromBody] UpdateComboDetailRequest updateRequest)
+        public async Task<IActionResult> UpdateComboDetail([FromForm] UpdateComboDetailRequest updateRequest)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { Error = 1, Message = "Invalid data" });
-            }
-
-            var result = await _comboDetailService.GetComboDetailById(id);
-            if (result.Data == null)
-            {
-                return NotFound(new { Error = 1, Message = "Combo detail not found" });
-            }
-
-            try
-            {
                 var updateResult = await _comboDetailService.UpdateComboDetail(updateRequest);
                 return Ok(updateResult);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { Error = 1, Message = ex.Message });
-            }
         }
 
         [HttpDelete("delete-comboDetails/{id}")]
@@ -179,32 +161,14 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpPut("update-comboServices/{id}")]
+        [HttpPut("update-comboServices")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         [ProducesResponseType(404, Type = typeof(Result<object>))]
-        public async Task<IActionResult> UpdateComboService(Guid id, [FromBody] UpdateComboServiceRequest updateRequest)
+        public async Task<IActionResult> UpdateComboService([FromForm] UpdateComboServiceRequest updateRequest)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(new { Error = 1, Message = "Invalid data" });
-            }
-
-            var result = await _comboServiceService.GetAllComboDetailByComboServiceId(id);
-            if (result.Data == null)
-            {
-                return NotFound(new { Error = 1, Message = "Combo service not found" });
-            }
-
-            try
-            {
                 var updateResult = await _comboServiceService.UpdateComboService(updateRequest);
                 return Ok(updateResult);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { Error = 1, Message = ex.Message });
-            }
         }
 
         [HttpDelete("delete-comboServices/{id}")]
