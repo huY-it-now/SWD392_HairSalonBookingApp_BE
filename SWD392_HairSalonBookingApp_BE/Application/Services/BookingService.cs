@@ -498,6 +498,7 @@ namespace Application.Services
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,
                 CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                Feedback = booking.Feedback.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
@@ -540,7 +541,7 @@ namespace Application.Services
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,
                 CustomerPhoneNumber = booking.CustomerPhoneNumber,
-                Feedback = booking.Feedback,
+                Feedback = booking.Feedback.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO

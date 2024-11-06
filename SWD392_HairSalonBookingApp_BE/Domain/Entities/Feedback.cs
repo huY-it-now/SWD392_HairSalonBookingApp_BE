@@ -8,10 +8,8 @@ namespace Domain.Entities
 {
     public class Feedback : BaseEntity
     {
-        public string RatingContent { get; set; }
-        public Guid UserId { get; set; }
-        public User User { get; set; }
-        public Guid BookingId { get; set; }
-        public Booking Booking { get; set; }
+        public string Title { get; set; }
+        public string? Description { get; set; }
+        public ICollection<Booking> Bookings { get; set; }
     }
 }

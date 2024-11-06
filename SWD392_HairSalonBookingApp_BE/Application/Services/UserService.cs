@@ -10,6 +10,7 @@ using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
 using Domain.Contracts.DTO.Combo;
+using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
@@ -762,7 +763,7 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                //Feedback = b.Feedback.Title,
+                Feedback = b.Feedback.Title,
                 StylistId = b.SalonMember.Id,
                 StylistName = b.SalonMember.User.FullName,
                 ComboServiceName = b.ComboService != null ? new ComboServiceForBookingDTO
@@ -902,60 +903,35 @@ namespace Application.Services
             throw new NotImplementedException();
         }
 
-        public async Task<Result<object>> Login(LoginUserDTO request)
+        public async Task<string> UserFeedback(FeedbackDTO request)
         {
-            var user = await _unitOfWork.UserRepository.GetUserByEmail(request.Email);
+            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
 
-            if (user == null)
+            if (booking == null)
             {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "User not found",
-                    Data = null
-                };
+                throw new Exception("Not found booking");
             }
 
-            if (user.IsDeleted == true)
+            if (booking.FeedbackId != null)
             {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "You was banned by Admin",
-                    Data = null
-                };
+                return "no";
             }
 
-            var isPasswordValid = _passwordHash.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
-
-            if (!isPasswordValid)
+            var feedback = new Feedback
             {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Incorrect password.",
-                    Data = null
-                };
-            }
-
-            if (user.VerifiedAt == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Please verify your email.",
-                    Data = null
-                };
-            }
-
-            var token = user.GenerateJsonWebToken(_configuration.JWTSecretKey, _currentTime.GetCurrentTime());
-
-            return new Result<object>
-            {
-                Error = 0,
-                Message = $"Welcome back, {user.FullName}!",
-                Data = token
+                Id = Guid.NewGuid(),
+                Title = request.Title,
+                Description = request.Description,
             };
+
+            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+            
+            booking.FeedbackId = feedback.Id;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return "Thank you for your feedback";
         }
     }
 }

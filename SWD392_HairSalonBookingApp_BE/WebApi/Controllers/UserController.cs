@@ -9,7 +9,9 @@ using Domain.Contracts.Abstracts.Account;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
+using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Stylist;
+using Domain.Entities;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -202,6 +204,38 @@ namespace WebApi.Controllers
             var result = await _userService.AddFeedbackForUser(bookingId, feedback);
 
             return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UserFeedback(FeedbackDTO request)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+
+            if (booking == null)
+            {
+                return BadRequest("Not found booking");
+            }
+
+            if (booking.FeedbackId != null)
+            {
+                return BadRequest("You have already feedback for this booking");
+            }
+
+            var feedback = new Feedback
+            {
+                Id = Guid.NewGuid(),
+                Title = request.Title,
+                Description = request.Description,
+            };
+
+            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+
+            booking.FeedbackId = feedback.Id;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return Ok("Thank you for your feedback");
         }
     }
 }
