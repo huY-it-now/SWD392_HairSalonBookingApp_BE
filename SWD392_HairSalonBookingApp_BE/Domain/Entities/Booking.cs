@@ -2,7 +2,6 @@
 {
     public class Booking : BaseEntity
     {
-        public string? Feedback { get; set; }
         public DateTime BookingDate { get; set; }
         public string BookingStatus { get; set; }
         public string CustomerName { get; set; }
@@ -19,6 +18,8 @@
         public SalonMember SalonMember { get; set; }
         public Guid ComboServiceId { get; set; }
         public ComboService ComboService { get; set; }
-         #endregion
+        public Guid? FeedbackId { get; set; }
+        public Feedback? Feedback { get; set; }
+        #endregion
     }
 }

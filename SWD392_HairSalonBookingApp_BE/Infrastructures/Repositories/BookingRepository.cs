@@ -37,14 +37,14 @@ namespace Infrastructures.Repositories
 
         public async Task<Booking> GetBookingDetail(Guid bookingId)
         {
-            return await _dbContext.Bookings
-                            .Include(x => x.SalonMember)
-                            .ThenInclude(x => x.User)
-                            .Include(x => x.ComboService)
-                            .Include(x => x.Payments)
-                            .ThenInclude(x => x.PaymentStatus)
-                            .Where(x => x.Id == bookingId)
-                            .FirstOrDefaultAsync();
+            return await _dbContext.Bookings.Include(x => x.Feedback)
+    .Include(x => x.SalonMember)
+        .ThenInclude(x => x.User)
+    .Include(x => x.ComboService)
+    .Include(x => x.Payments)
+        .ThenInclude(x => x.PaymentStatus)
+    .Where(x => x.Id == bookingId)
+    .FirstOrDefaultAsync();
         }
 
         public async Task<Booking> GetBookingWithPayment(Guid id)
@@ -96,6 +96,7 @@ namespace Infrastructures.Repositories
         public async Task<List<Booking>> GetAllBookingWithAllStatus()
         {
             return await _dbContext.Bookings
+                                        .Include(x => x.Feedback)
                                         .Include(x => x.SalonMember)
                                         .ThenInclude(x => x.User)
                                         .Include(x => x.ComboService)
@@ -110,6 +111,11 @@ namespace Infrastructures.Repositories
                     .Where(x => x.SalonMemberId == stylistId)
                     .Include(x => x.ComboService)
                     .ToListAsync();
+        }
+
+        public Task<Booking> GetBookingUncompletedNow(Guid userId)
+        {
+            return _dbContext.Bookings.Where(x => x.BookingStatus != "Completed").Include(x => x.salon).Include(x => x.SalonMember).Include(x => x.ComboService).FirstOrDefaultAsync();
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate)

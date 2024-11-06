@@ -23,7 +23,7 @@ namespace Infrastructures
         private IBookingRepository _bookingRepository;
         private readonly ICurrentTime _currentTime;
         private readonly IClaimsService _claimsService;
-
+        private readonly IFeedbackRepository _feedbackRepository;
 
         public UnitOfWork(AppDbContext dbContext,
                           IUserRepository userRepository,
@@ -39,7 +39,7 @@ namespace Infrastructures
                           IServiceComboServiceRepository serviceComboServiceRepository, 
                           IBookingRepository bookingRepository,
                           ICurrentTime currentTime, 
-                          IClaimsService claimsService)
+                          IClaimsService claimsService, IFeedbackRepository feedbackRepository)
         {
             _dbContext = dbContext;
             _userRepository = userRepository;
@@ -56,6 +56,7 @@ namespace Infrastructures
             _bookingRepository = bookingRepository;
             _currentTime = currentTime;
             _claimsService = claimsService;
+            _feedbackRepository = feedbackRepository;
         }
         
         public IUserRepository UserRepository => _userRepository;
@@ -72,6 +73,8 @@ namespace Infrastructures
         public IServiceComboServiceRepository ServiceComboServiceRepository => _serviceComboServiceRepository;
 
         public IBookingRepository BookingRepository => _bookingRepository;
+
+        public IFeedbackRepository FeedbackRepository => _feedbackRepository;
 
         public async Task<int> SaveChangeAsync()
         {

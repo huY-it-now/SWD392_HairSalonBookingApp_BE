@@ -193,8 +193,10 @@ namespace Infrastructures.Mappers
                 .ForMember(dest => dest.StylistName, opt => 
                     opt.MapFrom(src => src.SalonMember.User.FullName))
                 .ForMember(dest => dest.PaymentStatus, opt => 
-                    opt.MapFrom(src => src.Payments.PaymentStatus.StatusName));
-
+                    opt.MapFrom(src => src.Payments.PaymentStatus.StatusName))
+                .ForMember(dest => dest.Feedback, opt => 
+                    opt.MapFrom(src => src.Feedback.Title));
+                    
             CreateMap<BookingStatusDTO, Booking>();
 
             CreateMap<BookingForStylist, Booking>();
