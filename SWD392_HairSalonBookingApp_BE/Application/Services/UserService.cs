@@ -380,7 +380,7 @@ namespace Application.Services
         {
             var shift = WorkShiftDTO
                             .GetAvailableShifts()
-                            .FirstOrDefault(s => bookingTime >= s.StartTime 
+                            .FirstOrDefault(s => bookingTime >= s.StartTime
                                             && bookingTime < s.EndTime);
 
             if (shift == null)
@@ -388,23 +388,31 @@ namespace Application.Services
                 return new List<StylistDTO>();
             }
 
+            // Lấy danh sách stylist có ca làm việc phù hợp
             var availableStylists = await _unitOfWork
                                                 .ScheduleRepository
                                                 .GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
 
-            var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
+            // Lọc stylist không có lịch hẹn vào thời gian truyền vào
+            var stylistWithoutAppointments = new List<StylistDTO>();
+
+            foreach (var stylist in availableStylists)
             {
-                Id = stylist.Id,
-                FullName = stylist.FullName,
-                Email = stylist.Email,
-                Job = stylist.Job,
-                Rating = stylist.Rating,
-                Status = stylist.Status
-            }).ToList();
+                // Kiểm tra xem stylist có booking vào thời gian yêu cầu hay không
+                var hasBooking = await _unitOfWork.BookingRepository
+                                     .AnyAsync(b => b.SalonMemberId == stylist.Id &&
+                                                    b.BookingDate.Date == bookingDate.Date &&
+                                                    b.BookingDate.TimeOfDay == bookingTime);
 
-            return stylistDTOs;
+                // Nếu không có booking tại thời gian đó, thêm stylist vào danh sách
+                if (!hasBooking)
+                {
+                    stylistWithoutAppointments.Add(stylist);
+                }
+            }
+
+            return stylistWithoutAppointments;
         }
-
         public async Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
             var schedules = await _unitOfWork
