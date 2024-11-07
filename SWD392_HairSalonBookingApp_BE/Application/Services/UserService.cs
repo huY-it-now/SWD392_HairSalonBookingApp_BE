@@ -10,10 +10,14 @@ using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
 using Domain.Contracts.DTO.Combo;
+using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Salon;
 using Domain.Contracts.DTO.Stylist;
 using Domain.Contracts.DTO.User;
 using Domain.Entities;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Org.BouncyCastle.Asn1.Ocsp;
 
 namespace Application.Services
@@ -44,7 +48,7 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllUser()
         {
-            var users = await _unitOfWork.UserRepository.GetAllAsync();
+            var users = await _unitOfWork.UserRepository.GetAllUserAsync();
             var userMapper = _mapper.Map<List<UserDTO>>(users);
 
             return new Result<object>
@@ -75,63 +79,6 @@ namespace Application.Services
                 Data = userDTO
             };
         }
-
-        public async Task<Result<object>> Login(LoginUserDTO request)
-        {
-            var user = await _unitOfWork.UserRepository.GetUserByEmail(request.Email);
-
-            if (user == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "User not found",
-                    Data = null
-                };
-            }
-
-            if (user.IsDeleted == true)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "You was banned by Admin",
-                    Data = null
-                };
-            }
-
-            var isPasswordValid = _passwordHash.VerifyPasswordHash(request.Password, user.PasswordHash, user.PasswordSalt);
-
-            if (!isPasswordValid)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Incorrect password.",
-                    Data = null
-                };
-            }
-
-            if (user.VerifiedAt == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "Please verify your email.",
-                    Data = null
-                };
-            }
-
-            var token = user.GenerateJsonWebToken(_configuration.JWTSecretKey, _currentTime.GetCurrentTime());
-
-            return new Result<object>
-            {
-                Error = 0,
-                Message = $"Welcome back, {user.FullName}!",
-                Data = token
-            };
-        }
-
 
         public async Task<Result<object>> Register(RegisterUserDTO request)
         {
@@ -434,32 +381,40 @@ namespace Application.Services
         public async Task<List<StylistDTO>> GetAvailableStylists(Guid salonId, DateTime bookingDate, TimeSpan bookingTime)
         {
             var shift = WorkShiftDTO
-                            .GetAvailableShifts()
-                            .FirstOrDefault(s => bookingTime >= s.StartTime 
-                                            && bookingTime < s.EndTime);
+                   .GetAvailableShifts()
+                   .FirstOrDefault(s => bookingTime >= s.StartTime
+                                   && bookingTime < s.EndTime);
 
             if (shift == null)
             {
                 return new List<StylistDTO>();
             }
 
+            // Lấy danh sách stylist có ca làm việc phù hợp
             var availableStylists = await _unitOfWork
                                                 .ScheduleRepository
                                                 .GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
 
-            var stylistDTOs = availableStylists.Select(stylist => new StylistDTO
+            // Lọc stylist không có booking vào ngày truyền vào với trạng thái chưa completed
+            var stylistWithoutAppointments = new List<StylistDTO>();
+
+            foreach (var stylist in availableStylists)
             {
-                Id = stylist.Id,
-                FullName = stylist.FullName,
-                Email = stylist.Email,
-                Job = stylist.Job,
-                Rating = stylist.Rating,
-                Status = stylist.Status
-            }).ToList();
+                // Kiểm tra xem stylist có bất kỳ booking nào trong ngày với trạng thái chưa hoàn thành
+                var hasBooking = await _unitOfWork.BookingRepository
+                                     .AnyAsync(b => b.SalonMemberId == stylist.Id &&
+                                                    b.BookingDate.Date == bookingDate.Date &&
+                                                    b.BookingStatus != "Completed");
 
-            return stylistDTOs;
+                // Nếu không có booking chưa hoàn thành vào ngày đó, thêm stylist vào danh sách
+                if (!hasBooking)
+                {
+                    stylistWithoutAppointments.Add(stylist);
+                }
+            }
+
+            return stylistWithoutAppointments;
         }
-
         public async Task<List<WorkAndDayOffScheduleDTO>> ViewWorkAndDayOffSchedule(Guid stylistId, DateTime fromDate, DateTime toDate)
         {
             var schedules = await _unitOfWork
@@ -748,7 +703,7 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "You don't have any orders",
+                    Message = "No bookings found",
                     Data = null
                 };
             }
@@ -760,18 +715,20 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                ComboServiceName = new List<ComboServiceForBookingDTO>
-        {
-            new ComboServiceForBookingDTO
-            {
-                Id = b.ComboService.Id,
-                ComboServiceName = b.ComboService.ComboServiceName,
-                Price = b.ComboService.Price,
-                Image = b.ComboService.ImageUrl
-            }
-        },
-                PaymentAmount = b.Payments.PaymentAmount,
-                PaymentDate = b.Payments.PaymentDate
+                StylistId = b.SalonMemberId,
+                StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                SalonName = b.salon.salonName,
+                Address = b.salon.Address,
+                ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
 
             var bookingUserDTO = new BookingUserDTO
@@ -809,28 +766,30 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
-                Feedback = b.Feedback,
+                Feedback = b.Feedback.Title,
                 StylistId = b.SalonMember.Id,
                 StylistName = b.SalonMember.User.FullName,
-                ComboServiceName = b.ComboService != null ? new List<ComboServiceForBookingDTO>
-            {
-                new ComboServiceForBookingDTO
+                SalonName = b.salon.salonName,
+                Address = b.salon.Address,
+                ComboServiceName = b.ComboService != null ? new ComboServiceForBookingDTO
                 {
                     Id = b.ComboService.Id,
                     ComboServiceName = b.ComboService.ComboServiceName,
                     Price = b.ComboService.Price,
                     Image = b.ComboService.ImageUrl
-                }
-            } : new List<ComboServiceForBookingDTO>(),
+                } : null,
                 PaymentAmount = b.Payments?.PaymentAmount ?? 0,
                 PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
-                PaymentStatus = b.Payments?.PaymentStatus.StatusName
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
+
+            var totalRevenue = bookings.Sum(b => b.Payments?.PaymentAmount ?? 0);
 
             var adminDashboardDTO = new AdminDashboardDTO
             {
-                TotalBookings = bookings.Count(),
-                Bookings = bookingDTOs
+                TotalBookings = bookings.Count,
+                Bookings = bookingDTOs,
+                TotalRevenue = totalRevenue
             };
 
             return new Result<object>
@@ -901,7 +860,16 @@ namespace Application.Services
                 };
             }
 
-            booking.Feedback = feedback;
+            if (booking.Feedback != null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "You have already feedback"
+                };
+            }
+
+            /*booking.Feedback = ;*/
 
             _unitOfWork.BookingRepository.Update(booking);
             await _unitOfWork.SaveChangeAsync();
@@ -935,6 +903,178 @@ namespace Application.Services
             {
                 Error = 0,
                 Message = "Ban user successfully"
+            };
+        }
+
+        public async Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
+        {
+            var bookings = await _unitOfWork.BookingRepository.GetBookingUncompletedNow(userId);
+
+            if (bookings == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No booking"
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingStatusDTO
+            {
+                BookingId = b.Id,
+                BookingDate = b.BookingDate,
+                BookingStatus = b.BookingStatus,
+                CustomerName = b.CustomerName,
+                CustomerPhoneNumber = b.CustomerPhoneNumber,
+                StylistId = b.SalonMemberId,
+                StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = b.salon.Address,
+                ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
+            }).ToList();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Orders",
+                Data = bookingDTOs
+            };
+        }
+
+        public async Task<string> UserFeedback(FeedbackDTO request)
+        {
+            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+
+            if (booking == null)
+            {
+                throw new Exception("Not found booking");
+            }
+
+            if (booking.FeedbackId != null)
+            {
+                return "no";
+            }
+
+            var feedback = new Feedback
+            {
+                Id = Guid.NewGuid(),
+                Title = request.Title,
+                Description = request.Description,
+            };
+
+            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+            
+            booking.FeedbackId = feedback.Id;
+
+            _unitOfWork.BookingRepository.Update(booking);
+            await _unitOfWork.SaveChangeAsync();
+
+            return "Thank you for your feedback";
+        }
+
+        public async Task<Result<object>> GetListFeedback()
+        {
+            var feedback = await _unitOfWork.FeedbackRepository.GetListFeedback();
+
+            if (feedback == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No one feedback"
+                };
+            }
+
+            var result = _mapper.Map<List<ListFeedbackDTO>>(feedback);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All feedback",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> GetUserByEmailAsync(string email)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserByEmail(email);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "User not found",
+                    Data = null
+                };
+            }
+
+            var userDto = _mapper.Map<UserDTO>(user);
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "User retrieved successfully",
+                Data = userDto
+            };
+        }
+
+        public async Task<Result<object>> CreateUserAsync(UserDTO userDto)
+        {
+            var user = _mapper.Map<User>(userDto);
+
+            await _unitOfWork.UserRepository.AddAsync(user);
+            await _unitOfWork.SaveChangeAsync(); // Lưu thay đổi với UnitOfWork
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "User created successfully",
+                Data = _mapper.Map<UserDTO>(user)
+            };
+        }
+
+        public async Task<Result<object>> GetAllCustomer()
+        {
+            var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
+
+            if (users == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            var result = _mapper.Map<List<UserDTO>>(users);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All user",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> CountCustomer()
+        {
+            var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
+
+            var result = users.Count();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Count Customer",
+                Data = result
             };
         }
     }

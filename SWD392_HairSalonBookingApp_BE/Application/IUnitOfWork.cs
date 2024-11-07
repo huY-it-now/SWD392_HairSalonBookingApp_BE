@@ -17,5 +17,6 @@ namespace Application
         IAppointmentRepository AppointmentRepository { get; }
         IServiceComboServiceRepository ServiceComboServiceRepository { get; }
         IBookingRepository BookingRepository { get; }
+        IFeedbackRepository FeedbackRepository { get; }
     }
 }

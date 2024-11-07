@@ -13,14 +13,18 @@ namespace Application.Validations.Stylist
         public ScheduleValidation()
         {
             RuleFor(x => x.StylistId)
-                .NotEmpty().WithMessage("Stylist ID is required.");
+                .NotEmpty()
+                .WithMessage("Stylist ID is required.");
 
             RuleFor(x => x.Date)
-                .NotEmpty().WithMessage("Date is required.")
-                .GreaterThan(DateTime.MinValue).WithMessage("Invalid date.");
+                .NotEmpty()
+                .WithMessage("Date is required.")
+                .GreaterThan(DateTime.MinValue)
+                .WithMessage("Invalid date.");
 
             RuleFor(x => x.WorkShift)
-                .NotEmpty().WithMessage("Work shift is required.")
+                .NotEmpty()
+                .WithMessage("Work shift is required.")
                 .Must(shift => shift == "Morning" || shift == "Afternoon" || shift == "Evening")
                 .WithMessage("Work shift must be either 'Morning', 'Afternoon', or 'Evening'.");
         }

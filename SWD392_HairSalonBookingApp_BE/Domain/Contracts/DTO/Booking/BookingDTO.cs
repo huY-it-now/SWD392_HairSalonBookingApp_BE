@@ -14,10 +14,12 @@ namespace Domain.Contracts.DTO.Booking
         public string BookingStatus { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhoneNumber { get; set; }
-        public string Feedback { get; set; }
+        public string? Feedback { get; set; }
         public Guid StylistId { get; set; }
         public string StylistName { get; set; }
-        public List<ComboServiceForBookingDTO> ComboServiceName { get; set; }
+        public string SalonName { get; set; }
+        public string Address { get; set; }
+        public ComboServiceForBookingDTO ComboServiceName { get; set; }
         public decimal PaymentAmount { get; set; }
         public DateTime PaymentDate { get; set; }
         public string PaymentStatus { get; set; }

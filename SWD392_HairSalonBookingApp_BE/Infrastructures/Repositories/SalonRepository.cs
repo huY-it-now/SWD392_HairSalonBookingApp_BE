@@ -14,24 +14,30 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public SalonRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public SalonRepository(AppDbContext dbContext, 
+                               ICurrentTime timeService, 
+                               IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }
 
         public async Task<List<Salon>> GetAllSalonAsync()
         {
-            return await _dbContext.Salons.ToListAsync();
+            return await _dbContext.Salons
+                                        .ToListAsync();
         }
 
         public async Task<Salon> GetSalonByName(string salonName)
         {
             return await _dbContext.Salons
-                .FirstOrDefaultAsync(s => s.Address.ToLower().Contains(salonName.ToLower()));
+                                        .FirstOrDefaultAsync(s => s.Address
+                                        .ToLower()
+                                        .Contains(salonName.ToLower()));
         }
 
         public async Task<Salon> GetSalonById(Guid id) {
-            return await _dbContext.Salons.FirstOrDefaultAsync(x => x.Id == id);
+            return await _dbContext.Salons
+                                        .FirstOrDefaultAsync(x => x.Id == id);
         }
     }
 }

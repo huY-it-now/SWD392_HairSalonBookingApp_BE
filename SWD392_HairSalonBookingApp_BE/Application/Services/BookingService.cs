@@ -159,13 +159,23 @@ namespace Application.Services
                 Data = null
             };
 
+            // Kiểm tra trùng lịch booking trước khi tạo mới
+            var existingBooking = await _unitOfWork.BookingRepository.GetBookingBySalonAndDateAsync(salonId, cuttingDate);
+
+            if (existingBooking != null)
+            {
+                Result.Error = 1;
+                Result.Message = "This time has already been booked for the selected salon. Please choose a different time.";
+                return Result;
+            }
+
             booking.BookingStatus = "Pending";
             booking.BookingDate = cuttingDate;
             booking.SalonMemberId = SalonMemberId;
             booking.UserId = CustomerId;
             booking.CreationDate = DateTime.Now;
             booking.CustomerName = CustomerName;
-            booking.CustomerPhoneNumber = CustomerPhoneNumber;    
+            booking.CustomerPhoneNumber = CustomerPhoneNumber;
 
             var comboService = await _comboService.GetComboServiceById(ComboServiceId);
 
@@ -176,9 +186,8 @@ namespace Application.Services
                 return Result;
             }
 
-            var salonMember = await _unitOfWork.SalonMemberRepository.GetByIdAsync(SalonMemberId);
-
-            var Salon = await _unitOfWork.SalonRepository.GetByIdAsync(salonId);
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberById(SalonMemberId);
+            var Salon = await _unitOfWork.SalonRepository.GetSalonById(salonId);
 
             if (Salon != null)
             {
@@ -209,118 +218,47 @@ namespace Application.Services
                 booking.SalonMemberId = salonMember.Id;
             }
 
-            var schedule = await _scheduleWorkTimeRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
-
+            // Tiếp tục các bước để tạo lịch làm việc cho salon member...
             var salonMemberSchedule = await _salonMemberScheduleRepository.GetByTime(booking.BookingDate.Year, booking.BookingDate.Month, booking.BookingDate.Day);
 
             if (salonMemberSchedule == null)
             {
-                List<string> list = new List<string>();
-                list.Add("Check");
-                salonMemberSchedule = new SalonMemberSchedule();
-                salonMemberSchedule.Id = new Guid();
-                salonMemberSchedule.IsDayOff = false;
-                salonMemberSchedule.SalonMember = booking.SalonMember;
-                salonMemberSchedule.SalonMemberId = booking.SalonMemberId;
-                salonMemberSchedule.WorkShifts = list;
+                List<string> list = new List<string> { "Check" };
+                salonMemberSchedule = new SalonMemberSchedule
+                {
+                    Id = Guid.NewGuid(),
+                    IsDayOff = false,
+                    SalonMember = booking.SalonMember,
+                    SalonMemberId = booking.SalonMemberId,
+                    WorkShifts = list
+                };
 
                 await _salonMemberScheduleRepository.AddAsync(salonMemberSchedule);
                 await _unitOfWork.SaveChangeAsync();
             }
 
-            if (schedule == null)
+            // Tạo lịch làm việc mới
+            ScheduleWorkTime scheduleWorkTime = new ScheduleWorkTime
             {
-                ScheduleWorkTime scheduleWorkTime = new();
-                scheduleWorkTime.ScheduleDate = booking.BookingDate;
-                scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
-                scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
-                scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
+                ScheduleDate = booking.BookingDate,
+                WorkShifts = comboService.ComboServiceName,
+                SalonMemberSchedule = salonMemberSchedule,
+                SalonMemberScheduleId = salonMemberSchedule.Id
+            };
 
-                await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
+            await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
 
-                if (!(await _unitOfWork.SaveChangeAsync() > 0))
-                {
-                    Result.Error = 1;
-                    Result.Message = "Create stylist schedule fail";
-                }
-
-                salonMemberSchedule.WorkShifts.Add(scheduleWorkTime.WorkShifts);
-            }
-            else
+            if (!(await _unitOfWork.SaveChangeAsync() > 0))
             {
-                TimeSpan comboTime = CheckComboSericeTime(comboService.ComboServiceName);
-
-                TimeSpan timeEndPredict = new TimeSpan(booking.BookingDate.Hour + comboTime.Hours, 
-                                                       booking.BookingDate.Minute + comboTime.Minutes, 0);
-
-                foreach (var item in schedule) //check xem co trung lich ko
-                {
-                    if (item.ScheduleDate == booking.BookingDate)
-                    {
-                        Result.Error = 1;
-                        Result.Message = "This time has been booked";
-                    }
-
-                    TimeSpan timeOfWork = CheckComboSericeTime(item.ScheduleDate.ToString());
-
-                    if ((timeEndPredict.Hours - item.ScheduleDate.Hour) > 0 
-                        && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0)
-                    {
-                        Result.Error = 1;
-                        Result.Message = $"Please choose another time before {timeEndPredict.Hours - item.ScheduleDate.Hour} hour";
-                        return Result;
-                    }
-                    else if ((timeEndPredict.Hours - item.ScheduleDate.Hour) == 0 
-                            && (booking.BookingDate.Hour - item.ScheduleDate.Hour) < 0 
-                            && (item.ScheduleDate.Minute - timeEndPredict.Minutes) < 0)
-                    {
-                        Result.Error = 1;
-                        Result.Message = $"Please choose another time before 30 minutes";
-                        return Result;
-                    }
-                    else if ((booking.BookingDate.Hour - item.ScheduleDate.Hour) > 0 
-                        && (booking.BookingDate.Hour - item.ScheduleDate.Hour + timeOfWork.Hours) < 0)
-                    {
-                        Result.Error = 1;
-                        Result.Message = $"Please choose another time after {item.ScheduleDate.Hour + timeOfWork.Hours - booking.BookingDate.Hour} hour";
-                        return Result;
-                    }
-                }
-
-                ScheduleWorkTime scheduleWorkTime = new();
-                scheduleWorkTime.ScheduleDate = booking.BookingDate;
-                scheduleWorkTime.WorkShifts = comboService.ComboServiceName;
-                scheduleWorkTime.SalonMemberSchedule = salonMemberSchedule;
-                scheduleWorkTime.SalonMemberScheduleId = salonMemberSchedule.Id;
-
-                await _scheduleWorkTimeRepository.AddAsync(scheduleWorkTime);
-
-                if (!(await _unitOfWork.SaveChangeAsync() > 0))
-                {
-                    Result.Error = 1;
-                    Result.Message = "Create stylist schedule fail";
-                }
-
-                salonMemberSchedule.WorkShifts.Add(scheduleWorkTime.WorkShifts);
+                Result.Error = 1;
+                Result.Message = "Create stylist schedule failed";
+                return Result;
             }
+
+            salonMemberSchedule.WorkShifts.Add(scheduleWorkTime.WorkShifts);
 
             booking.ComboServiceId = comboService.Id;
             booking.ComboService = comboService;
-
-            if (string.IsNullOrEmpty(SalonMemberId.ToString()))
-            {
-                var salonmember = await ChooseRandomStylist(cuttingDate, Salon, comboService.ComboServiceName, salonMember);
-
-                if (salonmember == null)
-                {
-                    Result.Error = 1;
-                    Result.Message = "There is no free stylist now.";
-                    return Result;
-                }
-
-                booking.SalonMember = salonmember;
-                booking.SalonMemberId = salonmember.Id;
-            }
 
             var User = await _unitOfWork.UserRepository.GetByIdAsync(CustomerId);
 
@@ -328,43 +266,45 @@ namespace Application.Services
             {
                 booking.User = User;
                 booking.UserId = CustomerId;
-            }            
+            }
 
+            // Tạo booking mới
             if (!await CreateBooking(booking))
             {
                 Result.Error = 1;
-                Result.Message = "Create booking faild";
+                Result.Message = "Create booking failed";
                 return Result;
             }
 
-            var payment = new Payments();
-            var paymentStatus = new PaymentStatus();
-            var paymentMethod = new PaymentMethods();
-
-            paymentMethod.MethodName = "Qr";
-            paymentMethod.Description = "Pay through Qr";
-
-            paymentStatus.StatusName = "Pending";
-            paymentStatus.Description = "Waiting for pay";
-
-            payment.PaymentAmount = comboService.Price;
-            payment.BookingId = CustomerId;
-            payment.Booking = booking;
-            payment.PaymentStatus = paymentStatus;
-            payment.PaymentMethods = paymentMethod;
-            payment.PaymentDate = DateTime.UtcNow;
+            // Tạo thông tin thanh toán
+            var payment = new Payments
+            {
+                PaymentAmount = comboService.Price,
+                BookingId = booking.Id,
+                Booking = booking,
+                PaymentStatus = new PaymentStatus
+                {
+                    StatusName = "Pending",
+                    Description = "Waiting for pay"
+                },
+                PaymentMethods = new PaymentMethods
+                {
+                    MethodName = "Qr",
+                    Description = "Pay through Qr"
+                },
+                PaymentDate = DateTime.UtcNow
+            };
 
             await _paymentsRepository.AddAsync(payment);
 
             if (!(await _unitOfWork.SaveChangeAsync() > 0))
             {
                 Result.Error = 1;
-                Result.Message = "Create payment faild";
+                Result.Message = "Create payment failed";
                 return Result;
             }
 
             var bookingDTO = _mapper.Map<BookingDTO>(booking);
-
             Result.Message = "Create success";
             Result.Data = bookingDTO;
 
@@ -487,11 +427,33 @@ namespace Application.Services
                 return new Result<object>
                 {
                     Error = 1,
-                    Message = "Do not have any booking"
+                    Message = "Do not found any booking"
                 };
             }
 
-            var result = _mapper.Map<BookingDTO>(booking);
+            var result = new BookingDTO
+            {
+                Id = booking.Id,
+                BookingDate = booking.BookingDate,
+                BookingStatus = booking.BookingStatus,
+                CustomerName = booking.CustomerName,
+                CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                Feedback = booking.Feedback?.Title,
+                StylistId = booking.SalonMemberId,
+                StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                SalonName = booking.salon.salonName,
+                Address = booking.salon.Address,
+                ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = booking.ComboServiceId,
+                    ComboServiceName = booking.ComboService.ComboServiceName ?? "Unknown Service",
+                    Price = booking.ComboService.Price,
+                    Image = booking.ComboService.ImageUrl
+                },
+                PaymentAmount = booking.Payments?.PaymentAmount ?? 0,
+                PaymentDate = booking.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = booking.Payments?.PaymentStatus?.StatusName
+            };
 
             return new Result<object>
             {
@@ -521,8 +483,10 @@ namespace Application.Services
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,
                 CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                Feedback = booking.Feedback?.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = booking.salon.Address,
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = booking.ComboServiceId,

@@ -3,8 +3,12 @@ using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Account;
 using Domain.Contracts.DTO.Appointment;
 using Domain.Contracts.DTO.Booking;
+using Domain.Contracts.DTO.Feedback;
 using Domain.Contracts.DTO.Stylist;
+using Domain.Contracts.DTO.User;
+using Domain.Entities;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Application.Interfaces
 {
@@ -12,7 +16,6 @@ namespace Application.Interfaces
     {
         Task<Result<object>> GetAllUser();
         Task<Result<object>> Register(RegisterUserDTO request);
-        Task<Result<object>> Login(LoginUserDTO request);
         Task<Result<object>> Verify(VerifyTokenDTO request);
         Task<Result<object>> GetUserById(Guid id);
         Task<Result<object>> CreateStylist(CreateStylistDTO request);
@@ -33,5 +36,13 @@ namespace Application.Interfaces
         Task<Result<object>> GetAllManager();
         Task<Result<object>> AddFeedbackForUser(Guid bookingId, string feedback);
         Task<Result<object>> BanUser(Guid userId);
+        Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId);
+        Task<string> UserFeedback(FeedbackDTO request);
+        Task<Result<object>> GetListFeedback();
+
+        Task<Result<object>> GetUserByEmailAsync(string email);
+        Task<Result<object>> CreateUserAsync(UserDTO userDto);
+        Task<Result<object>> GetAllCustomer();
+        Task<Result<object>> CountCustomer();
     }
 }

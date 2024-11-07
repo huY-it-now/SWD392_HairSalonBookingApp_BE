@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -21,5 +22,8 @@ namespace Application.Repositories
         Task<Booking> GetBookingByIdAsync(Guid bookingId);
         Task<List<Booking>> GetAllBookingWithAllStatus();
         Task<List<Booking>> GetBookingForStylist(Guid stylistId);
+        Task<List<Booking>> GetBookingUncompletedNow(Guid userId);
+        Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate);
+        Task<Booking> GetBookingBySalonAndDateAsync(Guid salonId, DateTime bookingDate);
     }
 }

@@ -3,6 +3,7 @@ using Application.Repositories;
 using AutoMapper;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Booking;
+using Domain.Contracts.DTO.Combo;
 using Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -51,13 +52,29 @@ namespace Application.Services
                 };
             }
 
-            var result = _mapper.Map<List<BookingDTO>>(stylistBookings);
+            var bookingDTOs = stylistBookings.Select(b => new BookingForStylist
+            {
+                BookingId = b.Id,
+                BookingDate = b.BookingDate,
+                BookingStatus = b.BookingStatus,
+                CustomerName = b.CustomerName,
+                PhoneNumber = b.CustomerPhoneNumber,
+                Address = b.salon.Address,
+                ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+            }).ToList();
 
             return new Result<object>
             {
                 Error = 0,
                 Message = "List booking for stylist",
-                Data = result
+                Data = bookingDTOs
             };
         }
     }

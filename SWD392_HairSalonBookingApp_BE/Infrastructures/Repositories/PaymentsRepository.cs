@@ -14,7 +14,9 @@ namespace Infrastructures.Repositories
     {
         private readonly AppDbContext _dbContext;
 
-        public PaymentsRepository(AppDbContext dbContext, ICurrentTime timeService, IClaimsService claimsService) : base(dbContext, timeService, claimsService)
+        public PaymentsRepository(AppDbContext dbContext, 
+                                    ICurrentTime timeService, 
+                                    IClaimsService claimsService) : base(dbContext, timeService, claimsService)
         {
             _dbContext = dbContext;
         }

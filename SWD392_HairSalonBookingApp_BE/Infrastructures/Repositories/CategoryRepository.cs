@@ -55,6 +55,7 @@ namespace Infrastructures.Repositories
                         .Categories
                         .AddAsync(category);
             await _dbContext.SaveChangesAsync();
+
             return category;
         }
 
@@ -70,9 +71,10 @@ namespace Infrastructures.Repositories
             }
 
             existingCategory.CategoryName = category.CategoryName;
-            _dbContext
-                .Categories
-                .Update(existingCategory);
+
+            _dbContext.Categories
+                            .Update(existingCategory);
+
             await _dbContext.SaveChangesAsync();
 
             return existingCategory;
