@@ -126,19 +126,39 @@ namespace WebApi.Services
                 return false;
             }
 
-            var paymentStatusDes = await _paymentStatusRepository.GetPaymentStatusByName(PaymentStatus);
+            var Description = GetPaymentStatusDescription(PaymentStatus);
 
-            if (paymentStatusDes == null)
+            if (string.IsNullOrEmpty(Description))
             {
                 return false;
             }
 
             payment.PaymentStatus.StatusName = PaymentStatus;
-            payment.PaymentStatus.Description = paymentStatusDes.Description;
+            payment.PaymentStatus.Description = Description;
 
             _paymentsRepository.Update(payment);
 
             return (await _unitOfWork.SaveChangeAsync() > 0);
+        }
+
+        public string GetPaymentStatusDescription (string PaymentStatus)
+        {
+            if (PaymentStatus == "Cancel")
+            {
+                return "Payment is cancel.";
+            }
+            else if (PaymentStatus == "Pending")
+            {
+                return "Payment is waiting for pay.";
+            }
+            else if (PaymentStatus == "Paid")
+            {
+                return "Payment is completed.";
+            }
+            else
+            {
+                return "";
+            }
         }
 
         public async Task<bool> UpdatePaymentStatus(Guid PaymentStatusId, string StatusName, string Description)
