@@ -6,5 +6,6 @@ namespace Domain.Contracts.DTO.User
     {
         public int TotalBookings { get; set; }
         public List<BookingDTO> Bookings { get; set; }
+        public decimal TotalRevenue { get; set; }
     }
 }

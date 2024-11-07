@@ -48,7 +48,7 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllUser()
         {
-            var users = await _unitOfWork.UserRepository.GetAllAsync();
+            var users = await _unitOfWork.UserRepository.GetAllUserAsync();
             var userMapper = _mapper.Map<List<UserDTO>>(users);
 
             return new Result<object>
@@ -769,6 +769,8 @@ namespace Application.Services
                 Feedback = b.Feedback.Title,
                 StylistId = b.SalonMember.Id,
                 StylistName = b.SalonMember.User.FullName,
+                SalonName = b.salon.salonName,
+                Address = b.salon.Address,
                 ComboServiceName = b.ComboService != null ? new ComboServiceForBookingDTO
                 {
                     Id = b.ComboService.Id,
@@ -781,10 +783,13 @@ namespace Application.Services
                 PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
 
+            var totalRevenue = bookings.Sum(b => b.Payments?.PaymentAmount ?? 0);
+
             var adminDashboardDTO = new AdminDashboardDTO
             {
                 TotalBookings = bookings.Count,
-                Bookings = bookingDTOs
+                Bookings = bookingDTOs,
+                TotalRevenue = totalRevenue
             };
 
             return new Result<object>
@@ -1033,6 +1038,43 @@ namespace Application.Services
                 Error = 0,
                 Message = "User created successfully",
                 Data = _mapper.Map<UserDTO>(user)
+            };
+        }
+
+        public async Task<Result<object>> GetAllCustomer()
+        {
+            var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
+
+            if (users == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            var result = _mapper.Map<List<UserDTO>>(users);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All user",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> CountCustomer()
+        {
+            var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
+
+            var result = users.Count();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Count Customer",
+                Data = result
             };
         }
     }

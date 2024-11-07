@@ -42,6 +42,7 @@ namespace Application.Interfaces
 
         Task<Result<object>> GetUserByEmailAsync(string email);
         Task<Result<object>> CreateUserAsync(UserDTO userDto);
-
+        Task<Result<object>> GetAllCustomer();
+        Task<Result<object>> CountCustomer();
     }
 }
