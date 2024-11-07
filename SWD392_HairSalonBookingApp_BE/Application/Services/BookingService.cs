@@ -82,7 +82,7 @@ namespace Application.Services
 
             if (Check != "Pending")
             {
-                booking.BookingStatus = "Checked";
+                booking.BookingStatus = Check;
 
                 _bookingRepository.Update(booking);
 
@@ -292,7 +292,7 @@ namespace Application.Services
                     MethodName = "Qr",
                     Description = "Pay through Qr"
                 },
-                PaymentDate = DateTime.Now
+                PaymentDate = DateTime.UtcNow
             };
 
             await _paymentsRepository.AddAsync(payment);
