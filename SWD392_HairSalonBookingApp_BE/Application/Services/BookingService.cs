@@ -323,6 +323,7 @@ namespace Application.Services
                 PaymentAmount = booking.ComboService.Price,
                 PaymentDate = booking.Payments.PaymentDate,
                 PaymentStatus = booking.Payments.PaymentStatus.StatusName,
+                StylistId = booking.SalonMemberId,
             };
             Result.Message = "Create success";
             Result.Data = bookingDTO;
