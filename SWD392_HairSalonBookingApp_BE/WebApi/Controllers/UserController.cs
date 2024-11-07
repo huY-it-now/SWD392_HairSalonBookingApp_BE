@@ -238,7 +238,9 @@ namespace WebApi.Controllers
             _unitOfWork.BookingRepository.Update(booking);
             await _unitOfWork.SaveChangeAsync();
 
-            return Ok("Thank you for your feedback");
+            var result = _mapper.Map<ListFeedbackDTO>(booking);
+
+            return Ok(result);
         }
 
         [HttpPost("google-login")]
