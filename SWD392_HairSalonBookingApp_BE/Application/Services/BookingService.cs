@@ -82,7 +82,7 @@ namespace Application.Services
 
             if (Check != "Pending")
             {
-                booking.BookingStatus = "Checked";
+                booking.BookingStatus = Check;
 
                 _bookingRepository.Update(booking);
 
@@ -352,7 +352,7 @@ namespace Application.Services
             payment.Booking = booking;
             payment.PaymentStatus = paymentStatus;
             payment.PaymentMethods = paymentMethod;
-            payment.PaymentDate = DateTime.Now;
+            payment.PaymentDate = DateTime.UtcNow;
 
             await _paymentsRepository.AddAsync(payment);
 
