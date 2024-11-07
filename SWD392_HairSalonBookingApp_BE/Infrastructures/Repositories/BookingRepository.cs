@@ -47,6 +47,7 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Bookings
                                         .Include(x => x.Feedback)
+                                        .Include(x => x.salon)
                                         .Include(x => x.SalonMember)
                                         .ThenInclude(x => x.User)
                                         .Include(x => x.ComboService)
