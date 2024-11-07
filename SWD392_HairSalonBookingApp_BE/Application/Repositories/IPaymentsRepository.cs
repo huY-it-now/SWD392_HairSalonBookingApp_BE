@@ -11,5 +11,6 @@ namespace Application.Repositories
     {
         public bool CheckPayment(Payments payments);
         public void ChangeStatus(Payments payments);
+        public Task<Payments> GetPaymentById (Guid paymentId);
     }
 }

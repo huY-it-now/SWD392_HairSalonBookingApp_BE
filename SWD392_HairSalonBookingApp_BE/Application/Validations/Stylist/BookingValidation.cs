@@ -13,10 +13,12 @@ namespace Application.Validations.Stylist
         public BookingValidation()
         {
             RuleFor(x => x.BookingId)
-                .NotEmpty().WithMessage("Booking ID is required.");
+                .NotEmpty()
+                .WithMessage("Booking ID is required.");
 
             RuleFor(x => x.Status)
-                .NotEmpty().WithMessage("Status is required.")
+                .NotEmpty()
+                .WithMessage("Status is required.")
                 .Must(status => status == "In Progress" || status == "Completed")
                 .WithMessage("Status must be 'In Progress' or 'Completed'.");
         }

@@ -5,8 +5,10 @@ using AutoMapper;
 using AutoMapper.Internal;
 using Azure;
 using Domain.Contracts.Abstracts.Bank;
+using Domain.Contracts.Abstracts.Category;
 using Domain.Contracts.Abstracts.Shared;
 using Domain.Contracts.DTO.Bank;
+using Domain.Contracts.DTO.Category;
 using Domain.Entities;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +18,7 @@ using Net.payOS;
 using Net.payOS.Types;
 using Newtonsoft.Json;
 using Org.BouncyCastle.Asn1.Crmf;
+using System.Reflection;
 using WebApi.Services;
 
 namespace WebApi.Controllers
@@ -126,8 +129,8 @@ namespace WebApi.Controllers
             }
         }
 
-        [HttpPost("cancel")]
-        public async Task<Result<object>> CancelPayment([FromRoute] System.Int64 orderId)
+        [HttpPost("{orderId}")]
+        public async Task<Result<object>> CancelPayment([FromRoute] int orderId)
         {
             var result = new Result<object>
             {
@@ -145,16 +148,16 @@ namespace WebApi.Controllers
                 return result;
 
             }
-            catch 
+            catch (Exception ex)
             {
-                result.Message = "Cancel fail";
+                result.Message = ex.ToString();
                 result.Error = -1;
                 return result;
             }
         }
 
-        [HttpGet("GetPayment")]
-        public async Task<Result<object>> GetPayment([FromRoute] System.Int64 orderId)
+        [HttpGet("{orderId}")]
+        public async Task<Result<object>> GetPayment([FromRoute] int orderId)
         {
             var result = new Result<object>
             {
@@ -171,9 +174,9 @@ namespace WebApi.Controllers
                 result.Data = paymentLinkInformation;
                 return result;
             }
-            catch
+            catch(Exception ex)
             {
-                result.Message = "Get fail";
+                result.Message = ex.ToString();
                 result.Error = -1;
                 return result;
             }
@@ -234,6 +237,106 @@ namespace WebApi.Controllers
                 return result;
             }
 
+        }
+
+        [HttpPost("create-payment-status")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> CreatePaymentStatus(string StatusName, string Discription)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            if (await _paymentService.CreatePaymentStatus(StatusName, Discription))
+            {
+                result.Message = "Create success";
+            }
+            else
+            {
+                result.Error = 1;
+                result.Message = "Create fail";
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut("update-payment-status/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> UpdatePaymentStatus(Guid id, string MethodName, string Discription)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            if (await _paymentService.UpdatePaymentStatus(id, MethodName, Discription))
+            {
+                result.Message = "Update success";
+            }
+            else
+            {
+                result.Error = 1;
+                result.Message = "Update fail";
+            }
+
+            return Ok(result);
+        }
+
+        [HttpDelete("delete-payment-status/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> DeletePaymentStatus(Guid id)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            if (await _paymentService.DeletePaymentStatus(id))
+            {
+                result.Message = "Delete success";
+            }
+            else
+            {
+                result.Error = 1;
+                result.Message = "Delete fail";
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPut("update-payment/{id}")]
+        [ProducesResponseType(200, Type = typeof(Result<object>))]
+        [ProducesResponseType(400, Type = typeof(Result<object>))]
+        public async Task<IActionResult> UpdatePayment(Guid PaymentId, string PaymentStatus)
+        {
+            var result = new Result<object>
+            {
+                Error = 0,
+                Message = "",
+                Data = null
+            };
+
+            if (await _paymentService.UpdatePayment(PaymentId, PaymentStatus))
+            {
+                result.Message = "Update success";
+            }
+            else
+            {
+                result.Error = 1;
+                result.Message = "Update fail";
+            }
+
+            return Ok(result);
         }
     }
 }

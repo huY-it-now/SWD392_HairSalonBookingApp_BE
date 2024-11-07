@@ -12,7 +12,9 @@ namespace Infrastructures.Repositories
         protected readonly ICurrentTime _timeService;
         protected readonly IClaimsService _claimsService;
 
-        public GenericRepository(AppDbContext context, ICurrentTime timeService, IClaimsService claimsService)
+        public GenericRepository(AppDbContext context, 
+                                 ICurrentTime timeService, 
+                                 IClaimsService claimsService)
         {
             _dbSet = context.Set<TEntity>();
             _timeService = timeService;
@@ -23,6 +25,7 @@ namespace Infrastructures.Repositories
         public async Task<TEntity?> GetByIdAsync(Guid? id)
         {
             var result = await _dbSet.FirstOrDefaultAsync(x => x.Id == id);
+
             // todo should throw exception when not found
             return result;
         }
@@ -31,6 +34,7 @@ namespace Infrastructures.Repositories
         {
             entity.CreationDate = _timeService.GetCurrentTime();
             entity.CreatedBy = _claimsService.GetCurrentUserId;
+
             await _dbSet.AddAsync(entity);
         }
 
@@ -38,6 +42,7 @@ namespace Infrastructures.Repositories
         {
             entity.IsDeleted = true;
             entity.DeleteBy = _claimsService.GetCurrentUserId;
+
             _dbSet.Update(entity);
         }
 
@@ -45,6 +50,7 @@ namespace Infrastructures.Repositories
         {
             entity.ModificationDate = _timeService.GetCurrentTime();
             entity.ModificationBy = _claimsService.GetCurrentUserId;
+
             _dbSet.Update(entity);
         }
 
@@ -55,6 +61,7 @@ namespace Infrastructures.Repositories
                 entity.CreationDate = _timeService.GetCurrentTime();
                 entity.CreatedBy = _claimsService.GetCurrentUserId;
             }
+
             await _dbSet.AddRangeAsync(entities);
         }
 
@@ -66,6 +73,7 @@ namespace Infrastructures.Repositories
                 entity.DeletionDate = _timeService.GetCurrentTime();
                 entity.DeleteBy = _claimsService.GetCurrentUserId;
             }
+
             _dbSet.UpdateRange(entities);
         }
 
@@ -96,6 +104,7 @@ namespace Infrastructures.Repositories
                 entity.CreationDate = _timeService.GetCurrentTime();
                 entity.CreatedBy = _claimsService.GetCurrentUserId;
             }
+
             _dbSet.UpdateRange(entities);
         }
     }
