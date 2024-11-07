@@ -928,6 +928,7 @@ namespace Application.Services
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Feedback = b.Feedback.Title,
                 Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
                 {

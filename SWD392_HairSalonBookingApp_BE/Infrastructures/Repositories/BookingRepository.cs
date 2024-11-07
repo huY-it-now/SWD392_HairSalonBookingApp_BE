@@ -127,7 +127,7 @@ namespace Infrastructures.Repositories
 
         public Task<List<Booking>> GetBookingUncompletedNow(Guid userId)
         {
-            return _dbContext.Bookings
+            return _dbContext.Bookings.Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).Include(x => x.Feedback)
                                 .Where(x => x.BookingStatus != "Completed")
                                 .Include(x => x.salon)
                                 .Include(x => x.SalonMember)
