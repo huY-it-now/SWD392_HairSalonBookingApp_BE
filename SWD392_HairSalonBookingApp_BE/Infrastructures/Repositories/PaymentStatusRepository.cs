@@ -18,6 +18,15 @@ namespace Infrastructures.Repositories
         {
             _dbContext = dbContext;
         }
-    
+
+        public async Task<PaymentStatus> GetPaymentStatusByName(string name)
+        {
+            return await _dbContext.PaymentSatus.Where(ps => ps.StatusName == name).FirstOrDefaultAsync();
+        }
+
+        public void Remove(PaymentStatus paymentStatus)
+        {
+            _dbContext.Remove(paymentStatus);
+        }
     }
 }

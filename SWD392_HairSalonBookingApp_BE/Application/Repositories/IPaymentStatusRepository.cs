@@ -9,5 +9,7 @@ namespace Application.Repositories
 {
     public interface IPaymentStatusRepository : IGenericRepository<PaymentStatus>
     {
+        void Remove(PaymentStatus paymentStatus);
+        Task<PaymentStatus> GetPaymentStatusByName (string name);
     }
 }

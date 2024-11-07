@@ -1,6 +1,7 @@
 ﻿using Application.Interfaces;
 using Application.Repositories;
 using Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,6 +34,15 @@ namespace Infrastructures.Repositories
             {
                 return false;
             }
+        }
+
+        public Task<Payments> GetPaymentById(Guid paymentId)
+        {
+            return _dbContext.Payments.Include(p => p.PaymentStatus)
+                .Include(p => p.PaymentLogs)
+                .Include(p => p.PaymentStatus)
+                .Where(p => p.Id == paymentId)
+                .FirstOrDefaultAsync();
         }
     }
 }

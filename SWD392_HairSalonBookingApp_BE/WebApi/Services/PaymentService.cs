@@ -98,9 +98,64 @@ namespace WebApi.Services
             return true;
         }
 
-        public Task<Payments> GetPaymentsById(Guid Id)
+        public async Task<bool> DeletePaymentStatus(Guid PaymentStatusId)
         {
-            throw new NotImplementedException();
+            var paymentStatus = await _paymentStatusRepository.GetByIdAsync(PaymentStatusId);
+
+            if (paymentStatus == null)
+            {
+                return false;
+            }
+
+            _paymentStatusRepository.Remove(paymentStatus);
+
+            return (await _unitOfWork.SaveChangeAsync() > 0);
+        }
+
+        public async Task<Payments> GetPaymentsById(Guid Id)
+        {
+            return await _paymentsRepository.GetByIdAsync(Id);
+        }
+
+        public async Task<bool> UpdatePayment(Guid PaymentId, string PaymentStatus)
+        {
+            var payment = await _paymentsRepository.GetPaymentById(PaymentId);
+
+            if (payment == null)
+            {
+                return false;
+            }
+
+            var paymentStatusDes = await _paymentStatusRepository.GetPaymentStatusByName(PaymentStatus);
+
+            if (paymentStatusDes == null)
+            {
+                return false;
+            }
+
+            payment.PaymentStatus.StatusName = PaymentStatus;
+            payment.PaymentStatus.Description = paymentStatusDes.Description;
+
+            _paymentsRepository.Update(payment);
+
+            return (await _unitOfWork.SaveChangeAsync() > 0);
+        }
+
+        public async Task<bool> UpdatePaymentStatus(Guid PaymentStatusId, string StatusName, string Description)
+        {
+            var paymentStatus = await _paymentStatusRepository.GetByIdAsync(PaymentStatusId);
+
+            if (paymentStatus == null)
+            {
+                return false;
+            }
+
+            paymentStatus.StatusName = StatusName;
+            paymentStatus.Description = Description;
+
+            _paymentStatusRepository.Update(paymentStatus);
+
+            return (await _unitOfWork.SaveChangeAsync() > 0);
         }
     }
 }
