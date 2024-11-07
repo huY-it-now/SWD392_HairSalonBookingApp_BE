@@ -44,5 +44,6 @@ namespace Application.Interfaces
         Task<Result<object>> CreateUserAsync(UserDTO userDto);
         Task<Result<object>> GetAllCustomer();
         Task<Result<object>> CountCustomer();
+        Task<Result<object>> UnBanUser(Guid userId);
     }
 }

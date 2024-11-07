@@ -1077,5 +1077,30 @@ namespace Application.Services
                 Data = result
             };
         }
+
+        public async Task<Result<object>> UnBanUser(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserById(userId);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            user.IsDeleted = false;
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Unban successfully"
+            };
+        }
     }
 }

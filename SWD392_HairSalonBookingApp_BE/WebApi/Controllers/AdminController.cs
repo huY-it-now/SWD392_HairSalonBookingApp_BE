@@ -110,5 +110,12 @@ namespace WebApi.Controllers
             var result = await _userService.CountCustomer();
             return Ok(result);
         }
+
+        [HttpPut]
+        public async Task<IActionResult> UnbanUser(Guid userId)
+        {
+            var result = await _userService.UnBanUser(userId);
+            return Ok(result);
+        }
     }
 }
