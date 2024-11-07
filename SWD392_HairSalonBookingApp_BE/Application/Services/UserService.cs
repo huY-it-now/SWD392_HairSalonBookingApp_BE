@@ -1102,5 +1102,57 @@ namespace Application.Services
                 Message = "Unban successfully"
             };
         }
+
+        public async Task<Result<object>> BanSalonMember(Guid salonMemberId)
+        {
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberById(salonMemberId);
+
+            if (salonMember == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            salonMember.IsDeleted = true;
+            salonMember.User.IsDeleted = true;
+
+            _unitOfWork.SalonMemberRepository.Update(salonMember);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 1,
+                Message = $"Ban {salonMember.User.FullName} successfully"
+            };
+        }
+
+        public async Task<Result<object>> UnbanSalonMember(Guid salonMemberId)
+        {
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberById(salonMemberId);
+
+            if (salonMember == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            salonMember.IsDeleted = false;
+            salonMember.User.IsDeleted = false;
+
+            _unitOfWork.SalonMemberRepository.Update(salonMember);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 1,
+                Message = $"Unban {salonMember.User.FullName} successfully"
+            };
+        }
     }
 }
