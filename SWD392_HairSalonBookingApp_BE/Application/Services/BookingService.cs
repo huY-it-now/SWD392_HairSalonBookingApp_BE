@@ -297,6 +297,10 @@ namespace Application.Services
 
             await _paymentsRepository.AddAsync(payment);
 
+            booking.PaymentId = payment.Id;
+
+            _bookingRepository.Update(booking);
+
             if (!(await _unitOfWork.SaveChangeAsync() > 0))
             {
                 Result.Error = 1;
@@ -304,7 +308,22 @@ namespace Application.Services
                 return Result;
             }
 
-            var bookingDTO = _mapper.Map<BookingDTO>(booking);
+            var bookingDTO = new BookingDTO
+            {
+                Id = booking.Id,
+                PaymentId = payment.Id,
+                BookingDate = booking.BookingDate,
+                BookingStatus = booking.BookingStatus,
+                CustomerName = booking.CustomerName,
+                CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                StylistName = booking.SalonMember.User.FullName,
+                SalonName = booking.salon.salonName,
+                Address = booking.salon.Address,
+                ComboServiceName = _mapper.Map<ComboServiceForBookingDTO>(booking.ComboService),
+                PaymentAmount = booking.ComboService.Price,
+                PaymentDate = booking.Payments.PaymentDate,
+                PaymentStatus = booking.Payments.PaymentStatus.StatusName,
+            };
             Result.Message = "Create success";
             Result.Data = bookingDTO;
 
