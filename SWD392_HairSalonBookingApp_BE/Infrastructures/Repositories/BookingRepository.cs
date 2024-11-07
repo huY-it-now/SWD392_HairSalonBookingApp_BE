@@ -122,20 +122,28 @@ namespace Infrastructures.Repositories
                                         .ToListAsync();
         }
 
-        public Task<Booking> GetBookingUncompletedNow(Guid userId)
+        public Task<List<Booking>> GetBookingUncompletedNow(Guid userId)
         {
             return _dbContext.Bookings
                                 .Where(x => x.BookingStatus != "Completed")
                                 .Include(x => x.salon)
                                 .Include(x => x.SalonMember)
+                                .ThenInclude(x => x.User)
                                 .Include(x => x.ComboService)
-                                .FirstOrDefaultAsync();
+                                .ToListAsync();
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate)
         {
             return await _dbContext.Bookings
                                         .AnyAsync(predicate);
+        }
+
+        public async Task<Booking> GetBookingBySalonAndDateAsync(Guid salonId, DateTime bookingDate)
+        {
+            return await _dbContext.Set<Booking>()
+            .Where(b => b.SalonId == salonId && b.BookingDate == bookingDate)
+            .FirstOrDefaultAsync();
         }
     }
 }

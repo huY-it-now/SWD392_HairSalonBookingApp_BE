@@ -381,9 +381,9 @@ namespace Application.Services
         public async Task<List<StylistDTO>> GetAvailableStylists(Guid salonId, DateTime bookingDate, TimeSpan bookingTime)
         {
             var shift = WorkShiftDTO
-                            .GetAvailableShifts()
-                            .FirstOrDefault(s => bookingTime >= s.StartTime
-                                            && bookingTime < s.EndTime);
+                   .GetAvailableShifts()
+                   .FirstOrDefault(s => bookingTime >= s.StartTime
+                                   && bookingTime < s.EndTime);
 
             if (shift == null)
             {
@@ -395,18 +395,18 @@ namespace Application.Services
                                                 .ScheduleRepository
                                                 .GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
 
-            // Lọc stylist không có lịch hẹn vào thời gian truyền vào
+            // Lọc stylist không có booking vào ngày truyền vào với trạng thái chưa completed
             var stylistWithoutAppointments = new List<StylistDTO>();
 
             foreach (var stylist in availableStylists)
             {
-                // Kiểm tra xem stylist có booking vào thời gian yêu cầu hay không
+                // Kiểm tra xem stylist có bất kỳ booking nào trong ngày với trạng thái chưa hoàn thành
                 var hasBooking = await _unitOfWork.BookingRepository
                                      .AnyAsync(b => b.SalonMemberId == stylist.Id &&
                                                     b.BookingDate.Date == bookingDate.Date &&
-                                                    b.BookingDate.TimeOfDay == bookingTime);
+                                                    b.BookingStatus != "Completed");
 
-                // Nếu không có booking tại thời gian đó, thêm stylist vào danh sách
+                // Nếu không có booking chưa hoàn thành vào ngày đó, thêm stylist vào danh sách
                 if (!hasBooking)
                 {
                     stylistWithoutAppointments.Add(stylist);
@@ -717,6 +717,7 @@ namespace Application.Services
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = b.ComboService.Id,
@@ -899,9 +900,47 @@ namespace Application.Services
             };
         }
 
-        public Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
+        public async Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
         {
-            throw new NotImplementedException();
+            var bookings = await _unitOfWork.BookingRepository.GetBookingUncompletedNow(userId);
+
+            if (bookings == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No booking"
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingStatusDTO
+            {
+                BookingId = b.Id,
+                BookingDate = b.BookingDate,
+                BookingStatus = b.BookingStatus,
+                CustomerName = b.CustomerName,
+                CustomerPhoneNumber = b.CustomerPhoneNumber,
+                StylistId = b.SalonMemberId,
+                StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = b.salon.Address,
+                ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
+            }).ToList();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Orders",
+                Data = bookingDTOs
+            };
         }
 
         public async Task<string> UserFeedback(FeedbackDTO request)

@@ -21,14 +21,14 @@ namespace Infrastructures.Repositories
             _dbContext = dbContext;
         }
 
-        public Task<SalonMemberSchedule> GetByTime(int year, int month, int day)
+        public async Task<SalonMemberSchedule> GetByTime(int year, int month, int day)
         {
-            return _dbContext.SalonMemberSchedules
+            return await _dbContext.SalonMemberSchedules
                                     .Where(sms => sms.ScheduleDate.Day == day && 
                                            sms.ScheduleDate.Year == year && 
                                            sms.ScheduleDate.Month == month)
                                     .OrderBy(sms => sms.ScheduleDate)
-                                    .SingleOrDefaultAsync();
+                                    .FirstOrDefaultAsync();
         }
     }
 }

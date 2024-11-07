@@ -259,6 +259,14 @@ namespace WebApi.Controllers
             var systemToken = await _googleAuthService.GenerateSystemTokenAsync(userGuid.ToString());
             return Ok(new { Token = systemToken });
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewBookingByUserId(Guid userId)
+        {
+            var result = await _userService.GetBookingUnCompletedByUserId(userId);
+
+            return Ok(result);
+        }
     }
 }
 

@@ -113,9 +113,27 @@ namespace Application.Services
 
         public async Task<Result<object>> UpdateComboDetail(UpdateComboDetailRequest updateRequest)
         {
-            ComboDetailValidation.Validate(_mapper.Map<ComboDetailDTO>(updateRequest));
-            var comboDetail = _mapper.Map<ComboDetail>(updateRequest);
-            await _comboDetailRepository.UpdateComboDetail(comboDetail);
+            var existingComboDetail = await _comboDetailRepository.GetByIdAsync(updateRequest.Id);
+
+            if (existingComboDetail == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Combo detail not found",
+                    Data = null
+                };
+            }
+
+            if (!string.IsNullOrEmpty(updateRequest.Content))
+            {
+                existingComboDetail.Content = updateRequest.Content;
+            }
+
+            existingComboDetail = _mapper.Map(updateRequest, existingComboDetail);
+
+            _unitOfWork.ComboDetailRepository.Update(existingComboDetail);
+            await _unitOfWork.SaveChangeAsync();
 
             return new Result<object>
             {

@@ -71,21 +71,25 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
 
         foreach (var item in listschedules)
         {
-            foreach (var workTime in item.WorkTime)
+            if (item.WorkTime != null)
             {
-                if (workTime.ScheduleDate.Hour > HourStart && 
-                    workTime.ScheduleDate.Hour < HourEnd)
+                foreach (var workTime in item.WorkTime)
                 {
-                    foreach (var sty in listStylist)
+                    if (workTime.ScheduleDate.Hour > HourStart && workTime.ScheduleDate.Hour < HourEnd)
                     {
-                        if(sty.SalonMemberSchedules == item)
+                        foreach (var sty in listStylist)
                         {
-                            listStylist.Remove(sty);
+                            if (sty.SalonMemberSchedules == item)
+                            {
+                                listStylist.Remove(sty);
+                                break;
+                            }
                         }
                     }
                 }
             }
         }
+
 
         return listStylist;
     }
@@ -97,5 +101,10 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
                                     .Include(x => x.User)
                                     .Where(x => x.User.RoleId == 5)
                                     .ToListAsync();
+    }
+
+    public async Task<SalonMember> GetSalonMemberById(Guid stylistId)
+    {
+        return await _dbContext.SalonMembers.Where(x => x.Id == stylistId).FirstOrDefaultAsync();
     }
 }
