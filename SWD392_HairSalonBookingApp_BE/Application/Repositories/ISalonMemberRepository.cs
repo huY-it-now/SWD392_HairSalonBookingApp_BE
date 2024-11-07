@@ -7,4 +7,5 @@ public interface ISalonMemberRepository : IGenericRepository<SalonMember> {
     Task<List<SalonMember>> GetSalonMemberBySalonId(Guid salonId);
     Task<List<SalonMember>> GetSalonMembersFree(DateTime dateTime, Salon salon, int HourStart, int HourEnd, int minuteStart, int minutEnd, SalonMember salonMember);
     Task<List<SalonMember>> GetStylistBySalonId(Guid salonId);
+    Task<SalonMember> GetSalonMemberById(Guid stylistId);
 }

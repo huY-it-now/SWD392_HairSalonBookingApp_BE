@@ -115,5 +115,12 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Bookings.AnyAsync(predicate);
         }
+
+        public async Task<Booking> GetBookingBySalonAndDateAsync(Guid salonId, DateTime bookingDate)
+        {
+            return await _dbContext.Set<Booking>()
+            .Where(b => b.SalonId == salonId && b.BookingDate == bookingDate)
+            .FirstOrDefaultAsync();
+        }
     }
 }

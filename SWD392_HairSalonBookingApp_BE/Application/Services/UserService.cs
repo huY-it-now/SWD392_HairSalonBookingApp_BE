@@ -380,9 +380,9 @@ namespace Application.Services
         public async Task<List<StylistDTO>> GetAvailableStylists(Guid salonId, DateTime bookingDate, TimeSpan bookingTime)
         {
             var shift = WorkShiftDTO
-                            .GetAvailableShifts()
-                            .FirstOrDefault(s => bookingTime >= s.StartTime
-                                            && bookingTime < s.EndTime);
+                   .GetAvailableShifts()
+                   .FirstOrDefault(s => bookingTime >= s.StartTime
+                                   && bookingTime < s.EndTime);
 
             if (shift == null)
             {
@@ -394,18 +394,18 @@ namespace Application.Services
                                                 .ScheduleRepository
                                                 .GetAvailableStylistsByTime(shift.Shift, bookingDate, salonId);
 
-            // Lọc stylist không có lịch hẹn vào thời gian truyền vào
+            // Lọc stylist không có booking vào ngày truyền vào với trạng thái chưa completed
             var stylistWithoutAppointments = new List<StylistDTO>();
 
             foreach (var stylist in availableStylists)
             {
-                // Kiểm tra xem stylist có booking vào thời gian yêu cầu hay không
+                // Kiểm tra xem stylist có bất kỳ booking nào trong ngày với trạng thái chưa hoàn thành
                 var hasBooking = await _unitOfWork.BookingRepository
                                      .AnyAsync(b => b.SalonMemberId == stylist.Id &&
                                                     b.BookingDate.Date == bookingDate.Date &&
-                                                    b.BookingDate.TimeOfDay == bookingTime);
+                                                    b.BookingStatus != "Completed");
 
-                // Nếu không có booking tại thời gian đó, thêm stylist vào danh sách
+                // Nếu không có booking chưa hoàn thành vào ngày đó, thêm stylist vào danh sách
                 if (!hasBooking)
                 {
                     stylistWithoutAppointments.Add(stylist);

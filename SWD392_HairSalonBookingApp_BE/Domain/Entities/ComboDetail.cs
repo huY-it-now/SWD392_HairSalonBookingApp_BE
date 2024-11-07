@@ -2,7 +2,7 @@
 {
     public class ComboDetail : BaseEntity
     {
-        public string Content { get; set; }
+        public string? Content { get; set; }
 
         #region Relationship
         public ICollection<ComboServiceComboDetail> ComboServiceComboDetails { get; set; }
