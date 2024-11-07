@@ -45,5 +45,7 @@ namespace Application.Interfaces
         Task<Result<object>> GetAllCustomer();
         Task<Result<object>> CountCustomer();
         Task<Result<object>> UnBanUser(Guid userId);
+        Task<Result<object>> BanSalonMember(Guid salonMemberId);
+        Task<Result<object>> UnbanSalonMember(Guid salonMemberId);
     }
 }

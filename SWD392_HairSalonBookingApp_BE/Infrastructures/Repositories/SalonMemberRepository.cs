@@ -105,6 +105,6 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
 
     public async Task<SalonMember> GetSalonMemberById(Guid stylistId)
     {
-        return await _dbContext.SalonMembers.Where(x => x.Id == stylistId).FirstOrDefaultAsync();
+        return await _dbContext.SalonMembers.Include(x => x.User).Where(x => x.Id == stylistId).FirstOrDefaultAsync();
     }
 }
