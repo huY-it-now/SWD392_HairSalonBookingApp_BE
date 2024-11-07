@@ -57,10 +57,10 @@ builder.Services.AddCors(opt =>
     now we can use dependency injection for AppConfiguration
 */
 // Configure Firebase
-FirebaseApp.Create(new AppOptions()
-{
-    Credential = GoogleCredential.FromFile("path-to-your-service-account.json")
-});
+//FirebaseApp.Create(new AppOptions()
+//{
+//    Credential = GoogleCredential.FromFile("path-to-your-service-account.json")
+//});
 
 // Add other services
 builder.Services.AddControllers();

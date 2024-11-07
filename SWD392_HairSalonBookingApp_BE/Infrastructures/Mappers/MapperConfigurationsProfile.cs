@@ -60,10 +60,12 @@ namespace Infrastructures.Mappers
                     opt.MapFrom(src => src.ImageUrl));
 
             CreateMap<Booking, BookingDTO>()
-                .ForMember(dest => dest.CustomerName, opt => 
+                .ForMember(dest => dest.CustomerName, opt =>
                     opt.MapFrom(src => src.SalonMember.User != null ? src.SalonMember.User.FullName : "N/A"))
-                .ForMember(dest => dest.StylistName, opt => 
-                    opt.MapFrom(src => src.SalonMember != null ? src.SalonMember.User.FullName : "Unknown"));
+                .ForMember(dest => dest.StylistName, opt =>
+                    opt.MapFrom(src => src.SalonMember.Id))
+                .ForMember(dest => dest.StylistName, opt =>
+                    opt.MapFrom(src => src.SalonMember.User.FullName));
 
             CreateMap<SalonMemberDTO, SalonMember>();
 

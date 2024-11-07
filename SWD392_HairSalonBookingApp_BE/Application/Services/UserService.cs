@@ -717,6 +717,7 @@ namespace Application.Services
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = b.ComboService.Id,
@@ -899,9 +900,47 @@ namespace Application.Services
             };
         }
 
-        public Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
+        public async Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId)
         {
-            throw new NotImplementedException();
+            var bookings = await _unitOfWork.BookingRepository.GetBookingUncompletedNow(userId);
+
+            if (bookings == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "No booking"
+                };
+            }
+
+            var bookingDTOs = bookings.Select(b => new BookingStatusDTO
+            {
+                BookingId = b.Id,
+                BookingDate = b.BookingDate,
+                BookingStatus = b.BookingStatus,
+                CustomerName = b.CustomerName,
+                CustomerPhoneNumber = b.CustomerPhoneNumber,
+                StylistId = b.SalonMemberId,
+                StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = b.salon.Address,
+                ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                {
+                    Id = b.ComboService.Id,
+                    ComboServiceName = b.ComboService.ComboServiceName,
+                    Price = b.ComboService.Price,
+                    Image = b.ComboService.ImageUrl
+                },
+                PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                PaymentStatus = b.Payments?.PaymentStatus?.StatusName
+            }).ToList();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Orders",
+                Data = bookingDTOs
+            };
         }
 
         public async Task<string> UserFeedback(FeedbackDTO request)

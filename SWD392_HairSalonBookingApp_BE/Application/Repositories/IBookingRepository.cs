@@ -22,7 +22,7 @@ namespace Application.Repositories
         Task<Booking> GetBookingByIdAsync(Guid bookingId);
         Task<List<Booking>> GetAllBookingWithAllStatus();
         Task<List<Booking>> GetBookingForStylist(Guid stylistId);
-        Task<Booking> GetBookingUncompletedNow(Guid userId);
+        Task<List<Booking>> GetBookingUncompletedNow(Guid userId);
         Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate);
         Task<Booking> GetBookingBySalonAndDateAsync(Guid salonId, DateTime bookingDate);
     }

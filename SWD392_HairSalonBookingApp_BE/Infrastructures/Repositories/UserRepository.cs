@@ -51,6 +51,9 @@ namespace Infrastructures.Repositories
             return await _dbContext.Bookings
                                         .Where(b => b.UserId == userId)
                                         .Where(s => s.BookingStatus == "Completed")
+                                        .Include(x => x.salon)
+                                        .Include(x => x.SalonMember)
+                                        .ThenInclude(x => x.User)
                                         .Include(b => b.Payments)
                                         .Include(b => b.ComboService)
                                         .ToListAsync();
