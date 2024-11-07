@@ -452,6 +452,7 @@ namespace Application.Services
             var result = new BookingDTO
             {
                 Id = booking.Id,
+                PaymentId = booking.PaymentId,
                 BookingDate = booking.BookingDate,
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,

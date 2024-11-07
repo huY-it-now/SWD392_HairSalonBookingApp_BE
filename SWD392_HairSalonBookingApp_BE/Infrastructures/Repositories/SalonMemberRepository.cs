@@ -36,7 +36,7 @@ public class SalonMemberRepository : GenericRepository<SalonMember>, ISalonMembe
 
     public async Task<List<SalonMember>> GetSalonMembersFree(DateTime dateTime, Salon salon, int HourStart, int HourEnd, int minuteStart, int minutEnd, SalonMember salonMember)
     {
-        var listStylist = await _dbContext.SalonMembers
+        var listStylist = await _dbContext.SalonMembers.Include(x => x.User).Where(x => x.User.RoleId == 5)
                                                 .Include(st => st.SalonMemberSchedules)
                                                 .Where(st => st.Salon == salon)
                                                 .ToListAsync();
