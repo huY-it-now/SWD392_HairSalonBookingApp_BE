@@ -314,7 +314,7 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPut("update-payment/{id}")]
+        [HttpPut("update-payment/{PaymentId}")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
         public async Task<IActionResult> UpdatePayment(Guid PaymentId, string PaymentStatus)
