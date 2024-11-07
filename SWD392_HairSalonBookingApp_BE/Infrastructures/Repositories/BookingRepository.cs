@@ -68,7 +68,7 @@ namespace Infrastructures.Repositories
             return await _dbContext.Bookings
                                        .Where(b => b.BookingStatus == "Checked")
                                        .Include(b => b.User)
-                                       .Include(b => b.Payments)
+                                       .Include(b => b.Payments).ThenInclude(x => x.PaymentStatus)
                                        .Include(b => b.SalonMember)
                                        .Include(b => b.ComboService)
                                        .ToListAsync();
@@ -95,7 +95,7 @@ namespace Infrastructures.Repositories
 
         public async Task<Booking> GetBookingByIdAsync(Guid bookingId)
         {
-            return await _dbContext.Bookings
+            return await _dbContext.Bookings.Where(x => x.BookingStatus == "Completed")
                                         .Include(b => b.User)
                                         .Include(b => b.ComboService)
                                         .Include(b => b.salon)
@@ -116,8 +116,9 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetBookingForStylist(Guid stylistId)
         {
-            return await _dbContext.Bookings
-                                        .Where(x => x.SalonMemberId == stylistId)
+            return await _dbContext.Bookings.Where(x => x.BookingStatus == "Checked")
+                .Include(x => x.Feedback).Include(x => x.SalonMember).Include(x => x.salon)
+                                        .Where(x => x.SalonMemberId == stylistId).Include(x => x.User).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus)
                                         .Include(x => x.ComboService)
                                         .ToListAsync();
         }
@@ -128,7 +129,7 @@ namespace Infrastructures.Repositories
                                 .Where(x => x.BookingStatus != "Completed")
                                 .Include(x => x.salon)
                                 .Include(x => x.SalonMember)
-                                .ThenInclude(x => x.User)
+                                .ThenInclude(x => x.User).Where(x => x.UserId == userId)
                                 .Include(x => x.ComboService)
                                 .ToListAsync();
         }
