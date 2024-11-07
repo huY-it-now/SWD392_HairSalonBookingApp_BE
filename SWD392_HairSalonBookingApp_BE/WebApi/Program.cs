@@ -5,6 +5,11 @@ using Domain.Contracts.Settings;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Filters;
 using Net.payOS;
+using Application.Interfaces;
+using Application.Services;
+using Microsoft.AspNetCore.Builder.Extensions;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -51,6 +56,21 @@ builder.Services.AddCors(opt =>
     register with singleton life time
     now we can use dependency injection for AppConfiguration
 */
+// Configure Firebase
+FirebaseApp.Create(new AppOptions()
+{
+    Credential = GoogleCredential.FromFile("path-to-your-service-account.json")
+});
+
+// Add other services
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// Register custom services (including GoogleAuthService and IUserService)
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
 builder.Services.AddSingleton(configuration);
 
 var app = builder.Build();
