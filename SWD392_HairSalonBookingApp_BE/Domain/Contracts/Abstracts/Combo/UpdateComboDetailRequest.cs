@@ -10,7 +10,6 @@ namespace Domain.Contracts.Abstracts.Combo
     {
         public Guid? Id { get; set; }
         public string? Content { get; set; }
-        public bool? IsDeleted { get; set; }
     }
 }
 
