@@ -13,5 +13,6 @@ namespace Application.Repositories
         Task<List<Booking>> GetBookingsByUserId(Guid userId);
         Task<List<SalonMember>> GetAllStaff();
         Task<List<SalonMember>> GetAllManager();
+        Task<List<User>> GetAllCustomerAsync();
     }
 }

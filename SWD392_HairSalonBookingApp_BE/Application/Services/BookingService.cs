@@ -441,6 +441,7 @@ namespace Application.Services
                 Feedback = booking.Feedback?.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = booking.salon.Address,
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = booking.ComboServiceId,
@@ -484,6 +485,7 @@ namespace Application.Services
                 Feedback = booking.Feedback?.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = booking.salon.Address,
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = booking.ComboServiceId,

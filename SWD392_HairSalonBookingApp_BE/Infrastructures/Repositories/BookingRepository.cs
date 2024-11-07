@@ -25,7 +25,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetAllBookingsAsync()
         {
-            return await _dbContext.Bookings
+            return await _dbContext.Bookings.Include(x => x.salon).Include(x => x.Feedback)
                                         .Include(x => x.SalonMember)
                                         .ThenInclude(x => x.User)
                                         .Include(x => x.ComboService)   

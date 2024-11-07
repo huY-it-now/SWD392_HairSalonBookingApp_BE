@@ -22,6 +22,11 @@ namespace Infrastructures.Repositories
                                        .AnyAsync(e => e.Email == email);
         }
 
+        public async Task<List<User>> GetAllCustomerAsync()
+        {
+            return await _dbContext.Users.Where(x => x.RoleId == 2).ToListAsync();
+        }
+
         public async Task<List<SalonMember>> GetAllManager()
         {
             return await _dbContext.SalonMembers
@@ -50,7 +55,7 @@ namespace Infrastructures.Repositories
         {
             return await _dbContext.Bookings
                                         .Where(b => b.UserId == userId)
-                                        .Where(s => s.BookingStatus == "Completed")
+                                        .Where(s => s.BookingStatus == "Completed" || s.BookingStatus == "Cancel")
                                         .Include(x => x.salon)
                                         .Include(x => x.SalonMember)
                                         .ThenInclude(x => x.User)
