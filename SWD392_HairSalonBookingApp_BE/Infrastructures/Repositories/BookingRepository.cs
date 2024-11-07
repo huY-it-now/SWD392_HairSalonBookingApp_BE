@@ -125,15 +125,19 @@ namespace Infrastructures.Repositories
                                         .ToListAsync();
         }
 
-        public Task<List<Booking>> GetBookingUncompletedNow(Guid userId)
+        public async Task<List<Booking>> GetBookingUncompletedNow(Guid userId)
         {
-            return _dbContext.Bookings.Include(x => x.Payments).ThenInclude(x => x.PaymentStatus).Include(x => x.Feedback)
-                                .Where(x => x.BookingStatus != "Completed")
-                                .Include(x => x.salon)
-                                .Include(x => x.SalonMember)
-                                .ThenInclude(x => x.User).Where(x => x.UserId == userId)
-                                .Include(x => x.ComboService)
-                                .ToListAsync();
+            return await _dbContext.Bookings
+                                        .Where(b => b.UserId == userId)
+                                        .Where(s => s.BookingStatus != "Completed")
+                                        .Include(x => x.salon)
+                                        .Include(x => x.SalonMember)
+                                        .ThenInclude(x => x.User)
+                                        .Include(b => b.Payments)
+                                        .ThenInclude(b => b.PaymentStatus)
+                                        .Include(b => b.ComboService)
+                                        .Include(x => x.Feedback)
+                                        .ToListAsync();
         }
 
         public async Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate)

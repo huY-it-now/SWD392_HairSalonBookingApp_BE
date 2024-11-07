@@ -715,6 +715,7 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
+                PaymentId = b.Payments.Id,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
                 SalonName = b.salon.salonName,
@@ -919,16 +920,18 @@ namespace Application.Services
                 };
             }
 
-            var bookingDTOs = bookings.Select(b => new BookingStatusDTO
+            var bookingDTOs = bookings.Select(b => new BookingDTO
             {
-                BookingId = b.Id,
+                Id = b.Id,
                 BookingDate = b.BookingDate,
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
+                PaymentId = b.Payments.Id,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
                 Feedback = b.Feedback.Title,
+                SalonName = b.salon.salonName,
                 Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
                 {

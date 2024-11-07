@@ -60,6 +60,7 @@ namespace Infrastructures.Repositories
                                         .Include(x => x.SalonMember)
                                         .ThenInclude(x => x.User)
                                         .Include(b => b.Payments)
+                                        .ThenInclude(b => b.PaymentStatus)
                                         .Include(b => b.ComboService)
                                         .ToListAsync();
         }
