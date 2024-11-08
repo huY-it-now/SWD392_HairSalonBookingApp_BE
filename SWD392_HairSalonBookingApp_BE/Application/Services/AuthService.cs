@@ -15,8 +15,6 @@ namespace Application.Services
     {
         private readonly IMapper _mapper;
         private readonly IUserService _userService;
-        private readonly IJwtService _jwtService;
-        private readonly ICacheService _cacheService;
         private readonly IUserRepository _userRepo;
 
         public Task<GoogleAuthResponsesDTO> HandleGoogleLogin(string rdc, GoogleAuthInfoDTO info)
