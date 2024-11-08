@@ -56,10 +56,12 @@ builder.Services.AddCors(opt =>
     register with singleton life time
     now we can use dependency injection for AppConfiguration
 */
+
 // Configure Firebase
 //FirebaseApp.Create(new AppOptions()
 //{
 //    Credential = GoogleCredential.FromFile("path-to-your-service-account.json")
+
 //});
 
 // Add other services

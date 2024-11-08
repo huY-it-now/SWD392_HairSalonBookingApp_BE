@@ -984,7 +984,8 @@ namespace Application.Services
 
         public async Task<string> UserFeedback(FeedbackDTO request)
         {
-            var booking = await _unitOfWork.BookingRepository.GetBookingByIdAsync(request.BookingId);
+            var booking = await _unitOfWork.BookingRepository
+                                                .GetBookingByIdAsync(request.BookingId);
 
             if (booking == null)
             {
@@ -1003,11 +1004,13 @@ namespace Application.Services
                 Description = request.Description,
             };
 
-            await _unitOfWork.FeedbackRepository.AddAsync(feedback);
+            await _unitOfWork.FeedbackRepository
+                                .AddAsync(feedback);
             
             booking.FeedbackId = feedback.Id;
 
             _unitOfWork.BookingRepository.Update(booking);
+
             await _unitOfWork.SaveChangeAsync();
 
             return "Thank you for your feedback";
@@ -1036,44 +1039,44 @@ namespace Application.Services
             };
         }
 
-        public async Task<Result<object>> GetUserByEmailAsync(string email)
-        {
-            var user = await _unitOfWork.UserRepository.GetUserByEmail(email);
+        //public async Task<Result<object>> GetUserByEmailAsync(string email)
+        //{
+        //    var user = await _unitOfWork.UserRepository.GetUserByEmail(email);
 
-            if (user == null)
-            {
-                return new Result<object>
-                {
-                    Error = 1,
-                    Message = "User not found",
-                    Data = null
-                };
-            }
+        //    if (user == null)
+        //    {
+        //        return new Result<object>
+        //        {
+        //            Error = 1,
+        //            Message = "User not found",
+        //            Data = null
+        //        };
+        //    }
 
-            var userDto = _mapper.Map<UserDTO>(user);
-            return new Result<object>
-            {
-                Error = 0,
-                Message = "User retrieved successfully",
-                Data = userDto
-            };
-        }
+        //    var userDto = _mapper.Map<UserDTO>(user);
+        //    return new Result<object>
+        //    {
+        //        Error = 0,
+        //        Message = "User retrieved successfully",
+        //        Data = userDto
+        //    };
+        //}
 
-        public async Task<Result<object>> CreateUserAsync(UserDTO userDto)
-        {
-            var user = _mapper.Map<User>(userDto);
+        //public async Task<Result<object>> CreateUserAsync(UserDTO userDto)
+        //{
+        //    var user = _mapper.Map<User>(userDto);
 
-            await _unitOfWork.UserRepository.AddAsync(user);
-            await _unitOfWork.SaveChangeAsync(); // Lưu thay đổi với UnitOfWork
+        //    await _unitOfWork.UserRepository.AddAsync(user);
+        //    await _unitOfWork.SaveChangeAsync(); // Lưu thay đổi với UnitOfWork
 
-            return new Result<object>
-            {
-                Error = 0,
-                Message = "User created successfully",
-                Data = _mapper.Map<UserDTO>(user)
-            };
-        }
-
+        //    return new Result<object>
+        //    {
+        //        Error = 0,
+        //        Message = "User created successfully",
+        //        Data = _mapper.Map<UserDTO>(user)
+        //    };
+        //}
+        
         public async Task<Result<object>> GetAllCustomer()
         {
             var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
