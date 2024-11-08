@@ -10,8 +10,8 @@ namespace Application.Interfaces
 {
     public interface IAuthService
     {
-        public Task<GoogleAuthResponses> HandleGoogleLogin(string rdc, GgAuthInfo info);
-        public Task<IActionResult> HandleRefresh(RefreshReq req);
-        public Task<IActionResult> HandleLogout(LogoutReq req);
+        public Task<GoogleAuthResponsesDTO> HandleGoogleLogin(string rdc, GoogleAuthInfoDTO info);
+        public Task<IActionResult> HandleRefresh(RefreshRequestDTO req);
+        public Task<IActionResult> HandleLogout(LogoutRequestDTO req);
     }
 }

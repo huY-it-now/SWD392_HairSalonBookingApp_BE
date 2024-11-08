@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Domain.Contracts.DTO.Auth
 {
-    public class GoogleAuthInfo
+    public class GoogleAuthInfoDTO
     {
         public string Email { get; set; } = null!;
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
         public string? ProfileUrl { get; set; }
     }
-    public class GoogleAuthResponses
+    public class GoogleAuthResponsesDTO
     {
         public bool Success { get; set; }
         public string? Message { get; set; }
