@@ -561,7 +561,36 @@ namespace Application.Services
                                         .BookingRepository
                                         .GetBookingsByStylistIdAndDateRange(stylistId, fromDate, toDate);
 
-                return _mapper.Map<List<BookingDTO>>(bookings);
+                if (bookings == null || bookings.Count == 0)
+                {
+                    return new List<BookingDTO>(); // Trả về danh sách trống nếu không có booking nào
+                }
+
+                var bookingDTOs = bookings.Select(b => new BookingDTO
+                {
+                    Id = b.Id,
+                    BookingDate = b.BookingDate,
+                    BookingStatus = b.BookingStatus,
+                    CustomerName = b.CustomerName,
+                    CustomerPhoneNumber = b.CustomerPhoneNumber,
+                    PaymentId = b.Payments.Id,
+                    StylistId = b.SalonMemberId,
+                    StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                    SalonName = b.salon.salonName,
+                    Address = b.salon.Address,
+                    ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                    {
+                        Id = b.ComboService.Id,
+                        ComboServiceName = b.ComboService.ComboServiceName,
+                        Price = b.ComboService.Price,
+                        Image = b.ComboService.ImageUrl
+                    },
+                    PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                    PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                    PaymentStatus = b.Payments?.PaymentStatus?.StatusName
+                }).ToList();
+
+                return bookingDTOs;
             }
             catch (Exception ex)
             {
