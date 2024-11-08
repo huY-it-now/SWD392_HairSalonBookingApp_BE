@@ -15,7 +15,7 @@ namespace Domain.Contracts.DTO.Booking
         public string BookingStatus { get; set; }
         public string CustomerName { get; set; }
         public string CustomerPhoneNumber { get; set; }
-        public string? Feedback { get; set; }
+        public string Feedback { get; set; }
         public Guid StylistId { get; set; }
         public string StylistName { get; set; }
         public string SalonName { get; set; }
