@@ -55,7 +55,7 @@ namespace Application.Services
         {
             var booking = await _bookingRepository.GetBookingByIdAsync(Id);
 
-            var stylist = await ChooseRandomStylist(booking.BookingDate, booking.salon, booking.ComboService.ComboServiceName, booking.SalonMember);
+            var stylist = await ChooseRandomStylist(booking.BookingDate, booking.salon.Id, booking.ComboService.ComboServiceName, booking.SalonMember);
 
             if (stylist == null)
             {
@@ -132,11 +132,11 @@ namespace Application.Services
             return await  _unitOfWork.SaveChangeAsync() > 0;
         }
 
-        public async Task<SalonMember> ChooseRandomStylist(DateTime dateTime, Salon salon, string comboServiceName, SalonMember salonMember)
+        public async Task<SalonMember> ChooseRandomStylist(DateTime dateTime, Guid salonId, string comboServiceName, SalonMember salonMember)
         {
             int EndHour = dateTime.Hour + CheckComboSericeTime(comboServiceName).Hours;
 
-            var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(dateTime, salon, dateTime.Hour, EndHour, 0, 0, salonMember);
+            var stylistListFree = await _unitOfWork.SalonMemberRepository.GetSalonMembersFree(dateTime, salonId, dateTime.Hour, EndHour, 0, 0, salonMember);
 
             if (stylistListFree == null)
             {
@@ -203,7 +203,7 @@ namespace Application.Services
 
             if (salonMember == null)
             {
-                booking.SalonMember = await ChooseRandomStylist(cuttingDate, Salon, comboService.ComboServiceName, salonMember);
+                booking.SalonMember = await ChooseRandomStylist(cuttingDate, salonId, comboService.ComboServiceName, salonMember);
 
                 if (booking.SalonMember == null)
                 {
