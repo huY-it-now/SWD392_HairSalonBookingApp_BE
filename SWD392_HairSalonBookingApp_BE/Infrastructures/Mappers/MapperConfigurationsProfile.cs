@@ -31,7 +31,9 @@ namespace Infrastructures.Mappers
 
             CreateMap<VerifyTokenRequest, VerifyTokenDTO>();
 
-            CreateMap<User, UserDTO>();
+            CreateMap<User, UserDTO>()
+                .ForMember(dest => dest.Phone, opt => opt.MapFrom(src => src.PhoneNumber))
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address));
 
             CreateMap<UpdateProfileDTO, User>();
 

@@ -48,7 +48,7 @@ namespace Application.Services
 
         public async Task<Result<object>> GetAllUser()
         {
-            var users = await _unitOfWork.UserRepository.GetAllAsync();
+            var users = await _unitOfWork.UserRepository.GetAllUserAsync();
             var userMapper = _mapper.Map<List<UserDTO>>(users);
 
             return new Result<object>
@@ -561,7 +561,36 @@ namespace Application.Services
                                         .BookingRepository
                                         .GetBookingsByStylistIdAndDateRange(stylistId, fromDate, toDate);
 
-                return _mapper.Map<List<BookingDTO>>(bookings);
+                if (bookings == null || bookings.Count == 0)
+                {
+                    return new List<BookingDTO>(); // Trả về danh sách trống nếu không có booking nào
+                }
+
+                var bookingDTOs = bookings.Select(b => new BookingDTO
+                {
+                    Id = b.Id,
+                    BookingDate = b.BookingDate,
+                    BookingStatus = b.BookingStatus,
+                    CustomerName = b.CustomerName,
+                    CustomerPhoneNumber = b.CustomerPhoneNumber,
+                    PaymentId = b.Payments.Id,
+                    StylistId = b.SalonMemberId,
+                    StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                    SalonName = b.salon.salonName,
+                    Address = b.salon.Address,
+                    ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
+                    {
+                        Id = b.ComboService.Id,
+                        ComboServiceName = b.ComboService.ComboServiceName,
+                        Price = b.ComboService.Price,
+                        Image = b.ComboService.ImageUrl
+                    },
+                    PaymentAmount = b.Payments?.PaymentAmount ?? 0,
+                    PaymentDate = b.Payments?.PaymentDate ?? DateTime.MinValue,
+                    PaymentStatus = b.Payments?.PaymentStatus?.StatusName
+                }).ToList();
+
+                return bookingDTOs;
             }
             catch (Exception ex)
             {
@@ -715,8 +744,10 @@ namespace Application.Services
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
+                PaymentId = b.Payments.Id,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                SalonName = b.salon.salonName,
                 Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
@@ -768,6 +799,8 @@ namespace Application.Services
                 Feedback = b.Feedback.Title,
                 StylistId = b.SalonMember.Id,
                 StylistName = b.SalonMember.User.FullName,
+                SalonName = b.salon.salonName,
+                Address = b.salon.Address,
                 ComboServiceName = b.ComboService != null ? new ComboServiceForBookingDTO
                 {
                     Id = b.ComboService.Id,
@@ -780,10 +813,13 @@ namespace Application.Services
                 PaymentStatus = b.Payments?.PaymentStatus?.StatusName
             }).ToList();
 
+            var totalRevenue = bookings.Sum(b => b.Payments?.PaymentAmount ?? 0);
+
             var adminDashboardDTO = new AdminDashboardDTO
             {
                 TotalBookings = bookings.Count,
-                Bookings = bookingDTOs
+                Bookings = bookingDTOs,
+                TotalRevenue = totalRevenue
             };
 
             return new Result<object>
@@ -913,15 +949,18 @@ namespace Application.Services
                 };
             }
 
-            var bookingDTOs = bookings.Select(b => new BookingStatusDTO
+            var bookingDTOs = bookings.Select(b => new BookingDTO
             {
-                BookingId = b.Id,
+                Id = b.Id,
                 BookingDate = b.BookingDate,
                 BookingStatus = b.BookingStatus,
                 CustomerName = b.CustomerName,
+                PaymentId = b.Payments.Id,
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Feedback = b.Feedback.Title,
+                SalonName = b.salon.salonName,
                 Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
@@ -1037,5 +1076,119 @@ namespace Application.Services
         //        Data = _mapper.Map<UserDTO>(user)
         //    };
         //}
+        
+        public async Task<Result<object>> GetAllCustomer()
+        {
+            var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
+
+            if (users == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            var result = _mapper.Map<List<UserDTO>>(users);
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "All user",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> CountCustomer()
+        {
+            var users = await _unitOfWork.UserRepository.GetAllCustomerAsync();
+
+            var result = users.Count();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Count Customer",
+                Data = result
+            };
+        }
+
+        public async Task<Result<object>> UnBanUser(Guid userId)
+        {
+            var user = await _unitOfWork.UserRepository.GetUserById(userId);
+
+            if (user == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            user.IsDeleted = false;
+
+            _unitOfWork.UserRepository.Update(user);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Unban successfully"
+            };
+        }
+
+        public async Task<Result<object>> BanSalonMember(Guid salonMemberId)
+        {
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberById(salonMemberId);
+
+            if (salonMember == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            salonMember.IsDeleted = true;
+            salonMember.User.IsDeleted = true;
+
+            _unitOfWork.SalonMemberRepository.Update(salonMember);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 1,
+                Message = $"Ban {salonMember.User.FullName} successfully"
+            };
+        }
+
+        public async Task<Result<object>> UnbanSalonMember(Guid salonMemberId)
+        {
+            var salonMember = await _unitOfWork.SalonMemberRepository.GetSalonMemberById(salonMemberId);
+
+            if (salonMember == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found user"
+                };
+            }
+
+            salonMember.IsDeleted = false;
+            salonMember.User.IsDeleted = false;
+
+            _unitOfWork.SalonMemberRepository.Update(salonMember);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 1,
+                Message = $"Unban {salonMember.User.FullName} successfully"
+            };
+        }
     }
 }

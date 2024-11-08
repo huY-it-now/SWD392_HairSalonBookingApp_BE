@@ -96,5 +96,40 @@ namespace WebApi.Controllers
             var result = await _userService.GetListFeedback();
             return Ok(result);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ViewAllCustomer()
+        {
+            var result = await _userService.GetAllCustomer();
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CountCustomer()
+        {
+            var result = await _userService.CountCustomer();
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UnbanUser(Guid userId)
+        {
+            var result = await _userService.UnBanUser(userId);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> BanSalonMember(Guid salonMemberId)
+        {
+            var result = await _userService.BanSalonMember(salonMemberId);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UnbanSalonMember(Guid salonMemberId)
+        {
+            var result = await _userService.UnbanSalonMember(salonMemberId);
+            return Ok(result);
+        }
     }
 }

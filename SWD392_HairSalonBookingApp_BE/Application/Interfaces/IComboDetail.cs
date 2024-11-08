@@ -19,5 +19,6 @@ namespace Application.Interfaces
         // Thêm phương thức để lấy ComboService liên quan qua bảng trung gian
         Task<Result<object>> GetComboServicesByComboDetailId(Guid comboDetailId);
         Task<Result<object>> GetComboDetailIsDeleted();
+        Task<Result<object>> UnDeletedComboDetail(Guid comboDetailId);
     }
 }

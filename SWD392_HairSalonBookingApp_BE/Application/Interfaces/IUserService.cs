@@ -39,10 +39,13 @@ namespace Application.Interfaces
         Task<Result<object>> GetBookingUnCompletedByUserId(Guid userId);
         Task<string> UserFeedback(FeedbackDTO request);
         Task<Result<object>> GetListFeedback();
-
         //Task<Result<object>> GetUserByEmailAsync(string email);
         //Task<Result<object>> CreateUserAsync(UserDTO userDto);
         //hide
-
+        Task<Result<object>> GetAllCustomer();
+        Task<Result<object>> CountCustomer();
+        Task<Result<object>> UnBanUser(Guid userId);
+        Task<Result<object>> BanSalonMember(Guid salonMemberId);
+        Task<Result<object>> UnbanSalonMember(Guid salonMemberId);
     }
 }

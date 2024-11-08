@@ -217,5 +217,12 @@ namespace WebApi.Controllers
 
             return Ok(result);
         }
+
+        [HttpPut("Undeleted")]
+        public async Task<IActionResult> UndeletedComboDetail(Guid comboDetailId)
+        {
+            var result = await _comboDetailService.UnDeletedComboDetail(comboDetailId);
+            return Ok(result);
+        }
     }
 }

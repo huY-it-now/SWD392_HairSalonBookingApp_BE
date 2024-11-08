@@ -199,7 +199,7 @@ namespace WebApi.Controllers
         [HttpPost("AddBooking")]
         [ProducesResponseType(200, Type = typeof(Result<object>))]
         [ProducesResponseType(400, Type = typeof(Result<object>))]
-        public async Task<Result<object>> AddBooking(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, TimeOnly hour_minutes, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
+        public async Task<Result<object>> AddBooking(Guid CustomerId, Guid salonId, Guid SalonMemberId, DateTime cuttingDate, int hour, int minutes, Guid ComboServiceId, string CustomerName, string CustomerPhoneNumber)
         {
             var result = new Result<object>
             {
@@ -215,7 +215,7 @@ namespace WebApi.Controllers
                 return result;
             }
 
-            DateTime dateTime = new DateTime(cuttingDate.Year, cuttingDate.Month, cuttingDate.Day, hour_minutes.Hour, hour_minutes.Minute, 0);
+            DateTime dateTime = new DateTime(cuttingDate.Year, cuttingDate.Month, cuttingDate.Day, hour, minutes, 0);
 
             if ((dateTime - DateTime.Now) < TimeSpan.FromHours(1))
             {

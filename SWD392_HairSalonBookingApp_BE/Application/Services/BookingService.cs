@@ -82,7 +82,7 @@ namespace Application.Services
 
             if (Check != "Pending")
             {
-                booking.BookingStatus = "Checked";
+                booking.BookingStatus = Check;
 
                 _bookingRepository.Update(booking);
 
@@ -292,10 +292,14 @@ namespace Application.Services
                     MethodName = "Qr",
                     Description = "Pay through Qr"
                 },
-                PaymentDate = DateTime.Now
+                PaymentDate = DateTime.UtcNow
             };
 
             await _paymentsRepository.AddAsync(payment);
+
+            booking.PaymentId = payment.Id;
+
+            _bookingRepository.Update(booking);
 
             if (!(await _unitOfWork.SaveChangeAsync() > 0))
             {
@@ -304,7 +308,21 @@ namespace Application.Services
                 return Result;
             }
 
-            var bookingDTO = _mapper.Map<BookingDTO>(booking);
+            var bookingDTO = new BookingDTO
+            {
+                Id = booking.Id,
+                PaymentId = payment.Id,
+                BookingDate = booking.BookingDate,
+                BookingStatus = booking.BookingStatus,
+                CustomerName = booking.CustomerName,
+                CustomerPhoneNumber = booking.CustomerPhoneNumber,
+                SalonName = booking.salon.salonName,
+                Address = booking.salon.Address,
+                PaymentAmount = booking.ComboService.Price,
+                PaymentDate = booking.Payments.PaymentDate,
+                PaymentStatus = booking.Payments.PaymentStatus.StatusName,
+                StylistId = booking.SalonMemberId,
+            };
             Result.Message = "Create success";
             Result.Data = bookingDTO;
 
@@ -434,6 +452,7 @@ namespace Application.Services
             var result = new BookingDTO
             {
                 Id = booking.Id,
+                PaymentId = booking.PaymentId,
                 BookingDate = booking.BookingDate,
                 BookingStatus = booking.BookingStatus,
                 CustomerName = booking.CustomerName,
@@ -441,6 +460,8 @@ namespace Application.Services
                 Feedback = booking.Feedback?.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                SalonName = booking.salon.salonName,
+                Address = booking.salon.Address,
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = booking.ComboServiceId,
@@ -484,6 +505,7 @@ namespace Application.Services
                 Feedback = booking.Feedback?.Title,
                 StylistId = booking.SalonMemberId,
                 StylistName = booking.SalonMember?.User?.FullName ?? "Unknown Stylist",
+                Address = booking.salon.Address,
                 ComboServiceName = booking.ComboService == null ? null : new ComboServiceForBookingDTO
                 {
                     Id = booking.ComboServiceId,

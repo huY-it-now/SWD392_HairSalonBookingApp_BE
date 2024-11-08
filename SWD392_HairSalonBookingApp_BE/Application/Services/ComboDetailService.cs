@@ -191,6 +191,31 @@ namespace Application.Services
             };
         }
 
+        public async Task<Result<object>> UnDeletedComboDetail(Guid comboDetailId)
+        {
+            var cbd = await _unitOfWork.ComboDetailRepository.GetComboDetailById(comboDetailId);
+
+            if (cbd == null)
+            {
+                return new Result<object>
+                {
+                    Error = 1,
+                    Message = "Not found combo detail"
+                };
+            }
+
+            cbd.IsDeleted = false;
+
+            _unitOfWork.ComboDetailRepository.Update(cbd);
+            await _unitOfWork.SaveChangeAsync();
+
+            return new Result<object>
+            {
+                Error = 0,
+                Message = "Undeleted combo detail successfully"
+            };
+        }
+
         //public async Task<Result<object>> GetComboDetailsByComboServiceId(Guid comboServiceId)
         //{
         //    var comboDetails = await _comboServiceComboDetailRepository.GetComboDetailsByComboServiceId(comboServiceId);
