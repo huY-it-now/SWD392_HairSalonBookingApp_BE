@@ -119,7 +119,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetBookingForStylist(Guid stylistId)
         {
-            return await _dbContext.Bookings.Where(x => x.BookingStatus == "Checked")
+            return await _dbContext.Bookings.Where(x => x.BookingStatus == "Confirmed")
                 .Include(x => x.Feedback).Include(x => x.SalonMember).Include(x => x.salon)
                                         .Where(x => x.SalonMemberId == stylistId).Include(x => x.User).Include(x => x.Payments).ThenInclude(x => x.PaymentStatus)
                                         .Include(x => x.ComboService)
@@ -128,7 +128,7 @@ namespace Infrastructures.Repositories
 
         public async Task<List<Booking>> GetBookingUncompletedNow(Guid userId)
         {
-            return await _dbContext.Bookings
+            return await _dbContext.Bookings.Include(f => f.Feedback)
                                         .Where(b => b.UserId == userId)
                                         .Where(s => s.BookingStatus != "Completed")
                                         .Include(x => x.salon)
@@ -137,7 +137,6 @@ namespace Infrastructures.Repositories
                                         .Include(b => b.Payments)
                                         .ThenInclude(b => b.PaymentStatus)
                                         .Include(b => b.ComboService)
-                                        .Include(x => x.Feedback)
                                         .ToListAsync();
         }
 
@@ -152,6 +151,15 @@ namespace Infrastructures.Repositories
             return await _dbContext.Set<Booking>()
             .Where(b => b.SalonId == salonId && b.BookingDate == bookingDate)
             .FirstOrDefaultAsync();
+        }
+
+        public async Task<Booking> GetBookingForStylistAsync(Guid bookingId)
+        {
+            return await _dbContext.Bookings.Where(x => x.BookingStatus == "Confirmed" || x.BookingStatus == "In Progress")
+                                        .Include(b => b.User)
+                                        .Include(b => b.ComboService)
+                                        .Include(b => b.salon)
+                                        .FirstOrDefaultAsync(b => b.Id == bookingId);
         }
     }
 }

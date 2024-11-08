@@ -618,7 +618,7 @@ namespace Application.Services
 
                 var booking = await _unitOfWork
                                         .BookingRepository
-                                        .GetBookingByIdAsync(request.BookingId);
+                                        .GetBookingForStylistAsync(request.BookingId);
 
                 if (booking == null)
                 {
@@ -959,7 +959,7 @@ namespace Application.Services
                 CustomerPhoneNumber = b.CustomerPhoneNumber,
                 StylistId = b.SalonMemberId,
                 StylistName = b.SalonMember?.User?.FullName ?? "Unknown Stylist",
-                Feedback = b.Feedback.Title,
+                Feedback = b.Feedback?.Title,
                 SalonName = b.salon.salonName,
                 Address = b.salon.Address,
                 ComboServiceName = b.ComboService == null ? null : new ComboServiceForBookingDTO

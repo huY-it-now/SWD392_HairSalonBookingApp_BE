@@ -25,5 +25,6 @@ namespace Application.Repositories
         Task<List<Booking>> GetBookingUncompletedNow(Guid userId);
         Task<bool> AnyAsync(Expression<Func<Booking, bool>> predicate);
         Task<Booking> GetBookingBySalonAndDateAsync(Guid salonId, DateTime bookingDate);
+        Task<Booking> GetBookingForStylistAsync(Guid bookingId);
     }
 }
