@@ -40,8 +40,9 @@ namespace Application.Interfaces
         Task<string> UserFeedback(FeedbackDTO request);
         Task<Result<object>> GetListFeedback();
 
-        Task<Result<object>> GetUserByEmailAsync(string email);
-        Task<Result<object>> CreateUserAsync(UserDTO userDto);
+        //Task<Result<object>> GetUserByEmailAsync(string email);
+        //Task<Result<object>> CreateUserAsync(UserDTO userDto);
+        //hide
 
     }
 }
