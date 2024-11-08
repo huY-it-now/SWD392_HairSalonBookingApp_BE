@@ -243,24 +243,24 @@ namespace WebApi.Controllers
             return Ok(result);
         }
 
-        [HttpPost("google-login")]
-        public async Task<IActionResult> GoogleLogin([FromBody] string firebaseToken)
-        {
-            var userId = await _googleAuthService.VerifyFirebaseTokenAsync(firebaseToken);
+        //[HttpPost("google-login")]
+        //public async Task<IActionResult> GoogleLogin([FromBody] string firebaseToken)
+        //{
+        //    var userId = await _googleAuthService.VerifyFirebaseTokenAsync(firebaseToken);
 
-            var userGuid = Guid.Parse(userId);
+        //    var userGuid = Guid.Parse(userId);
 
-            var user = await _userService.GetUserById(userGuid);
+        //    var user = await _userService.GetUserById(userGuid);
 
-            if (user == null)
-            {
-                // Nếu user chưa tồn tại trong database, tạo mới user
-                await _userService.CreateUserAsync(new UserDTO { Id = userGuid });
-            }
+        //    if (user == null)
+        //    {
+        //        // Nếu user chưa tồn tại trong database, tạo mới user
+        //        await _userService.CreateUserAsync(new UserDTO { Id = userGuid });
+        //    }
 
-            var systemToken = await _googleAuthService.GenerateSystemTokenAsync(userGuid.ToString());
-            return Ok(new { Token = systemToken });
-        }
+        //    var systemToken = await _googleAuthService.GenerateSystemTokenAsync(userGuid.ToString());
+        //    return Ok(new { Token = systemToken });
+        //}
 
         [HttpGet]
         public async Task<IActionResult> ViewBookingByUserId(Guid userId)
